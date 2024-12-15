@@ -27,7 +27,7 @@ const instructions = {
     79: "Spin around twice!",
 };
 
-let playerPosition = 1;
+let playerPosition = 1; // Player starts at square 1
 
 function drawBoard() {
     for (let i = 100; i > 0; i--) {
@@ -45,47 +45,102 @@ function drawSnakesAndLadders() {
     const boardBounds = board.getBoundingClientRect();
 
     function getCoords(squareNum) {
+        // Calculate the row and column based on the square number
         const row = Math.floor((squareNum - 1) / 10);
         const col = (squareNum - 1) % 10;
-        const x = col * 60 + 30;
+        const x = (row % 2 === 0 ? col : 9 - col) * 60 + 30; // Alternating row direction
         const y = 540 - row * 60 + 30;
         return { x, y };
     }
 
-    snakes.forEach(snake => drawLine(getCoords(snake.start), getCoords(snake.end), 'red'));
-    ladders.forEach(ladder => drawLine(getCoords(ladder.start), getCoords(ladder.end), 'green'));
+    // Draw snakes
+    snakes.forEach(snake => drawCurvyLine(getCoords(snake.start), getCoords(snake.end), 'red'));
+
+    // Draw ladders
+    ladders.forEach(ladder => drawStraightLine(getCoords(ladder.start), getCoords(ladder.end), 'green'));
 }
 
-function drawLine(start, end, color) {
+function drawStraightLine(start, end, color) {
     const line = document.createElement('div');
-    line.classList.add(color === 'red' ? 'snake-path' : 'ladder-line');
-    line.style.left = `${start.x}px`;
-    line.style.top = `${start.y}px`;
+    line.style.position = 'absolute';
+    line.style.backgroundColor = color;
+    line.style.zIndex = 1;
+    line.style.left = `${Math.min(start.x, end.x)}px`;
+    line.style.top = `${Math.min(start.y, end.y)}px`;
     line.style.width = `${Math.abs(end.x - start.x)}px`;
     line.style.height = `${Math.abs(end.y - start.y)}px`;
+    line.style.transform = `rotate(${Math.atan2(end.y - start.y, end.x - start.x)}rad)`;
     board.appendChild(line);
+}
+
+function drawCurvyLine(start, end, color) {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    const path = document.createElementNS(svgNS, "path");
+
+    const midX = (start.x + end.x) / 2;
+    const midY = (start.y + end.y) / 2 + 50; // Offset for curvature
+
+    path.setAttribute("d", `M${start.x},${start.y} Q${midX},${midY} ${end.x},${end.y}`);
+    path.setAttribute("stroke", color);
+    path.setAttribute("stroke-width", "4");
+    path.setAttribute("fill", "none");
+
+    svg.style.position = "absolute";
+    svg.style.left = "0";
+    svg.style.top = "0";
+    svg.style.width = "100%";
+    svg.style.height = "100%";
+    svg.appendChild(path);
+
+    board.appendChild(svg);
 }
 
 function movePlayer(to) {
     const coords = getCoords(to);
-    player.style.transform = `translate(${coords.x}px, ${coords.y}px)`;
+    player.style.transform = `translate(${coords.x - 10}px, ${coords.y - 10}px)`; // Adjust for dot size
 }
 
 function rollDice() {
     const dice = Math.floor(Math.random() * 6) + 1;
     const nextPosition = Math.min(100, playerPosition + dice);
+    const previousPosition = playerPosition;
     playerPosition = nextPosition;
-    movePlayer(playerPosition);
 
-    if (snakes.some(s => s.start === playerPosition)) {
-        const snake = snakes.find(s => s.start === playerPosition);
-        setTimeout(() => movePlayer(snake.end), 1000);
+    animatePlayer(previousPosition, playerPosition);
+
+    setTimeout(() => {
+        checkSpecialSquares();
+    }, 1000);
+}
+
+function checkSpecialSquares() {
+    const snake = snakes.find(s => s.start === playerPosition);
+    const ladder = ladders.find(l => l.start === playerPosition);
+
+    if (snake) {
+        animatePlayer(playerPosition, snake.end);
+        playerPosition = snake.end;
+    } else if (ladder) {
+        animatePlayer(playerPosition, ladder.end);
+        playerPosition = ladder.end;
+    }
+}
+
+function animatePlayer(from, to) {
+    const interval = 200;
+    let current = from;
+
+    function step() {
+        if (current === to) return;
+
+        current += (to > from ? 1 : -1);
+        movePlayer(current);
+
+        setTimeout(step, interval);
     }
 
-    if (ladders.some(l => l.start === playerPosition)) {
-        const ladder = ladders.find(l => l.start === playerPosition);
-        setTimeout(() => movePlayer(ladder.end), 1000);
-    }
+    step();
 }
 
 drawBoard();
