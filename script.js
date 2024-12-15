@@ -1,7 +1,7 @@
 const board = document.getElementById('board');
 const rollDiceBtn = document.getElementById('roll-dice');
 const diceResult = document.getElementById('dice-result');
-const playerTurn = document.getElementById('player-turn');
+const playerPositionDisplay = document.getElementById('player-position');
 const message = document.getElementById('message');
 
 const snakes = {
@@ -29,12 +29,7 @@ const ladders = {
     80: 100
 };
 
-let players = [
-    { name: 'Player 1', position: 0, class: 'player1' },
-    { name: 'Player 2', position: 0, class: 'player2' }
-];
-
-let currentPlayer = 0;
+let playerPosition = 0;
 let gameOver = false;
 
 // Initialize Board
@@ -46,73 +41,27 @@ function initBoard() {
         square.innerText = i;
         board.appendChild(square);
     }
-}
 
-// Update Player Position
-function updatePlayerPosition(player, newPos) {
-    // Remove player from old position
-    const oldSquare = document.getElementById(`square-${player.position}`);
-    if (oldSquare) {
-        const existingPlayer = oldSquare.querySelector(`.${player.class}`);
-        if (existingPlayer) {
-            existingPlayer.remove();
-        }
+    // Add visual representation for snakes and ladders
+    for (const [start, end] of Object.entries(snakes)) {
+        createPath(start, end, 'snake');
     }
 
-    player.position = newPos;
-
-    // Add player to new position
-    const newSquare = document.getElementById(`square-${player.position}`);
-    if (newSquare) {
-        const playerDiv = document.createElement('div');
-        playerDiv.classList.add('player', player.class);
-        newSquare.appendChild(playerDiv);
+    for (const [start, end] of Object.entries(ladders)) {
+        createPath(start, end, 'ladder');
     }
 }
 
-// Roll Dice
-function rollDice() {
-    if (gameOver) return;
+// Create Snake or Ladder Path
+function createPath(start, end, type) {
+    const startSquare = document.getElementById(`square-${start}`);
+    const endSquare = document.getElementById(`square-${end}`);
 
-    const dice = Math.floor(Math.random() * 6) + 1;
-    diceResult.innerText = `Dice: ${dice}`;
+    if (startSquare && endSquare) {
+        const path = document.createElement('div');
+        path.classList.add(type);
 
-    let newPos = players[currentPlayer].position + dice;
-    if (newPos > 100) newPos = 100;
+        const startRect = startSquare.getBoundingClientRect();
+        const endRect = endSquare.getBoundingClientRect();
 
-    // Check for snakes or ladders
-    if (snakes[newPos]) {
-        message.innerText = `${players[currentPlayer].name} got bitten by a snake! Moving down to ${snakes[newPos]}`;
-        newPos = snakes[newPos];
-    } else if (ladders[newPos]) {
-        message.innerText = `${players[currentPlayer].name} climbed a ladder! Moving up to ${ladders[newPos]}`;
-        newPos = ladders[newPos];
-    } else {
-        message.innerText = '';
-    }
-
-    updatePlayerPosition(players[currentPlayer], newPos);
-
-    if (newPos === 100) {
-        message.innerText = `${players[currentPlayer].name} wins!`;
-        gameOver = true;
-        rollDiceBtn.disabled = true;
-        return;
-    }
-
-    // Switch to next player
-    currentPlayer = (currentPlayer + 1) % players.length;
-    playerTurn.innerText = `${players[currentPlayer].name}'s Turn`;
-}
-
-// Start Game
-function startGame() {
-    initBoard();
-    players.forEach(player => updatePlayerPosition(player, 0));
-    playerTurn.innerText = `${players[currentPlayer].name}'s Turn`;
-}
-
-rollDiceBtn.addEventListener('click', rollDice);
-
-// Initialize the game on page load
-window.onload = startGame;
+        path.style.left = `${Math.min(start
