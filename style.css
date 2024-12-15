@@ -4,6 +4,10 @@ body {
     background-color: #f0f0f0;
 }
 
+h1 {
+    margin-top: 20px;
+}
+
 #game-container {
     display: flex;
     justify-content: center;
@@ -17,7 +21,6 @@ body {
     grid-template-rows: repeat(10, 60px);
     gap: 2px;
     background-color: #333;
-    padding: 5px;
     position: relative;
 }
 
@@ -25,33 +28,39 @@ body {
     width: 60px;
     height: 60px;
     background-color: #fff;
-    position: relative;
-    font-size: 12px;
+    border: 1px solid #ccc;
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid #ccc;
+    position: relative;
+    font-size: 12px;
+    text-align: center;
 }
 
-.snake {
-    background-color: rgba(255, 0, 0, 0.3);
+.snake-line {
     position: absolute;
+    width: 2px;
+    background-color: red;
     z-index: 1;
+    transform-origin: top left;
 }
 
-.ladder {
-    background-color: rgba(0, 255, 0, 0.3);
+.ladder-line {
     position: absolute;
+    width: 2px;
+    background-color: green;
     z-index: 1;
+    transform-origin: top left;
 }
 
 .player {
     width: 20px;
     height: 20px;
-    border-radius: 50%;
     background-color: blue;
+    border-radius: 50%;
     position: absolute;
     z-index: 2;
+    transition: transform 0.5s ease;
 }
 
 #controls {
@@ -64,7 +73,7 @@ button {
     font-size: 16px;
 }
 
-#dice-result, #player-position, #message {
+#dice-result, #player-position, #instructions, #message {
     margin-top: 10px;
     font-size: 18px;
 }
