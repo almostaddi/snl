@@ -1,155 +1,80 @@
-const board = document.getElementById("board");
-const rollDiceBtn = document.getElementById("roll-dice");
-const diceResult = document.getElementById("dice-result");
-const playerPositionDisplay = document.getElementById("player-position");
-const instructionsDisplay = document.getElementById("instructions");
-const message = document.getElementById("message");
+const board = document.getElementById('board');
+const player = document.createElement('div');
+player.classList.add('player');
+board.appendChild(player);
 
-const snakes = {
-    16: 6,
-    47: 26,
-    49: 11,
-    56: 53,
-    62: 19,
-    64: 60,
-    87: 24,
-    93: 73,
-    95: 75,
-    98: 78
-};
-
-const ladders = {
-    1: 38,
-    4: 14,
-    9: 31,
-    21: 42,
-    28: 84,
-    36: 44,
-    51: 67,
-    71: 91,
-    80: 100
-};
-
-const instructions = [
-    "Clap your hands 10 times",
-    "Spin in a circle",
-    "Touch your toes",
-    "Say your favorite color",
-    "Jump 5 times",
-    "Do 3 push-ups",
-    "Sing a song",
-    "Snap your fingers 5 times",
-    "Wave to the nearest person"
+const snakes = [
+    { start: 17, end: 7 },
+    { start: 54, end: 34 },
+    { start: 62, end: 19 },
+    { start: 98, end: 79 },
 ];
 
-let playerPosition = 0;
-let gameOver = false;
+const ladders = [
+    { start: 3, end: 22 },
+    { start: 6, end: 25 },
+    { start: 20, end: 59 },
+    { start: 36, end: 55 },
+    { start: 63, end: 95 },
+    { start: 68, end: 91 },
+];
 
-// Initialize Board
-function initBoard() {
-    for (let i = 100; i >= 1; i--) {
-        const square = document.createElement("div");
-        square.classList.add("square");
-        square.id = `square-${i}`;
-        square.innerHTML = `<div>${i}</div>`;
+const instructions = {
+    1: "Clap your hands 10 times!",
+    7: "Do 5 jumping jacks!",
+    22: "Say 'Hello!' to everyone.",
+    34: "Hop on one foot 3 times!",
+    79: "Spin around twice!",
+};
+
+let playerPosition = 1;
+
+function drawBoard() {
+    for (let i = 100; i > 0; i--) {
+        const square = document.createElement('div');
+        square.classList.add('square');
+        square.innerText = i;
+        if (instructions[i]) {
+            square.innerText += `\n(${instructions[i]})`;
+        }
         board.appendChild(square);
     }
-
-    drawSnakesAndLadders();
 }
 
-// Draw Snakes and Ladders
 function drawSnakesAndLadders() {
-    for (const [start, end] of Object.entries(snakes)) {
-        drawLine(start, end, "snake-line");
+    const boardBounds = board.getBoundingClientRect();
+
+    function getCoords(squareNum) {
+        const row = Math.floor((squareNum - 1) / 10);
+        const col = (squareNum - 1) % 10;
+        const x = col * 60 + 30;
+        const y = 540 - row * 60 + 30;
+        return { x, y };
     }
-    for (const [start, end] of Object.entries(ladders)) {
-        drawLine(start, end, "ladder-line");
-    }
+
+    snakes.forEach(snake => drawLine(getCoords(snake.start), getCoords(snake.end), 'red'));
+    ladders.forEach(ladder => drawLine(getCoords(ladder.start), getCoords(ladder.end), 'green'));
 }
 
-function drawLine(start, end, className) {
-    const startSquare = document.getElementById(`square-${start}`);
-    const endSquare = document.getElementById(`square-${end}`);
-    const startRect = startSquare.getBoundingClientRect();
-    const endRect = endSquare.getBoundingClientRect();
-    const line = document.createElement("div");
-
-    line.classList.add(className);
-    line.style.left = `${startRect.left - board.offsetLeft + 30}px`;
-    line.style.top = `${startRect.top - board.offsetTop + 30}px`;
-    line.style.height = `${Math.abs(startRect.top - endRect.top)}px`;
-    line.style.transform = `rotate(${Math.atan2(endRect.top - startRect.top, endRect.left - startRect.left) * (180 / Math.PI)}deg)`;
-
+function drawLine(start, end, color) {
+    const line = document.createElement('div');
+    line.classList.add(color === 'red' ? 'snake-path' : 'ladder-line');
+    line.style.left = `${start.x}px`;
+    line.style.top = `${start.y}px`;
+    line.style.width = `${Math.abs(end.x - start.x)}px`;
+    line.style.height = `${Math.abs(end.y - start.y)}px`;
     board.appendChild(line);
 }
 
-// Move Player Gradually
-async function movePlayer(newPosition) {
-    const steps = Math.abs(newPosition - playerPosition);
-    const stepDirection = newPosition > playerPosition ? 1 : -1;
-
-    for (let i = 1; i <= steps; i++) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        playerPosition += stepDirection;
-        updatePlayerPosition();
-    }
+function movePlayer(to) {
+    const coords = getCoords(to);
+    player.style.transform = `translate(${coords.x}px, ${coords.y}px)`;
 }
 
-function updatePlayerPosition() {
-    const oldSquare = document.querySelector(".player");
-    if (oldSquare) oldSquare.remove();
-
-    const square = document.getElementById(`square-${playerPosition}`);
-    if (square) {
-        const player = document.createElement("div");
-        player.classList.add("player");
-        square.appendChild(player);
-    }
-
-    playerPositionDisplay.textContent = `Position: ${playerPosition}`;
-}
-
-// Roll Dice
 function rollDice() {
-    if (gameOver) return;
-
     const dice = Math.floor(Math.random() * 6) + 1;
-    diceResult.textContent = `Dice: ${dice}`;
+    const nextPosition = Math.min(100, playerPosition + dice);
+    playerPosition = nextPosition;
+    movePlayer(playerPosition);
 
-    let newPosition = playerPosition + dice;
-    if (newPosition > 100) newPosition = 100;
-
-    if (snakes[newPosition]) {
-        message.textContent = `Oh no! Snake down to ${snakes[newPosition]}`;
-        newPosition = snakes[newPosition];
-    } else if (ladders[newPosition]) {
-        message.textContent = `Great! Ladder up to ${ladders[newPosition]}`;
-        newPosition = ladders[newPosition];
-    } else {
-        message.textContent = "";
-    }
-
-    movePlayer(newPosition).then(() => {
-        if (newPosition === 100) {
-            message.textContent = "Congratulations! You win!";
-            gameOver = true;
-            rollDiceBtn.disabled = true;
-        } else {
-            instructionsDisplay.textContent = getInstruction();
-        }
-    });
-}
-
-function getInstruction() {
-    return instructions[Math.floor(Math.random() * instructions.length)];
-}
-
-// Initialize Game
-function startGame() {
-    initBoard();
-    updatePlayerPosition();
-}
-
-rollDiceBtn.addEventListener("click", rollDice);
-window.onload = startGame;
+    if (snakes.some(s => s.start === player
