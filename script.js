@@ -77,4 +77,17 @@ function rollDice() {
     playerPosition = nextPosition;
     movePlayer(playerPosition);
 
-    if (snakes.some(s => s.start === player
+    if (snakes.some(s => s.start === playerPosition)) {
+        const snake = snakes.find(s => s.start === playerPosition);
+        setTimeout(() => movePlayer(snake.end), 1000);
+    }
+
+    if (ladders.some(l => l.start === playerPosition)) {
+        const ladder = ladders.find(l => l.start === playerPosition);
+        setTimeout(() => movePlayer(ladder.end), 1000);
+    }
+}
+
+drawBoard();
+drawSnakesAndLadders();
+movePlayer(1);
