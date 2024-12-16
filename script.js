@@ -35,19 +35,7 @@ const ladders = {
     78: 99
 };
 
-const instructionsList = {
-    1: { text: "Start your journey!", img: "https://via.placeholder.com/50/0000FF/808080?text=Start" },
-    2: { text: "Clap your hands 10 times.", img: "https://via.placeholder.com/50/0000FF/808080?text=Clap" },
-    3: { text: "Jump 3 times.", img: "https://via.placeholder.com/50/0000FF/808080?text=Jump" },
-    4: { text: "Do a little dance.", img: "https://via.placeholder.com/50/0000FF/808080?text=Dance" },
-    5: { text: "Spin around once.", img: "https://via.placeholder.com/50/0000FF/808080?text=Spin" },
-    6: { text: "Say 'Hello!' to everyone.", img: "https://via.placeholder.com/50/0000FF/808080?text=Hello" },
-    7: { text: "Take a deep breath.", img: "https://via.placeholder.com/50/0000FF/808080?text=Breath" },
-    8: { text: "Touch your toes.", img: "https://via.placeholder.com/50/0000FF/808080?text=Toes" },
-    9: { text: "Hop like a bunny.", img: "https://via.placeholder.com/50/0000FF/808080?text=Hop" },
-    10: { text: "Run in place for 10 seconds.", img: "https://via.placeholder.com/50/0000FF/808080?text=Run" },
-    // Add more squares with unique instructions
-};
+let instructionsList = {};  // Initially empty, will be loaded from the JSON file
 
 let playerPosition = 1;
 let isMoving = false;
@@ -65,6 +53,14 @@ function createBoard() {
             square.id = `square-${currentNumber}`;
             square.style.gridRow = boardSize - row;
             square.style.gridColumn = actualCol + 1;
+
+            // Add the ladder or snake color
+            if (snakes[currentNumber]) {
+                square.classList.add('snake');
+            } else if (ladders[currentNumber]) {
+                square.classList.add('ladder');
+            }
+
             board.appendChild(square);
 
             if (currentNumber === 1) {
@@ -76,6 +72,7 @@ function createBoard() {
         reverse = !reverse;
     }
 }
+
 
 function animatePlayer(start, end, callback, instant = false) {
     if (instant) {
@@ -99,6 +96,8 @@ function animatePlayer(start, end, callback, instant = false) {
     }, 200);
 }
 
+
+
 function rollDice() {
     rollDiceButton.disabled = true;
 
@@ -119,17 +118,28 @@ function rollDice() {
 
     const isSnake = snakes[nextPosition];
     const isLadder = ladders[nextPosition];
-    const finalPosition = isSnake || isLadder || nextPosition;
+    const finalPosition = isSnake || isLadder ? (isSnake || isLadder) : nextPosition;
 
+    // First display the instruction for the square the player is landing on
     animatePlayer(playerPosition, nextPosition, () => {
         playerPosition = nextPosition;
+
+        // Display instruction for the square the player lands on
+        instructions.textContent = `You landed on ${nextPosition}.`;
+        displayInstruction(nextPosition);  // Show the instruction for the square
+
+        let additionalMessage = '';
+        let imageHtml = '';
 
         if (isSnake || isLadder) {
             const message = isSnake
                 ? `Oops! You landed on a snake. Sliding down to ${finalPosition}.`
                 : `Great! You found a ladder. Climbing up to ${finalPosition}.`;
 
-            instructions.textContent = message;
+            additionalMessage = message; // Save the snake/ladder message
+
+            // Immediately display the snake/ladder message along with the regular instruction on a new line
+            instructions.innerHTML += ` <br><strong>${additionalMessage}</strong>${imageHtml}`;
 
             // Add the "Continue" button
             document.body.appendChild(continueButton);
@@ -138,19 +148,17 @@ function rollDice() {
             // Wait for user to press the Continue button
             continueButton.onclick = () => {
                 continueButton.style.display = "none";
-                instructions.textContent = `You landed on ${finalPosition}.`;
-
+                // Move the player to the final position after snake or ladder
                 animatePlayer(nextPosition, finalPosition, () => {
                     playerPosition = finalPosition;
-                    displayInstruction(finalPosition);
+
+                    // After moving, display the instruction for the square after landing
+                    instructions.innerHTML = `<div><strong>You landed on ${finalPosition}.</strong></div>`;
+                    displayInstruction(finalPosition);  // Ensure the instruction for the new square is shown
                     rollDiceButton.disabled = false;
                 }, true);
             };
         } else {
-            instructions.textContent = `You landed on ${finalPosition}.`;
-
-            displayInstruction(finalPosition);
-
             if (playerPosition !== 100) {
                 rollDiceButton.disabled = false;
             }
@@ -168,8 +176,19 @@ function displayInstruction(square) {
     }
 }
 
+function loadInstructions() {
+    fetch('instructions.json')
+        .then(response => response.json())
+        .then(data => {
+            instructionsList = data;
+            displayInstruction(1); // Display instruction for square 1 after loading
+        })
+        .catch(error => {
+            console.error('Error loading instructions:', error);
+        });
+}
+
 rollDiceButton.addEventListener('click', rollDice);
 
 createBoard();
-// Display instruction for square 1 when the page loads
-displayInstruction(1);
+loadInstructions();  // Load the instructions after the page loads
