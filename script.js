@@ -166,6 +166,7 @@ function rollDice() {
     });
 }
 
+
 function displayInstruction(square) {
     const instruction = instructionsList[square];
     if (instruction) {
