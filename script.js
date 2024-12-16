@@ -1,148 +1,175 @@
 const board = document.getElementById('board');
+const diceResult = document.getElementById('diceResult');
+const instructions = document.getElementById('instructions');
+const rollDiceButton = document.getElementById('rollDice');
+const continueButton = document.createElement('button');
+continueButton.id = "continueButton";
+continueButton.textContent = "Continue";
+
+const boardSize = 10;
+const totalSquares = boardSize * boardSize;
 const player = document.createElement('div');
 player.classList.add('player');
-board.appendChild(player);
 
-const snakes = [
-    { start: 17, end: 7 },
-    { start: 54, end: 34 },
-    { start: 62, end: 19 },
-    { start: 98, end: 79 },
-];
-
-const ladders = [
-    { start: 3, end: 22 },
-    { start: 6, end: 25 },
-    { start: 20, end: 59 },
-    { start: 36, end: 55 },
-    { start: 63, end: 95 },
-    { start: 68, end: 91 },
-];
-
-const instructions = {
-    1: "Clap your hands 10 times!",
-    7: "Do 5 jumping jacks!",
-    22: "Say 'Hello!' to everyone.",
-    34: "Hop on one foot 3 times!",
-    79: "Spin around twice!",
+const snakes = {
+    16: 6,
+    47: 26,
+    49: 11,
+    56: 53,
+    62: 19,
+    87: 24,
+    93: 73,
+    95: 75,
+    98: 78
 };
 
-let playerPosition = 1; // Player starts at square 1
+const ladders = {
+    3: 22,
+    8: 30,
+    15: 44,
+    21: 42,
+    28: 76,
+    36: 57,
+    51: 67,
+    71: 92,
+    78: 99
+};
 
-function drawBoard() {
-    for (let i = 100; i > 0; i--) {
-        const square = document.createElement('div');
-        square.classList.add('square');
-        square.innerText = i;
-        if (instructions[i]) {
-            square.innerText += `\n(${instructions[i]})`;
+const instructionsList = {
+    1: { text: "Start your journey!", img: "https://via.placeholder.com/50/0000FF/808080?text=Start" },
+    2: { text: "Clap your hands 10 times.", img: "https://via.placeholder.com/50/0000FF/808080?text=Clap" },
+    3: { text: "Jump 3 times.", img: "https://via.placeholder.com/50/0000FF/808080?text=Jump" },
+    4: { text: "Do a little dance.", img: "https://via.placeholder.com/50/0000FF/808080?text=Dance" },
+    5: { text: "Spin around once.", img: "https://via.placeholder.com/50/0000FF/808080?text=Spin" },
+    6: { text: "Say 'Hello!' to everyone.", img: "https://via.placeholder.com/50/0000FF/808080?text=Hello" },
+    7: { text: "Take a deep breath.", img: "https://via.placeholder.com/50/0000FF/808080?text=Breath" },
+    8: { text: "Touch your toes.", img: "https://via.placeholder.com/50/0000FF/808080?text=Toes" },
+    9: { text: "Hop like a bunny.", img: "https://via.placeholder.com/50/0000FF/808080?text=Hop" },
+    10: { text: "Run in place for 10 seconds.", img: "https://via.placeholder.com/50/0000FF/808080?text=Run" },
+    // Add more squares with unique instructions
+};
+
+let playerPosition = 1;
+let isMoving = false;
+
+function createBoard() {
+    let reverse = false;
+    let currentNumber = 1;
+
+    for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+            const actualCol = reverse ? boardSize - col - 1 : col;
+            const square = document.createElement('div');
+            square.classList.add('square');
+            square.textContent = currentNumber;
+            square.id = `square-${currentNumber}`;
+            square.style.gridRow = boardSize - row;
+            square.style.gridColumn = actualCol + 1;
+            board.appendChild(square);
+
+            if (currentNumber === 1) {
+                square.appendChild(player);
+            }
+
+            currentNumber++;
         }
-        board.appendChild(square);
+        reverse = !reverse;
     }
 }
 
-function drawSnakesAndLadders() {
-    const boardBounds = board.getBoundingClientRect();
-
-    function getCoords(squareNum) {
-        // Calculate the row and column based on the square number
-        const row = Math.floor((squareNum - 1) / 10);
-        const col = (squareNum - 1) % 10;
-        const x = (row % 2 === 0 ? col : 9 - col) * 60 + 30; // Alternating row direction
-        const y = 540 - row * 60 + 30;
-        return { x, y };
+function animatePlayer(start, end, callback, instant = false) {
+    if (instant) {
+        const targetSquare = document.getElementById(`square-${end}`);
+        targetSquare.appendChild(player);
+        if (callback) callback();
+        return;
     }
 
-    // Draw snakes
-    snakes.forEach(snake => drawCurvyLine(getCoords(snake.start), getCoords(snake.end), 'red'));
+    let current = start;
+    const step = current < end ? 1 : -1;
+    const interval = setInterval(() => {
+        current += step;
+        const currentSquare = document.getElementById(`square-${current}`);
+        currentSquare.appendChild(player);
 
-    // Draw ladders
-    ladders.forEach(ladder => drawStraightLine(getCoords(ladder.start), getCoords(ladder.end), 'green'));
-}
-
-function drawStraightLine(start, end, color) {
-    const line = document.createElement('div');
-    line.style.position = 'absolute';
-    line.style.backgroundColor = color;
-    line.style.zIndex = 1;
-    line.style.left = `${Math.min(start.x, end.x)}px`;
-    line.style.top = `${Math.min(start.y, end.y)}px`;
-    line.style.width = `${Math.abs(end.x - start.x)}px`;
-    line.style.height = `${Math.abs(end.y - start.y)}px`;
-    line.style.transform = `rotate(${Math.atan2(end.y - start.y, end.x - start.x)}rad)`;
-    board.appendChild(line);
-}
-
-function drawCurvyLine(start, end, color) {
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    const path = document.createElementNS(svgNS, "path");
-
-    const midX = (start.x + end.x) / 2;
-    const midY = (start.y + end.y) / 2 + 50; // Offset for curvature
-
-    path.setAttribute("d", `M${start.x},${start.y} Q${midX},${midY} ${end.x},${end.y}`);
-    path.setAttribute("stroke", color);
-    path.setAttribute("stroke-width", "4");
-    path.setAttribute("fill", "none");
-
-    svg.style.position = "absolute";
-    svg.style.left = "0";
-    svg.style.top = "0";
-    svg.style.width = "100%";
-    svg.style.height = "100%";
-    svg.appendChild(path);
-
-    board.appendChild(svg);
-}
-
-function movePlayer(to) {
-    const coords = getCoords(to);
-    player.style.transform = `translate(${coords.x - 10}px, ${coords.y - 10}px)`; // Adjust for dot size
+        if (current === end) {
+            clearInterval(interval);
+            if (callback) callback();
+        }
+    }, 200);
 }
 
 function rollDice() {
-    const dice = Math.floor(Math.random() * 6) + 1;
-    const nextPosition = Math.min(100, playerPosition + dice);
-    const previousPosition = playerPosition;
-    playerPosition = nextPosition;
+    rollDiceButton.disabled = true;
 
-    animatePlayer(previousPosition, playerPosition);
+    const diceRoll = Math.floor(Math.random() * 6) + 1;
+    diceResult.textContent = `Dice: ${diceRoll}`;
 
-    setTimeout(() => {
-        checkSpecialSquares();
-    }, 1000);
+    let nextPosition = playerPosition + diceRoll;
+    if (nextPosition > totalSquares) nextPosition = totalSquares;
+
+    if (nextPosition === 100) {
+        animatePlayer(playerPosition, nextPosition, () => {
+            playerPosition = nextPosition;
+            instructions.textContent = "Congratulations! You reached the final square!";
+            rollDiceButton.disabled = true;
+        });
+        return;
+    }
+
+    const isSnake = snakes[nextPosition];
+    const isLadder = ladders[nextPosition];
+    const finalPosition = isSnake || isLadder || nextPosition;
+
+    animatePlayer(playerPosition, nextPosition, () => {
+        playerPosition = nextPosition;
+
+        if (isSnake || isLadder) {
+            const message = isSnake
+                ? `Oops! You landed on a snake. Sliding down to ${finalPosition}.`
+                : `Great! You found a ladder. Climbing up to ${finalPosition}.`;
+
+            instructions.textContent = message;
+
+            // Add the "Continue" button
+            document.body.appendChild(continueButton);
+            continueButton.style.display = "block";
+
+            // Wait for user to press the Continue button
+            continueButton.onclick = () => {
+                continueButton.style.display = "none";
+                instructions.textContent = `You landed on ${finalPosition}.`;
+
+                animatePlayer(nextPosition, finalPosition, () => {
+                    playerPosition = finalPosition;
+                    displayInstruction(finalPosition);
+                    rollDiceButton.disabled = false;
+                }, true);
+            };
+        } else {
+            instructions.textContent = `You landed on ${finalPosition}.`;
+
+            displayInstruction(finalPosition);
+
+            if (playerPosition !== 100) {
+                rollDiceButton.disabled = false;
+            }
+        }
+    });
 }
 
-function checkSpecialSquares() {
-    const snake = snakes.find(s => s.start === playerPosition);
-    const ladder = ladders.find(l => l.start === playerPosition);
-
-    if (snake) {
-        animatePlayer(playerPosition, snake.end);
-        playerPosition = snake.end;
-    } else if (ladder) {
-        animatePlayer(playerPosition, ladder.end);
-        playerPosition = ladder.end;
+function displayInstruction(square) {
+    const instruction = instructionsList[square];
+    if (instruction) {
+        instructions.innerHTML = `
+            <div><img src="${instruction.img}" class="instruction-image" alt="Instruction"></div>
+            <div class="instruction-text">${instruction.text}</div>
+        `;
     }
 }
 
-function animatePlayer(from, to) {
-    const interval = 200;
-    let current = from;
+rollDiceButton.addEventListener('click', rollDice);
 
-    function step() {
-        if (current === to) return;
-
-        current += (to > from ? 1 : -1);
-        movePlayer(current);
-
-        setTimeout(step, interval);
-    }
-
-    step();
-}
-
-drawBoard();
-drawSnakesAndLadders();
-movePlayer(1);
+createBoard();
+// Display instruction for square 1 when the page loads
+displayInstruction(1);
