@@ -52,6 +52,7 @@ body {
 
 .instruction-image {
     margin-right: 10px;
+    width: 90%; 
 }
 
 .instruction-text {
