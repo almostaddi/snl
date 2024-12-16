@@ -37,7 +37,7 @@ const ladders = {
 
 let instructionsList = {};  // Initially empty, will be loaded from the JSON file
 
-let playerPosition = 1;
+let playerPosition = 0; // Start the player off the board
 let isMoving = false;
 
 function createBoard() {
@@ -62,11 +62,6 @@ function createBoard() {
             }
 
             board.appendChild(square);
-
-            if (currentNumber === 1) {
-                square.appendChild(player);
-            }
-
             currentNumber++;
         }
         reverse = !reverse;
@@ -95,7 +90,6 @@ function animatePlayer(start, end, callback, instant = false) {
         }
     }, 200);
 }
-
 
 
 function rollDice() {
