@@ -12,27 +12,23 @@ const player = document.createElement('div');
 player.classList.add('player');
 
 const snakes = {
-    16: 6,
-    47: 26,
-    49: 11,
-    56: 53,
-    62: 19,
-    87: 24,
-    93: 73,
-    95: 75,
-    98: 78
+    32: 10,
+    36: 6,
+    48: 26,
+    88: 24,
+    95: 56,
+    97: 78
 };
 
 const ladders = {
-    3: 22,
+    1: 38,
+    4: 14,
     8: 30,
-    15: 44,
     21: 42,
-    28: 76,
-    36: 57,
-    51: 67,
+    28: 74,
+    50: 67,
     71: 92,
-    78: 99
+    80: 99
 };
 
 let instructionsList = {};  // Initially empty, will be loaded from the JSON file
