@@ -69,7 +69,6 @@ function createBoard() {
     }
 }
 
-
 function animatePlayer(start, end, callback, instant = false) {
     if (instant) {
         const targetSquare = document.getElementById(`square-${end}`);
@@ -92,99 +91,163 @@ function animatePlayer(start, end, callback, instant = false) {
     }, 200);
 }
 
+function loadInstructions(selectedSets) {
+    const instructionPromises = selectedSets.map(set => {
+        return fetch(`${set}.json`) // Load the JSON for each selected set
+            .then(response => response.json())
+            .catch(error => {
+                console.error(`Error loading ${set}:`, error);
+                return {};  // Return an empty object if there's an error
+            });
+    });
 
-function rollDice() {
-    rollDiceButton.disabled = true;
+    // Wait for all instruction sets to be loaded
+    Promise.all(instructionPromises).then(instructionData => {
+        // Flatten the instructions from all sets into a single array
+        const allInstructions = instructionData.reduce((acc, data) => {
+            return acc.concat(Object.values(data));  // Flatten the instructions into one array
+        }, []);
 
-    const diceRoll = Math.floor(Math.random() * 6) + 1;
-    diceResult.textContent = `Dice: ${diceRoll}`;
+// After loading, display a random instruction
+displayRandomInstruction(allInstructions);  // Pass all instructions to display a random one
+    });
+}
 
-    let nextPosition = playerPosition + diceRoll;
-    if (nextPosition > totalSquares) nextPosition = totalSquares;
 
-    if (nextPosition === 100) {
-        animatePlayer(playerPosition, nextPosition, () => {
-            playerPosition = nextPosition;
-            instructions.textContent = "Congratulations! You reached the final square!";
-            rollDiceButton.disabled = true;
-        });
+function getSelectedInstructionSets() {
+    // Get the IDs of the selected checkboxes (checkbox IDs should correspond to the JSON filenames)
+    return Array.from(document.querySelectorAll('.dropdown-content input[type="checkbox"]:checked'))
+        .map(checkbox => checkbox.id);  // Get the id of each checked checkbox (e.g., 'instructionSet1', 'instructionSet2', etc.)
+}
+
+
+// Display a random instruction from the loaded instruction sets
+function displayRandomInstruction(instructionsList) {
+    if (instructionsList.length === 0) {
+        instructions.innerHTML = '<div><strong>No instructions available!</strong></div>';
         return;
     }
 
+    // Pick a random instruction from the merged list
+    const randomInstruction = instructionsList[Math.floor(Math.random() * instructionsList.length)];
+
+    // Display the random instruction text and image
+    instructions.innerHTML = `<div>${randomInstruction.text}</div>`;
+    instructions.innerHTML += `<img src="${randomInstruction.img}" alt="Instruction Image" />`;
+}
+
+
+
+function rollDice() {
+    rollDiceButton.disabled = true;  // Disable the button immediately
+    document.querySelector('.dropdown-btn').style.display = 'none';  // Hide the button
+
+    const diceRoll = Math.floor(Math.random() * 6) + 1;  // Roll a 6-sided die
+    diceResult.textContent = `Dice: ${diceRoll}`;  // Display the dice result
+
+    let nextPosition = playerPosition + diceRoll;
+    if (nextPosition > totalSquares) nextPosition = totalSquares;  // Prevent going beyond the last square
+
+    let finalPosition = nextPosition;
+    let showContinueButton = false;
+
     const isSnake = snakes[nextPosition];
     const isLadder = ladders[nextPosition];
-    const finalPosition = isSnake || isLadder ? (isSnake || isLadder) : nextPosition;
 
-    // First display the instruction for the square the player is landing on
+    if (isSnake || isLadder) {
+        finalPosition = isSnake ? snakes[nextPosition] : ladders[nextPosition];
+        showContinueButton = true;  // Show the Continue button if there's a snake/ladder
+    }
+
+    // Animate player move to the new square
     animatePlayer(playerPosition, nextPosition, () => {
         playerPosition = nextPosition;
 
-        // Display instruction for the square the player lands on
-        instructions.textContent = `You landed on ${nextPosition}.`;
-        displayInstruction(nextPosition);  // Show the instruction for the square
+        // Load instructions based on the new position
+        const selectedSets = getSelectedInstructionSets();
+        if (selectedSets.length > 0) {
+            loadInstructions(selectedSets);
+        } else {
+            instructions.innerHTML = '<div><strong>No instruction sets selected!</strong></div>';
+        }
 
-        let additionalMessage = '';
-        let imageHtml = '';
-
-        if (isSnake || isLadder) {
-            const message = isSnake
-                ? `Oops! You landed on a snake. Sliding down to ${finalPosition}.`
-                : `Great! You found a ladder. Climbing up to ${finalPosition}.`;
-
-            additionalMessage = message; // Save the snake/ladder message
-
-            // Immediately display the snake/ladder message along with the regular instruction on a new line
-            instructions.innerHTML += ` <br><strong>${additionalMessage}</strong>${imageHtml}`;
-
-            // Add the "Continue" button
+        // Handle "Continue" Button visibility and action
+        if (showContinueButton) {
             document.body.appendChild(continueButton);
-            continueButton.style.display = "block";
+            continueButton.style.display = "block";  // Show the Continue button
 
-            // Wait for user to press the Continue button
             continueButton.onclick = () => {
-                continueButton.style.display = "none";
-                // Move the player to the final position after snake or ladder
+                continueButton.style.display = "none";  // Hide after click
+
+                // Animate player to the final position after "Continue" click
                 animatePlayer(nextPosition, finalPosition, () => {
                     playerPosition = finalPosition;
+                    // Re-enable the dice button
+                    rollDiceButton.disabled = false;    
 
-                    // After moving, display the instruction for the square after landing
+                    // Display the instruction for the final square
                     instructions.innerHTML = `<div><strong>You landed on ${finalPosition}.</strong></div>`;
-                    displayInstruction(finalPosition);  // Ensure the instruction for the new square is shown
-                    rollDiceButton.disabled = false;
-                }, true);
+                    displayRandomInstruction(finalPosition);  // Show instruction for final square
+                }, true);  // Animate final position
             };
         } else {
-            if (playerPosition !== 100) {
-                rollDiceButton.disabled = false;
-            }
+            // Re-enable the dice button if no snake/ladder
+            rollDiceButton.disabled = false;
         }
     });
 }
 
 
-function displayInstruction(square) {
-    const instruction = instructionsList[square];
-    if (instruction) {
-        instructions.innerHTML = `
-            <div><img src="${instruction.img}" class="instruction-image" alt="Instruction"></div>
-            <div class="instruction-text">${instruction.text}</div>
-        `;
+
+
+// Dropdown logic
+document.querySelector('.dropdown-btn').addEventListener('click', function(event) {
+    const dropdownContent = document.querySelector('.dropdown-content');
+    
+    // Toggle the display property of the dropdown content
+    dropdownContent.style.display = (dropdownContent.style.display === 'block') ? 'none' : 'block';
+    
+    // Prevent the click event from propagating to the document
+    event.stopPropagation();
+});
+
+document.addEventListener('click', function(event) {
+    const dropdownContent = document.querySelector('.dropdown-content');
+    const dropdownButton = document.querySelector('.dropdown-btn');
+    
+    // If the click was outside the dropdown and the button, close the dropdown
+    if (!dropdownContent.contains(event.target) && !dropdownButton.contains(event.target)) {
+        dropdownContent.style.display = 'none';
+    }
+});
+
+// Get the modal
+var modal = document.getElementById("patchNotesModal");
+
+// Get the button that opens the modal
+var btn = document.getElementById("patchNotesBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close-btn")[0];
+
+// When the user clicks the button, open the modal
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
     }
 }
 
-function loadInstructions() {
-    fetch('instructions.json')
-        .then(response => response.json())
-        .then(data => {
-            instructionsList = data;
-            displayInstruction(1); // Display instruction for square 1 after loading
-        })
-        .catch(error => {
-            console.error('Error loading instructions:', error);
-        });
-}
 
 rollDiceButton.addEventListener('click', rollDice);
 
 createBoard();
-loadInstructions();  // Load the instructions after the page loads
