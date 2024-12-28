@@ -136,9 +136,14 @@ function displayRandomInstruction(instructionsList) {
     instructions.innerHTML += `<img src="${randomInstruction.img}" alt="Instruction Image" />`;
 }
 
+function playDiceRollSound() {
+    const audio = new Audio('assets/dice.mp3');  // Replace with the actual path to your dice sound
+    audio.play();
+}
 
 
 function rollDice() {
+    playDiceRollSound();  // Play the dice roll sound
     rollDiceButton.disabled = true;  // Disable the button immediately
     document.querySelector('.dropdown-btn').style.display = 'none';  // Hide the button
 
