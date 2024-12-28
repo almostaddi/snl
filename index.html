@@ -3,16 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sexy Snakes and Ladders</title>
+    <title>Snakes and Ladders</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Snakes and Ladders</h1>
+    <h1>Sexy Snakes and Ladders</h1>
     <div id="board"></div>
     <button id="rollDice">Roll Dice</button>
     <div id="diceResult">Dice: </div>
-    <div id="instructions">Instructions: </div>
+    <div id="instructions"></div>
+
+    <!-- Custom Dropdown with checkboxes -->
+    <div class="dropdown">
+        <button class="dropdown-btn">Select Instruction Sets</button>
+        <div class="dropdown-content">
+            <label><input type="checkbox" id="anal">Anal</label>
+            <label><input type="checkbox" id="blowjobtraining">Blowjob Training</label>
+            <label><input type="checkbox" id="pegging">Pegging</label>
+            <label><input type="checkbox" id="pain">Pain</label>
+        </div>
+    </div>
+
+    <!-- Patch Notes Button -->
+    <button id="patchNotesBtn">Patch Notes</button>
+
+    <!-- Patch Notes Modal -->
+    <div id="patchNotesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Patch Notes</h2>
+            <p>Ver 0.1: Initial release.</p>
+            <p>Ver 0.2: Added selectable instruction sets that randomly add images and instructions for each square.</p>
+            <!-- Add more patch notes as needed -->
+        </div>
+    </div>
+
     <script src="script.js"></script>
-    
 </body>
 </html>
