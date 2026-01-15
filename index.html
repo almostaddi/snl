@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snakes and Ladders</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        #gameContainer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        #board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            border: 4px solid #333;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            background: #fff;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .square {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            box-sizing: border-box;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #333;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .square:hover {
+            transform: scale(1.05);
+            z-index: 5;
+        }
+        
+        .snake {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            position: relative;
+        }
+        
+        .snake::before {
+            content: '🐍';
+            position: absolute;
+            font-size: 1.5em;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .ladder {
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            color: white;
+            position: relative;
+        }
+        
+        .ladder::before {
+            content: '🪜';
+            position: absolute;
+            font-size: 1.5em;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .player {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #4dabf7 0%, #1864ab 100%);
+            border-radius: 50%;
+            position: absolute;
+            z-index: 10;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            animation: pulse 1s ease-in-out infinite;
+            border: 3px solid white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        #controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        #rollDice {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        #rollDice:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(79, 172, 254, 0.5);
+        }
+        
+        #rollDice:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        #rollDice:disabled {
+            background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        #diceResult {
+            font-size: 28px;
+            font-weight: bold;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ffd93d 0%, #ffbc00 100%);
+            border-radius: 15px;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(255, 188, 0, 0.3);
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        #instructions {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+            min-height: 80px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        #instructions img {
+            margin-top: 15px;
+            max-width: 150px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        #instructions div {
+            margin-bottom: 10px;
+        }
+        
+        #continueButton {
+            margin-top: 15px;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #fa5252 0%, #e03131 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(250, 82, 82, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        #continueButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(250, 82, 82, 0.5);
+        }
+        
+        #buttoncontainer {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-btn {
+            background: linear-gradient(135deg, #20c997 0%, #12b886 100%);
+            color: white;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            border-radius: 50px;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(18, 184, 134, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(18, 184, 134, 0.4);
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 220px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: left;
+            padding: 15px;
+            border-radius: 15px;
+            top: 100%;
+            left: 0;
+            margin-top: 10px;
+            border: 2px solid #20c997;
+        }
+        
+        .dropdown-content label {
+            display: block;
+            font-size: 16px;
+            padding: 10px 5px;
+            cursor: pointer;
+            color: #333;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+        }
+        
+        .dropdown-content label:hover {
+            background: #e9ecef;
+            padding-left: 10px;
+        }
+        
+        .dropdown-content input {
+            margin-right: 10px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: #20c997;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            padding-top: 60px;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border: none;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            color: #333;
+        }
+        
+        .modal-content h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .modal-content p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #667eea;
+            transform: rotate(90deg);
+        }
+        
+        #patchNotesBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 10;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        #patchNotesBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        #resetBtn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 10;
+            background: linear-gradient(135deg, #fa5252 0%, #e03131 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(250, 82, 82, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        #resetBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(250, 82, 82, 0.5);
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            #gameContainer {
+                padding: 20px;
+            }
+            
+            #buttoncontainer {
+                flex-direction: column;
+            }
+            
+            .square {
+                font-size: 0.7em;
+            }
+            
+            .player {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎲 Snakes and Ladders 🎲</h1>
+    
+    <div id="gameContainer">
+        <div id="board"></div>
+        
+        <div id="controls">
+            <button id="rollDice">🎲 Roll Dice</button>
+            <div id="diceResult">Dice: -</div>
+        </div>
+        
+        <div id="instructions"></div>
+        
+        <div id="buttoncontainer">
+            <div style="width: 100%; max-width: 400px;">
+                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px;">📦 Select Instruction Sets:</label>
+                <div id="instructionSetCheckboxes" style="padding: 15px; background: white; border-radius: 10px; border: 2px solid #667eea;">
+                    <label style="display: block; padding: 8px; cursor: pointer; color: #333;"><input type="checkbox" value="ball" style="margin-right: 10px; width: 18px; height: 18px; accent-color: #667eea;"> Ball Set 🏀</label>
+                    <label style="display: block; padding: 8px; cursor: pointer; color: #333;"><input type="checkbox" value="rope" style="margin-right: 10px; width: 18px; height: 18px; accent-color: #667eea;"> Rope Set 🪢</label>
+                    <label style="display: block; padding: 8px; cursor: pointer; color: #333;"><input type="checkbox" value="basketball_game" style="margin-right: 10px; width: 18px; height: 18px; accent-color: #667eea;"> Basketball Game Set 🏀</label>
+                </div>
+            </div>
+            
+            <div id="toyCheckboxContainer" style="width: 100%; max-width: 400px; margin-top: 15px;">
+                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px;">🎯 Select Your Toys:</label>
+                <div id="toyCheckboxes" style="padding: 15px; background: white; border-radius: 10px; border: 2px solid #20c997; min-height: 60px;">
+                    <p style="color: #666; text-align: center; margin: 0;">Select instruction sets first</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button id="resetBtn">🔄 Reset</button>
+    <button id="patchNotesBtn">📋 Patch Notes</button>
+    
+    <div id="patchNotesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>📋 Patch Notes</h2>
+            <p><strong>12/15/2024 Ver 0.1:</strong><br>Initial release.</p>
+            <p><strong>12/28/2024 Ver 0.2:</strong><br>Added selectable instruction sets that randomly add images and instructions for each square that the player lands on.<br><br>Added dice sound effect.</p>
+        </div>
+    </div>
+    
+    <div id="resetModal" class="modal">
+        <div class="modal-content">
+            <h2>⚠️ Reset Game?</h2>
+            <p style="font-size: 18px; margin: 20px 0;">Are you sure? You will lose all progress!</p>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                <button id="confirmReset" style="padding: 12px 30px; font-size: 16px; background: linear-gradient(135deg, #fa5252 0%, #e03131 100%); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold;">Yes, Reset</button>
+                <button id="cancelReset" style="padding: 12px 30px; font-size: 16px; background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const diceResult = document.getElementById('diceResult');
+        const instructions = document.getElementById('instructions');
+        const rollDiceButton = document.getElementById('rollDice');
+        const continueButton = document.createElement('button');
+        continueButton.id = "continueButton";
+        continueButton.textContent = "✓ Complete";
+
+        const boardSize = 10;
+        const totalSquares = boardSize * boardSize;
+        const player = document.createElement('div');
+        player.classList.add('player');
+
+        const snakes = {
+            16: 6, 47: 26, 49: 11, 56: 53, 62: 19,
+            64: 60, 87: 24, 93: 73, 95: 75, 98: 78
+        };
+
+        const ladders = {
+            1: 38, 4: 14, 9: 31, 21: 42, 28: 84,
+            36: 44, 51: 67, 71: 91, 80: 99
+        };
+
+        // INSTRUCTION SETS DATA
+        // This can be moved to a separate .js file later (e.g., instructionSetsData.js)
+        // Just move everything between these comments to that file
+        const instructionSets = {
+            ball: {
+                name: "Ball Set",
+                toys: [
+                    { id: "basketball", name: "Basketball 🏀" },
+                    { id: "soccerball", name: "Soccer Ball ⚽" }
+                ],
+                tasks: {
+                    basketball: [
+                        {
+                            content: `
+                                <div><strong>Bounce the basketball 10 times!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>Spin the basketball on your finger!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Keep trying until you can hold it for 5 seconds!</p>
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>Pass the basketball around your waist 5 times!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                            `
+                        }
+                    ],
+                    soccerball: [
+                        {
+                            content: `
+                                <div><strong>Kick the soccer ball 5 times!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E⚽%3C/text%3E%3C/svg%3E" alt="Soccer Ball" />
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>Juggling Challenge!</strong></div>
+                                <p>Try to juggle the soccer ball 3 times without it touching the ground.</p>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E⚽%3C/text%3E%3C/svg%3E" alt="Soccer Ball" />
+                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Use your feet, knees, or head!</p>
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>Roll the soccer ball in a circle!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E⚽%3C/text%3E%3C/svg%3E" alt="Soccer Ball" />
+                            `
+                        }
+                    ]
+                }
+            },
+            rope: {
+                name: "Rope Set",
+                toys: [
+                    { id: "jumprope", name: "Jump Rope 🪢" },
+                    { id: "climbingrope", name: "Climbing Rope 🧗" }
+                ],
+                tasks: {
+                    jumprope: [
+                        {
+                            content: `
+                                <div><strong>Jump rope 15 times!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>Criss-Cross Challenge!</strong></div>
+                                <p>Do 5 criss-cross jumps with the jump rope.</p>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
+                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Cross your arms while the rope is in the air!</p>
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>Jump rope backwards 10 times!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
+                            `
+                        }
+                    ],
+                    climbingrope: [
+                        {
+                            content: `
+                                <div><strong>Climb the rope 3 feet up!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🧗%3C/text%3E%3C/svg%3E" alt="Climbing Rope" />
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>Hanging Challenge!</strong></div>
+                                <p>Hang from the climbing rope for 10 seconds.</p>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🧗%3C/text%3E%3C/svg%3E" alt="Climbing Rope" />
+                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Keep your feet off the ground!</p>
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>Do 3 rope pull-ups!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🧗%3C/text%3E%3C/svg%3E" alt="Climbing Rope" />
+                            `
+                        }
+                    ]
+                }
+            },
+            basketball_game: {
+                name: "Basketball Game Set",
+                toys: [
+                    { id: "basketball_hoop", name: "Basketball with Hoop 🏀" }
+                ],
+                tasks: {
+                    basketball_hoop: [
+                        {
+                            content: `
+                                <div><strong>Free Throw Challenge!</strong></div>
+                                <p>Make 3 baskets from the free throw line.</p>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Take your time and aim carefully!</p>
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>Make a layup shot!</strong></div>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                            `
+                        },
+                        {
+                            content: `
+                                <div><strong>3-Pointer Challenge!</strong></div>
+                                <p>Try to make a shot from the 3-point line!</p>
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Don't worry if you miss - just have fun!</p>
+                            `
+                        }
+                    ]
+                }
+            }
+        };
+        // END OF INSTRUCTION SETS DATA - everything above can be moved to instructionSetsData.js
+        
+        let selectedSets = [];
+        let toySelections = {}; // Store selections for each toy across all sets
+
+        let playerPosition = 0;
+        let isMoving = false;
+
+        function createBoard() {
+            let reverse = false;
+            let currentNumber = 1;
+
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    const actualCol = reverse ? boardSize - col - 1 : col;
+                    const square = document.createElement('div');
+                    square.classList.add('square');
+                    square.textContent = currentNumber;
+                    square.id = `square-${currentNumber}`;
+                    square.style.gridRow = boardSize - row;
+                    square.style.gridColumn = actualCol + 1;
+
+                    if (snakes[currentNumber]) {
+                        square.classList.add('snake');
+                    } else if (ladders[currentNumber]) {
+                        square.classList.add('ladder');
+                    }
+
+                    board.appendChild(square);
+                    currentNumber++;
+                }
+                reverse = !reverse;
+            }
+        }
+
+        function animatePlayer(start, end, callback, instant = false) {
+            if (instant) {
+                const targetSquare = document.getElementById(`square-${end}`);
+                if (targetSquare) targetSquare.appendChild(player);
+                if (callback) callback();
+                return;
+            }
+
+            let current = start;
+            const step = current < end ? 1 : -1;
+            const interval = setInterval(() => {
+                current += step;
+                const currentSquare = document.getElementById(`square-${current}`);
+                if (currentSquare) currentSquare.appendChild(player);
+
+                if (current === end) {
+                    clearInterval(interval);
+                    if (callback) callback();
+                }
+            }, 200);
+        }
+
+        function getSelectedToys() {
+            const allToys = [];
+            document.querySelectorAll('#toyCheckboxes input[type="checkbox"]:checked').forEach(cb => {
+                allToys.push({
+                    toyId: cb.value,
+                    setId: cb.dataset.setId
+                });
+            });
+            return allToys;
+        }
+
+        function displayRandomInstruction() {
+            const toys = getSelectedToys();
+            
+            if (toys.length === 0) {
+                instructions.innerHTML = "<div>🎯 Select instruction sets and toys to get started!</div>";
+                return;
+            }
+
+            // Pick a random toy from all selected toys
+            const randomToyObj = toys[Math.floor(Math.random() * toys.length)];
+            const tasks = instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];
+            
+            if (!tasks || tasks.length === 0) {
+                instructions.innerHTML = "<div>No tasks available for this toy!</div>";
+                return;
+            }
+
+            // Pick a random task for that toy
+            const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
+
+            // Display the full HTML content
+            instructions.innerHTML = randomTask.content;
+        }
+        
+        // Handle instruction set selection changes
+        function updateToyCheckboxes() {
+            selectedSets = Array.from(document.querySelectorAll('#instructionSetCheckboxes input:checked')).map(cb => cb.value);
+            const container = document.getElementById('toyCheckboxes');
+            container.innerHTML = '';
+            
+            if (selectedSets.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; margin: 0;">Select instruction sets first</p>';
+                return;
+            }
+            
+            // Display toys from all selected sets
+            selectedSets.forEach(setId => {
+                if (instructionSets[setId]) {
+                    // Add set header
+                    const setHeader = document.createElement('div');
+                    setHeader.style.fontWeight = 'bold';
+                    setHeader.style.color = '#667eea';
+                    setHeader.style.marginTop = '10px';
+                    setHeader.style.marginBottom = '5px';
+                    setHeader.textContent = instructionSets[setId].name;
+                    if (container.children.length > 0) container.appendChild(setHeader);
+                    
+                    instructionSets[setId].toys.forEach(toy => {
+                        const label = document.createElement('label');
+                        label.style.display = 'block';
+                        label.style.padding = '8px';
+                        label.style.paddingLeft = '20px';
+                        label.style.cursor = 'pointer';
+                        label.style.borderRadius = '8px';
+                        label.style.transition = 'background 0.2s';
+                        label.style.color = '#333';
+                        label.onmouseover = () => label.style.background = '#e9ecef';
+                        label.onmouseout = () => label.style.background = 'transparent';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = toy.id;
+                        checkbox.dataset.setId = setId;
+                        checkbox.style.width = '18px';
+                        checkbox.style.height = '18px';
+                        checkbox.style.marginRight = '10px';
+                        checkbox.style.accentColor = '#20c997';
+                        checkbox.style.cursor = 'pointer';
+                        
+                        // Restore previous selection
+                        const toyKey = `${setId}_${toy.id}`;
+                        if (toySelections[toyKey]) {
+                            checkbox.checked = true;
+                        }
+                        
+                        // Save selection on change
+                        checkbox.addEventListener('change', () => {
+                            toySelections[toyKey] = checkbox.checked;
+                        });
+                        
+                        const text = document.createTextNode(toy.name);
+                        
+                        label.appendChild(checkbox);
+                        label.appendChild(text);
+                        container.appendChild(label);
+                    });
+                }
+            });
+        }
+        
+        // Listen to instruction set checkbox changes
+        document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => {
+            cb.addEventListener('change', updateToyCheckboxes);
+        });
+
+        function playDiceRollSound() {
+            console.log("🎲 Rolling dice...");
+        }
+
+        function rollDice() {
+            playDiceRollSound();
+            rollDiceButton.disabled = true;
+            document.getElementById('instructionSetCheckboxes').parentElement.style.display = 'none';
+            document.getElementById('toyCheckboxContainer').style.display = 'none';
+
+            const diceRoll = Math.floor(Math.random() * 6) + 1;
+            diceResult.textContent = `Dice: ${diceRoll} 🎲`;
+
+            let nextPosition = playerPosition + diceRoll;
+            if (nextPosition > totalSquares) nextPosition = totalSquares;
+
+            let finalPosition = nextPosition;
+            let showContinueButton = false;
+
+            const isSnake = snakes[nextPosition];
+            const isLadder = ladders[nextPosition];
+
+            if (isSnake || isLadder) {
+                finalPosition = isSnake ? snakes[nextPosition] : ladders[nextPosition];
+                showContinueButton = true;
+            }
+
+            animatePlayer(playerPosition, nextPosition, () => {
+                playerPosition = nextPosition;
+
+                displayRandomInstruction();
+
+                if (playerPosition === totalSquares) {
+                    rollDiceButton.disabled = true;
+                    instructions.innerHTML += `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>`;
+                    return; // Don't show continue button if won
+                }
+
+                // Always show continue button after landing
+                instructions.appendChild(continueButton);
+                continueButton.style.display = "block";
+
+                if (showContinueButton) {
+                    // Snake or Ladder - continue to final position
+                    continueButton.onclick = () => {
+                        continueButton.style.display = "none";
+
+                        animatePlayer(nextPosition, finalPosition, () => {
+                            playerPosition = finalPosition;
+                            
+                            // Check if won after snake/ladder move
+                            if (playerPosition === totalSquares) {
+                                rollDiceButton.disabled = true;
+                                instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>`;
+                            } else {
+                                rollDiceButton.disabled = false;
+                                instructions.innerHTML = `<div><strong>📍 You landed on ${finalPosition}.</strong></div>`;
+                                displayRandomInstruction();
+                            }
+                        }, true);
+                    };
+                } else {
+                    // Normal square - just re-enable dice
+                    continueButton.onclick = () => {
+                        continueButton.style.display = "none";
+                        rollDiceButton.disabled = false;
+                    };
+                }
+            });
+        }
+
+        const modal = document.getElementById('patchNotesModal');
+        const btn = document.getElementById('patchNotesBtn');
+        const span = document.getElementsByClassName('close-btn')[0];
+
+        btn.onclick = function() {
+            modal.style.display = 'block';
+        }
+
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Reset button functionality
+        const resetBtn = document.getElementById('resetBtn');
+        const resetModal = document.getElementById('resetModal');
+        const confirmResetBtn = document.getElementById('confirmReset');
+        const cancelResetBtn = document.getElementById('cancelReset');
+        
+        resetBtn.addEventListener('click', function() {
+            resetModal.style.display = 'block';
+        });
+        
+        cancelResetBtn.addEventListener('click', function() {
+            resetModal.style.display = 'none';
+        });
+        
+        confirmResetBtn.addEventListener('click', function() {
+            resetModal.style.display = 'none';
+            
+            // Reset player position
+            playerPosition = 0;
+            player.remove();
+            
+            // Re-enable roll button
+            rollDiceButton.disabled = false;
+            
+            // Hide continue button
+            continueButton.style.display = 'none';
+            
+            // Clear instructions
+            instructions.innerHTML = '';
+            
+            // Reset dice display
+            diceResult.textContent = 'Dice: -';
+            
+            // Show setup options again
+            document.getElementById('instructionSetCheckboxes').parentElement.style.display = 'block';
+            document.getElementById('toyCheckboxContainer').style.display = 'block';
+            
+            // Uncheck all instruction sets
+            document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => cb.checked = false);
+            
+            // Clear toy selections
+            selectedSets = [];
+            toySelections = {};
+            document.getElementById('toyCheckboxes').innerHTML = '<p style="color: #666; text-align: center; margin: 0;">Select instruction sets first</p>';
+        });
+
+        rollDiceButton.addEventListener('click', rollDice);
+        createBoard();
+    </script>
+</body>
+</html>
