@@ -136,6 +136,36 @@
             margin-bottom: 20px;
         }
         
+        #startButton {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(81, 207, 102, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        #startButton:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(81, 207, 102, 0.5);
+        }
+        
+        #startButton:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        #startButton:disabled {
+            background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
         #rollDice {
             padding: 15px 40px;
             font-size: 20px;
@@ -188,6 +218,11 @@
             border-radius: 15px;
             color: #333;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        #instructions.active {
+            display: block;
         }
         
         #instructions img {
@@ -231,6 +266,74 @@
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
+        }
+        
+        .prize-settings {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border: 2px solid #667eea;
+        }
+        
+        .prize-settings h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .slider-container {
+            margin: 15px 0;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .slider-label .percentage {
+            color: #667eea;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        #minorSlider {
+            background: linear-gradient(to right, #51cf66, #37b24d);
+        }
+        
+        #majorSlider {
+            background: linear-gradient(to right, #ffd93d, #ffbc00);
+        }
+        
+        #noPrizeSlider {
+            background: linear-gradient(to right, #adb5bd, #868e96);
         }
         
         .metronome-container {
@@ -387,6 +490,36 @@
             box-shadow: 0 6px 20px rgba(250, 82, 82, 0.5);
         }
         
+        .prize-result {
+            font-size: 2em;
+            text-align: center;
+            margin: 20px 0;
+            padding: 30px;
+            border-radius: 15px;
+            animation: prizeReveal 0.5s ease-out;
+        }
+        
+        @keyframes prizeReveal {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .prize-minor {
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            color: white;
+        }
+        
+        .prize-major {
+            background: linear-gradient(135deg, #ffd93d 0%, #ffbc00 100%);
+            color: #333;
+        }
+        
+        .prize-none {
+            background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+            color: white;
+        }
+        
         @media (max-width: 600px) {
             h1 {
                 font-size: 2em;
@@ -418,8 +551,9 @@
         <div id="board"></div>
         
         <div id="controls">
-            <button id="rollDice">🎲 Roll Dice</button>
-            <div id="diceResult">Dice: -</div>
+            <button id="startButton">🎮 Start Game</button>
+            <button id="rollDice" style="display: none;">🎲 Roll Dice</button>
+            <div id="diceResult" style="display: none;">Dice: -</div>
         </div>
         
         <div id="instructions"></div>
@@ -433,26 +567,36 @@
                     <label style="display: block; padding: 8px; cursor: pointer; color: #333;"><input type="checkbox" value="basketball_game" style="margin-right: 10px; width: 18px; height: 18px; accent-color: #667eea;"> Basketball Game Set 🏀</label>
                 </div>
                 
-                <div style="margin-top: 15px;">
-                    <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px;">⚙️ Difficulty Level:</label>
-                    <div style="padding: 15px; background: white; border-radius: 10px; border: 2px solid #667eea; display: flex; gap: 10px; justify-content: center;">
-                        <label style="cursor: pointer; color: #333; padding: 8px 15px; border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='transparent'">
-                            <input type="radio" name="difficulty" value="easy" checked style="margin-right: 5px; accent-color: #51cf66;"> Easy 😊
-                        </label>
-                        <label style="cursor: pointer; color: #333; padding: 8px 15px; border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='transparent'">
-                            <input type="radio" name="difficulty" value="medium" style="margin-right: 5px; accent-color: #ffd93d;"> Medium 😐
-                        </label>
-                        <label style="cursor: pointer; color: #333; padding: 8px 15px; border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='transparent'">
-                            <input type="radio" name="difficulty" value="hard" style="margin-right: 5px; accent-color: #fa5252;"> Hard 😤
-                        </label>
+                <div id="toyCheckboxContainer" style="width: 100%; margin-top: 15px;">
+                    <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px;">🎯 Select Your Toys & Difficulty:</label>
+                    <div id="toyCheckboxes" style="padding: 15px; background: white; border-radius: 10px; border: 2px solid #20c997; min-height: 60px;">
+                        <p style="color: #666; text-align: center; margin: 0;">Select instruction sets first</p>
                     </div>
                 </div>
-            </div>
-            
-            <div id="toyCheckboxContainer" style="width: 100%; max-width: 400px; margin-top: 15px;">
-                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px;">🎯 Select Your Toys:</label>
-                <div id="toyCheckboxes" style="padding: 15px; background: white; border-radius: 10px; border: 2px solid #20c997; min-height: 60px;">
-                    <p style="color: #666; text-align: center; margin: 0;">Select instruction sets first</p>
+                
+                <div class="prize-settings">
+                    <h3>🎁 Prize Probabilities</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>🎉 Minor Prize:</span>
+                            <span class="percentage" id="minorPercent">25%</span>
+                        </div>
+                        <input type="range" id="minorSlider" min="0" max="100" value="25">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>🏆 Major Prize:</span>
+                            <span class="percentage" id="majorPercent">10%</span>
+                        </div>
+                        <input type="range" id="majorSlider" min="0" max="100" value="10">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>❌ No Prize:</span>
+                            <span class="percentage" id="noPrizePercent">65%</span>
+                        </div>
+                        <input type="range" id="noPrizeSlider" min="0" max="100" value="65">
+                    </div>
                 </div>
             </div>
         </div>
@@ -468,6 +612,7 @@
             <p><strong>12/15/2024 Ver 0.1:</strong><br>Initial release.</p>
             <p><strong>12/28/2024 Ver 0.2:</strong><br>Added selectable instruction sets that randomly add images and instructions for each square that the player lands on.<br><br>Added dice sound effect.</p>
             <p><strong>01/15/2026 Ver 0.3:</strong><br>Added metronome feature to basketball bounce task with countdown and beat indicator.</p>
+            <p><strong>01/16/2026 Ver 0.4:</strong><br>Added prize probability system with adjustable sliders for minor prize, major prize, and no prize outcomes.</p>
         </div>
     </div>
     
@@ -486,6 +631,7 @@
         const board = document.getElementById('board');
         const diceResult = document.getElementById('diceResult');
         const instructions = document.getElementById('instructions');
+        const startButton = document.getElementById('startButton');
         const rollDiceButton = document.getElementById('rollDice');
         const continueButton = document.createElement('button');
         continueButton.id = "continueButton";
@@ -508,7 +654,177 @@
 
         let audioContext = null;
         let currentMetronomeTask = null;
-        let currentDifficulty = 'easy';
+        let toyDifficulties = {};
+        let gameStarted = false;
+        
+        function saveGameState() {
+            const gameState = {
+                gameStarted: gameStarted,
+                playerPosition: playerPosition,
+                selectedSets: selectedSets,
+                toySelections: toySelections,
+                toyDifficulties: toyDifficulties,
+                prizeSettings: prizeSettings,
+                diceResultText: diceResult.textContent
+            };
+            localStorage.setItem('snakesLaddersGameState', JSON.stringify(gameState));
+        }
+        
+        function loadGameState() {
+            const saved = localStorage.getItem('snakesLaddersGameState');
+            if (!saved) return false;
+            
+            try {
+                const gameState = JSON.parse(saved);
+                gameStarted = gameState.gameStarted;
+                playerPosition = gameState.playerPosition;
+                selectedSets = gameState.selectedSets || [];
+                toySelections = gameState.toySelections || {};
+                toyDifficulties = gameState.toyDifficulties || {};
+                
+                if (gameState.prizeSettings) {
+                    prizeSettings = gameState.prizeSettings;
+                    updateSliderDisplays();
+                }
+                
+                if (gameStarted) {
+                    startButton.style.display = 'none';
+                    rollDiceButton.style.display = 'block';
+                    diceResult.style.display = 'block';
+                    diceResult.textContent = gameState.diceResultText || 'Dice: -';
+                    
+                    document.getElementById('instructionSetCheckboxes').parentElement.style.display = 'none';
+                    document.getElementById('toyCheckboxContainer').style.display = 'none';
+                    document.querySelector('.prize-settings').style.display = 'none';
+                    
+                    createBoard();
+                    
+                    if (playerPosition > 0) {
+                        const targetSquare = document.getElementById(`square-${playerPosition}`);
+                        if (targetSquare) targetSquare.appendChild(player);
+                    }
+                    
+                    instructions.classList.add('active');
+                    instructions.innerHTML = `
+                        <div style="font-size: 1.5em; font-weight: bold; color: #667eea; margin-bottom: 15px;">
+                            ↩️ Welcome Back! ↩️
+                        </div>
+                        <div style="font-size: 1em; color: #666;">
+                            You're on square ${playerPosition}. Roll the dice to continue!
+                        </div>
+                    `;
+                } else {
+                    updateToyCheckboxes();
+                }
+                
+                return true;
+            } catch (e) {
+                console.error('Error loading game state:', e);
+                return false;
+            }
+        }
+        
+        function clearGameState() {
+            localStorage.removeItem('snakesLaddersGameState');
+        }
+        
+        let prizeSettings = {
+            minor: 25,
+            major: 10,
+            noPrize: 65
+        };
+        
+        const minorSlider = document.getElementById('minorSlider');
+        const majorSlider = document.getElementById('majorSlider');
+        const noPrizeSlider = document.getElementById('noPrizeSlider');
+        const minorPercent = document.getElementById('minorPercent');
+        const majorPercent = document.getElementById('majorPercent');
+        const noPrizePercent = document.getElementById('noPrizePercent');
+        
+        function updateSliderDisplays() {
+            minorPercent.textContent = Math.round(prizeSettings.minor) + '%';
+            majorPercent.textContent = Math.round(prizeSettings.major) + '%';
+            noPrizePercent.textContent = Math.round(prizeSettings.noPrize) + '%';
+            
+            minorSlider.value = Math.round(prizeSettings.minor);
+            majorSlider.value = Math.round(prizeSettings.major);
+            noPrizeSlider.value = Math.round(prizeSettings.noPrize);
+            
+            saveGameState();
+        }
+        
+        minorSlider.addEventListener('input', function() {
+            const newMinor = parseInt(this.value);
+            const maxAllowed = 100 - prizeSettings.major;
+            
+            if (newMinor > maxAllowed) {
+                prizeSettings.minor = maxAllowed;
+            } else {
+                prizeSettings.minor = newMinor;
+            }
+            
+            prizeSettings.noPrize = 100 - prizeSettings.minor - prizeSettings.major;
+            updateSliderDisplays();
+        });
+        
+        majorSlider.addEventListener('input', function() {
+            const newMajor = parseInt(this.value);
+            const maxAllowed = 100 - prizeSettings.minor;
+            
+            if (newMajor > maxAllowed) {
+                prizeSettings.major = maxAllowed;
+            } else {
+                prizeSettings.major = newMajor;
+            }
+            
+            prizeSettings.noPrize = 100 - prizeSettings.minor - prizeSettings.major;
+            updateSliderDisplays();
+        });
+        
+        noPrizeSlider.addEventListener('input', function() {
+            const newNoPrize = parseInt(this.value);
+            const currentNoPrize = prizeSettings.noPrize;
+            const diff = newNoPrize - currentNoPrize;
+            
+            if (diff > 0) {
+                const removeFromEach = diff / 2;
+                prizeSettings.minor = Math.max(0, prizeSettings.minor - removeFromEach);
+                prizeSettings.major = Math.max(0, prizeSettings.major - removeFromEach);
+            } else if (diff < 0) {
+                const addToEach = Math.abs(diff) / 2;
+                prizeSettings.minor = Math.min(100, prizeSettings.minor + addToEach);
+                prizeSettings.major = Math.min(100, prizeSettings.major + addToEach);
+            }
+            
+            prizeSettings.noPrize = 100 - prizeSettings.minor - prizeSettings.major;
+            updateSliderDisplays();
+        });
+        
+        function determinePrize() {
+            const roll = Math.random() * 100;
+            
+            if (roll < prizeSettings.major) {
+                return 'major';
+            } else if (roll < prizeSettings.major + prizeSettings.minor) {
+                return 'minor';
+            } else {
+                return 'none';
+            }
+        }
+        
+        function displayPrizeResult(prize) {
+            let prizeHTML = '';
+            
+            if (prize === 'major') {
+                prizeHTML = '<div class="prize-result prize-major">🏆 MAJOR PRIZE! 🏆<br>Congratulations!</div>';
+            } else if (prize === 'minor') {
+                prizeHTML = '<div class="prize-result prize-minor">🎉 Minor Prize! 🎉<br>Nice job!</div>';
+            } else {
+                prizeHTML = '<div class="prize-result prize-none">❌ No Prize<br>Better luck next time!</div>';
+            }
+            
+            return prizeHTML;
+        }
         
         function createMetronomeTask(beatCount) {
             let metronomeInterval = null;
@@ -610,6 +926,156 @@
                 hasStarted: () => startBtn.disabled
             };
         }
+        
+        function createRedLightGreenLightTask(totalDuration) {
+            let gameInterval = null;
+            let countdownInterval = null;
+            let isComplete = false;
+            let timeRemaining = totalDuration;
+            
+            const imagePatterns = [
+                { image: 'chair.jpg', name: 'Chair', type: 'red' },
+                { image: 'broom.jpg', name: 'Broom', type: 'green' },
+                { image: 'hat.jpg', name: 'Hat', type: 'red' },
+                { image: 'ball.jpg', name: 'Ball', type: 'green' },
+                { image: 'books.jpg', name: 'Books', type: 'red' },
+                { image: 'car.jpg', name: 'Car', type: 'green' },
+                { image: 'tree.jpg', name: 'Tree', type: 'red' },
+                { image: 'guitar.jpg', name: 'Guitar', type: 'green' },
+                { image: 'apple.jpg', name: 'Apple', type: 'red' },
+                { image: 'bike.jpg', name: 'Bike', type: 'green' }
+            ];
+            
+            const lightPatterns = [
+                { duration: 2000 },
+                { duration: 1500 },
+                { duration: 1500 },
+                { duration: 2500 },
+                { duration: 1000 },
+                { duration: 3000 },
+                { duration: 2000 },
+                { duration: 1500 }
+            ];
+            
+            const container = document.createElement('div');
+            container.className = 'metronome-container';
+            container.style.background = 'linear-gradient(135deg, #845ef7 0%, #5f3dc4 100%)';
+            
+            container.innerHTML = `
+                <div><strong>🚦 Red Light, Green Light!</strong></div>
+                <p style="color: white; margin: 10px 0;">🟢 GREEN = Jump! | 🔴 RED = Stop!</p>
+                <div style="background: rgba(255, 255, 255, 0.2); border-radius: 15px; padding: 20px; margin: 15px 0;">
+                    <div style="width: 150px; height: 150px; margin: 0 auto 10px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden;" id="imageContainer">
+                        <div style="font-size: 3em; color: #845ef7;">🚦</div>
+                    </div>
+                    <div style="color: white; font-size: 1.2em; font-weight: bold;" id="imageName">Get Ready!</div>
+                </div>
+                <div style="width: 120px; height: 120px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 4em; transition: all 0.3s ease;" id="lightIndicator">
+                    ⏸️
+                </div>
+                <div class="metronome-display" id="lightDisplay">Press Start!</div>
+                <div style="color: white; font-size: 18px; margin: 10px 0;" id="timeDisplay"></div>
+                <button class="metronome-btn" id="startRedLight">▶️ Start</button>
+            `;
+            
+            const startBtn = container.querySelector('#startRedLight');
+            const display = container.querySelector('#lightDisplay');
+            const lightIndicator = container.querySelector('#lightIndicator');
+            const timeDisplay = container.querySelector('#timeDisplay');
+            const imageContainer = container.querySelector('#imageContainer');
+            const imageName = container.querySelector('#imageName');
+            
+            startBtn.addEventListener('click', function() {
+                startBtn.disabled = true;
+                
+                let count = 3;
+                imageContainer.innerHTML = `<div style="font-size: 4em; color: #845ef7;">${count}</div>`;
+                imageName.textContent = 'Starting...';
+                lightIndicator.textContent = '⏳';
+                display.textContent = 'Get ready...';
+                
+                countdownInterval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        imageContainer.innerHTML = `<div style="font-size: 4em; color: #845ef7;">${count}</div>`;
+                    } else {
+                        clearInterval(countdownInterval);
+                        startGame();
+                    }
+                }, 1000);
+            });
+            
+            function startGame() {
+                let currentImageIndex = 0;
+                let currentPatternIndex = 0;
+                
+                function showNextLight() {
+                    if (timeRemaining <= 0) {
+                        clearInterval(gameInterval);
+                        display.textContent = "Game Complete! ✓";
+                        lightIndicator.textContent = "✓";
+                        lightIndicator.style.background = "linear-gradient(135deg, #51cf66 0%, #37b24d 100%)";
+                        imageContainer.innerHTML = '<div style="font-size: 4em; color: #51cf66;">🎉</div>';
+                        imageName.textContent = "Great Job!";
+                        timeDisplay.textContent = "";
+                        isComplete = true;
+                        continueButton.disabled = false;
+                        continueButton.style.opacity = '1';
+                        return;
+                    }
+                    
+                    const currentImage = imagePatterns[currentImageIndex];
+                    const pattern = lightPatterns[currentPatternIndex];
+                    
+                    imageContainer.innerHTML = `<img src="${currentImage.image}" alt="${currentImage.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'font-size: 3em; color: #845ef7;\\'>${currentImage.name[0]}</div>';">`;
+                    imageName.textContent = currentImage.name;
+                    
+                    lightIndicator.textContent = currentImage.type === 'green' ? '🟢' : '🔴';
+                    display.textContent = currentImage.type === 'green' ? 'GREEN LIGHT - JUMP!' : 'RED LIGHT - STOP!';
+                    
+                    if (currentImage.type === 'green') {
+                        lightIndicator.style.background = 'linear-gradient(135deg, #51cf66 0%, #37b24d 100%)';
+                        lightIndicator.style.transform = 'scale(1.2)';
+                    } else {
+                        lightIndicator.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)';
+                        lightIndicator.style.transform = 'scale(1)';
+                    }
+                    
+                    const displayDuration = Math.min(pattern.duration, timeRemaining);
+                    timeRemaining -= displayDuration;
+                    timeDisplay.textContent = `${Math.ceil(timeRemaining / 1000)}s remaining`;
+                    
+                    setTimeout(() => {
+                        currentImageIndex++;
+                        if (currentImageIndex >= imagePatterns.length) {
+                            currentImageIndex = 0;
+                        }
+                        
+                        currentPatternIndex++;
+                        if (currentPatternIndex >= lightPatterns.length) {
+                            currentPatternIndex = 0;
+                        }
+                        
+                        showNextLight();
+                    }, displayDuration);
+                }
+                
+                continueButton.disabled = true;
+                continueButton.style.opacity = '0.5';
+                
+                showNextLight();
+            }
+            
+            return {
+                element: container,
+                isComplete: () => isComplete,
+                cleanup: () => {
+                    if (gameInterval) clearInterval(gameInterval);
+                    if (countdownInterval) clearInterval(countdownInterval);
+                },
+                hasStarted: () => startBtn.disabled
+            };
+        }
 
         const instructionSets = {
             ball: {
@@ -704,6 +1170,13 @@
                                     <div><strong>Jump rope ${counts[diff]} times!</strong></div>
                                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
                                 `;
+                            }
+                        },
+                        {
+                            type: 'redlight',
+                            getDifficulty: (diff) => {
+                                const durations = {easy: 15000, medium: 20000, hard: 30000};
+                                return durations[diff];
                             }
                         },
                         {
@@ -861,9 +1334,12 @@
         function getSelectedToys() {
             const allToys = [];
             document.querySelectorAll('#toyCheckboxes input[type="checkbox"]:checked').forEach(cb => {
+                const toyKey = `${cb.dataset.setId}_${cb.value}`;
+                const difficultySelect = document.getElementById(`difficulty_${toyKey}`);
                 allToys.push({
                     toyId: cb.value,
-                    setId: cb.dataset.setId
+                    setId: cb.dataset.setId,
+                    difficulty: difficultySelect ? difficultySelect.value : 'medium'
                 });
             });
             return allToys;
@@ -878,6 +1354,7 @@
             }
             
             if (toys.length === 0) {
+                instructions.classList.add('active');
                 instructions.innerHTML = "<div>🎯 Select instruction sets and toys to get started!</div>";
                 return;
             }
@@ -886,19 +1363,26 @@
             const tasks = instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];
             
             if (!tasks || tasks.length === 0) {
+                instructions.classList.add('active');
                 instructions.innerHTML = "<div>No tasks available for this toy!</div>";
                 return;
             }
 
             const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
 
+            instructions.classList.add('active');
             if (randomTask.type === 'metronome') {
-                const beatCount = randomTask.getDifficulty(currentDifficulty);
+                const beatCount = randomTask.getDifficulty(randomToyObj.difficulty);
                 currentMetronomeTask = createMetronomeTask(beatCount);
                 instructions.innerHTML = '';
                 instructions.appendChild(currentMetronomeTask.element);
+            } else if (randomTask.type === 'redlight') {
+                const duration = randomTask.getDifficulty(randomToyObj.difficulty);
+                currentMetronomeTask = createRedLightGreenLightTask(duration);
+                instructions.innerHTML = '';
+                instructions.appendChild(currentMetronomeTask.element);
             } else {
-                const content = randomTask.getDifficulty(currentDifficulty);
+                const content = randomTask.getDifficulty(randomToyObj.difficulty);
                 instructions.innerHTML = content;
             }
         }
@@ -907,8 +1391,6 @@
             selectedSets = Array.from(document.querySelectorAll('#instructionSetCheckboxes input:checked')).map(cb => cb.value);
             const container = document.getElementById('toyCheckboxes');
             container.innerHTML = '';
-            
-            console.log('Selected sets:', selectedSets);
             
             if (selectedSets.length === 0) {
                 container.innerHTML = '<p style="color: #666; text-align: center; margin: 0;">Select instruction sets first</p>';
@@ -926,16 +1408,25 @@
                     if (container.children.length > 0) container.appendChild(setHeader);
                     
                     instructionSets[setId].toys.forEach(toy => {
+                        const toyKey = `${setId}_${toy.id}`;
+                        
+                        const itemContainer = document.createElement('div');
+                        itemContainer.style.display = 'flex';
+                        itemContainer.style.alignItems = 'center';
+                        itemContainer.style.justifyContent = 'space-between';
+                        itemContainer.style.padding = '8px';
+                        itemContainer.style.paddingLeft = '20px';
+                        itemContainer.style.borderRadius = '8px';
+                        itemContainer.style.transition = 'background 0.2s';
+                        itemContainer.onmouseover = () => itemContainer.style.background = '#e9ecef';
+                        itemContainer.onmouseout = () => itemContainer.style.background = 'transparent';
+                        
                         const label = document.createElement('label');
-                        label.style.display = 'block';
-                        label.style.padding = '8px';
-                        label.style.paddingLeft = '20px';
                         label.style.cursor = 'pointer';
-                        label.style.borderRadius = '8px';
-                        label.style.transition = 'background 0.2s';
                         label.style.color = '#333';
-                        label.onmouseover = () => label.style.background = '#e9ecef';
-                        label.onmouseout = () => label.style.background = 'transparent';
+                        label.style.display = 'flex';
+                        label.style.alignItems = 'center';
+                        label.style.flex = '1';
                         
                         const checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
@@ -947,51 +1438,110 @@
                         checkbox.style.accentColor = '#20c997';
                         checkbox.style.cursor = 'pointer';
                         
-                        const toyKey = `${setId}_${toy.id}`;
                         if (toySelections[toyKey]) {
                             checkbox.checked = true;
                         }
                         
                         checkbox.addEventListener('change', () => {
                             toySelections[toyKey] = checkbox.checked;
-                            console.log('Toy selections:', toySelections);
+                            saveGameState();
                         });
                         
                         const text = document.createTextNode(toy.name);
                         
                         label.appendChild(checkbox);
                         label.appendChild(text);
-                        container.appendChild(label);
+                        
+                        const difficultySelect = document.createElement('select');
+                        difficultySelect.id = `difficulty_${toyKey}`;
+                        difficultySelect.style.padding = '4px 8px';
+                        difficultySelect.style.borderRadius = '8px';
+                        difficultySelect.style.border = '2px solid #667eea';
+                        difficultySelect.style.backgroundColor = 'white';
+                        difficultySelect.style.color = '#333';
+                        difficultySelect.style.cursor = 'pointer';
+                        difficultySelect.style.fontSize = '14px';
+                        
+                        const easyOption = document.createElement('option');
+                        easyOption.value = 'easy';
+                        easyOption.textContent = 'Easy 😊';
+                        
+                        const mediumOption = document.createElement('option');
+                        mediumOption.value = 'medium';
+                        mediumOption.textContent = 'Medium 😐';
+                        mediumOption.selected = true;
+                        
+                        const hardOption = document.createElement('option');
+                        hardOption.value = 'hard';
+                        hardOption.textContent = 'Hard 😤';
+                        
+                        difficultySelect.appendChild(easyOption);
+                        difficultySelect.appendChild(mediumOption);
+                        difficultySelect.appendChild(hardOption);
+                        
+                        if (toyDifficulties[toyKey]) {
+                            difficultySelect.value = toyDifficulties[toyKey];
+                        }
+                        
+                        difficultySelect.addEventListener('change', () => {
+                            toyDifficulties[toyKey] = difficultySelect.value;
+                            saveGameState();
+                        });
+                        
+                        itemContainer.appendChild(label);
+                        itemContainer.appendChild(difficultySelect);
+                        container.appendChild(itemContainer);
                     });
                 }
             });
+            
+            saveGameState();
         }
         
         document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => {
             cb.addEventListener('change', () => {
-                console.log('Checkbox changed:', cb.value, cb.checked);
                 updateToyCheckboxes();
+                saveGameState();
             });
         });
 
         function playDiceRollSound() {
             console.log("🎲 Rolling dice...");
         }
-
-        function rollDice() {
+        
+        function startGame() {
             const toys = getSelectedToys();
             
             if (toys.length === 0) {
-                alert('⚠️ Please select at least one toy from the instruction sets before rolling!');
+                alert('⚠️ Please select at least one toy from the instruction sets before starting!');
                 return;
             }
             
-            currentDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
+            gameStarted = true;
+            saveGameState();
             
-            playDiceRollSound();
-            rollDiceButton.disabled = true;
+            startButton.style.display = 'none';
             document.getElementById('instructionSetCheckboxes').parentElement.style.display = 'none';
             document.getElementById('toyCheckboxContainer').style.display = 'none';
+            document.querySelector('.prize-settings').style.display = 'none';
+            
+            instructions.classList.add('active');
+            instructions.innerHTML = `
+                <div style="font-size: 2em; font-weight: bold; color: #667eea; margin-bottom: 20px;">
+                    🍀 Good Luck! 🍀
+                </div>
+                <div style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
+                    Roll the dice to begin your adventure!
+                </div>
+            `;
+            
+            rollDiceButton.style.display = 'block';
+            diceResult.style.display = 'block';
+        }
+
+        function rollDice() {
+            playDiceRollSound();
+            rollDiceButton.disabled = true;
 
             const diceRoll = Math.floor(Math.random() * 6) + 1;
             diceResult.textContent = `Dice: ${diceRoll} 🎲`;
@@ -1012,12 +1562,14 @@
 
             animatePlayer(playerPosition, nextPosition, () => {
                 playerPosition = nextPosition;
+                saveGameState();
 
                 displayRandomInstruction();
 
                 if (playerPosition === totalSquares) {
                     rollDiceButton.disabled = true;
-                    instructions.innerHTML += `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>`;
+                    const prize = determinePrize();
+                    instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>` + displayPrizeResult(prize);
                     return;
                 }
 
@@ -1034,10 +1586,12 @@
 
                         animatePlayer(nextPosition, finalPosition, () => {
                             playerPosition = finalPosition;
+                            saveGameState();
                             
                             if (playerPosition === totalSquares) {
                                 rollDiceButton.disabled = true;
-                                instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>`;
+                                const prize = determinePrize();
+                                instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>` + displayPrizeResult(prize);
                             } else {
                                 rollDiceButton.disabled = false;
                                 instructions.innerHTML = `<div><strong>📍 You landed on ${finalPosition}.</strong></div>`;
@@ -1092,30 +1646,49 @@
         confirmResetBtn.addEventListener('click', function() {
             resetModal.style.display = 'none';
             
+            clearGameState();
+            
+            gameStarted = false;
             playerPosition = 0;
             player.remove();
             
+            startButton.style.display = 'block';
+            rollDiceButton.style.display = 'none';
             rollDiceButton.disabled = false;
             
             continueButton.style.display = 'none';
             
+            instructions.classList.remove('active');
             instructions.innerHTML = '';
             
             diceResult.textContent = 'Dice: -';
+            diceResult.style.display = 'none';
             
             document.getElementById('instructionSetCheckboxes').parentElement.style.display = 'block';
             document.getElementById('toyCheckboxContainer').style.display = 'block';
+            document.querySelector('.prize-settings').style.display = 'block';
             
             document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => cb.checked = false);
             
             selectedSets = [];
             toySelections = {};
+            toyDifficulties = {};
+            
+            prizeSettings = {
+                minor: 25,
+                major: 10,
+                noPrize: 65
+            };
+            updateSliderDisplays();
+            
             document.getElementById('toyCheckboxes').innerHTML = '<p style="color: #666; text-align: center; margin: 0;">Select instruction sets first</p>';
         });
 
+        startButton.addEventListener('click', startGame);
         rollDiceButton.addEventListener('click', rollDice);
         
         createBoard();
+        loadGameState();
     </script>
 </body>
 </html>
