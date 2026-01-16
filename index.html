@@ -86,9 +86,12 @@
         .snake::before {
             content: '🐍';
             position: absolute;
-            font-size: 1.5em;
+            font-size: 3em;
             opacity: 0.3;
             pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         
         .ladder {
@@ -100,9 +103,12 @@
         .ladder::before {
             content: '🪜';
             position: absolute;
-            font-size: 1.5em;
+            font-size: 3em;
             opacity: 0.3;
             pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         
         .player {
@@ -227,67 +233,64 @@
             flex-wrap: wrap;
         }
         
-        .dropdown {
-            position: relative;
+        .metronome-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
         }
         
-        .dropdown-btn {
-            background: linear-gradient(135deg, #20c997 0%, #12b886 100%);
+        .metronome-display {
+            font-size: 48px;
+            font-weight: bold;
             color: white;
-            padding: 12px 25px;
-            font-size: 16px;
-            font-weight: 600;
+            text-align: center;
+            margin: 15px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .metronome-beat {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 0 auto;
+            transition: all 0.1s ease;
+        }
+        
+        .metronome-beat.active {
+            background: white;
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+        
+        .metronome-btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
+            background: white;
+            color: #4facfe;
             border: none;
             border-radius: 50px;
-            width: 180px;
-            text-align: center;
-            box-shadow: 0 6px 20px rgba(18, 184, 134, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
-        }
-        
-        .dropdown-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(18, 184, 134, 0.4);
-        }
-        
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background: white;
-            min-width: 220px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            text-align: left;
-            padding: 15px;
-            border-radius: 15px;
-            top: 100%;
-            left: 0;
-            margin-top: 10px;
-            border: 2px solid #20c997;
-        }
-        
-        .dropdown-content label {
+            margin: 10px auto;
             display: block;
-            font-size: 16px;
-            padding: 10px 5px;
-            cursor: pointer;
-            color: #333;
-            transition: all 0.2s ease;
-            border-radius: 8px;
         }
         
-        .dropdown-content label:hover {
-            background: #e9ecef;
-            padding-left: 10px;
+        .metronome-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
         
-        .dropdown-content input {
-            margin-right: 10px;
-            cursor: pointer;
-            width: 18px;
-            height: 18px;
-            accent-color: #20c997;
+        .metronome-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         .modal {
@@ -429,6 +432,21 @@
                     <label style="display: block; padding: 8px; cursor: pointer; color: #333;"><input type="checkbox" value="rope" style="margin-right: 10px; width: 18px; height: 18px; accent-color: #667eea;"> Rope Set 🪢</label>
                     <label style="display: block; padding: 8px; cursor: pointer; color: #333;"><input type="checkbox" value="basketball_game" style="margin-right: 10px; width: 18px; height: 18px; accent-color: #667eea;"> Basketball Game Set 🏀</label>
                 </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px;">⚙️ Difficulty Level:</label>
+                    <div style="padding: 15px; background: white; border-radius: 10px; border: 2px solid #667eea; display: flex; gap: 10px; justify-content: center;">
+                        <label style="cursor: pointer; color: #333; padding: 8px 15px; border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='transparent'">
+                            <input type="radio" name="difficulty" value="easy" checked style="margin-right: 5px; accent-color: #51cf66;"> Easy 😊
+                        </label>
+                        <label style="cursor: pointer; color: #333; padding: 8px 15px; border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='transparent'">
+                            <input type="radio" name="difficulty" value="medium" style="margin-right: 5px; accent-color: #ffd93d;"> Medium 😐
+                        </label>
+                        <label style="cursor: pointer; color: #333; padding: 8px 15px; border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='transparent'">
+                            <input type="radio" name="difficulty" value="hard" style="margin-right: 5px; accent-color: #fa5252;"> Hard 😤
+                        </label>
+                    </div>
+                </div>
             </div>
             
             <div id="toyCheckboxContainer" style="width: 100%; max-width: 400px; margin-top: 15px;">
@@ -449,6 +467,7 @@
             <h2>📋 Patch Notes</h2>
             <p><strong>12/15/2024 Ver 0.1:</strong><br>Initial release.</p>
             <p><strong>12/28/2024 Ver 0.2:</strong><br>Added selectable instruction sets that randomly add images and instructions for each square that the player lands on.<br><br>Added dice sound effect.</p>
+            <p><strong>01/15/2026 Ver 0.3:</strong><br>Added metronome feature to basketball bounce task with countdown and beat indicator.</p>
         </div>
     </div>
     
@@ -487,9 +506,111 @@
             36: 44, 51: 67, 71: 91, 80: 99
         };
 
-        // INSTRUCTION SETS DATA
-        // This can be moved to a separate .js file later (e.g., instructionSetsData.js)
-        // Just move everything between these comments to that file
+        let audioContext = null;
+        let currentMetronomeTask = null;
+        let currentDifficulty = 'easy';
+        
+        function createMetronomeTask(beatCount) {
+            let metronomeInterval = null;
+            let countdownInterval = null;
+            let isComplete = false;
+            
+            const container = document.createElement('div');
+            container.className = 'metronome-container';
+            
+            container.innerHTML = `
+                <div><strong>🏀 Bounce to the Beat!</strong></div>
+                <p style="color: white; margin: 10px 0;">Bounce the basketball in rhythm with the metronome.</p>
+                <div class="metronome-beat" id="metronomeBeat"></div>
+                <div class="metronome-display" id="metronomeDisplay">Ready?</div>
+                <button class="metronome-btn" id="startMetronome">▶️ Start</button>
+            `;
+            
+            const startBtn = container.querySelector('#startMetronome');
+            const display = container.querySelector('#metronomeDisplay');
+            const beat = container.querySelector('#metronomeBeat');
+            
+            startBtn.addEventListener('click', function() {
+                startBtn.disabled = true;
+                
+                let count = 3;
+                display.textContent = count;
+                
+                countdownInterval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        display.textContent = count;
+                    } else {
+                        clearInterval(countdownInterval);
+                        display.textContent = "Bounce!";
+                        startMetronome();
+                    }
+                }, 1000);
+            });
+            
+            function playBeep() {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.value = 440;
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+                
+                osc.start(audioContext.currentTime);
+                osc.stop(audioContext.currentTime + 0.05);
+            }
+            
+            function startMetronome() {
+                let beatsLeft = beatCount;
+                const bpm = 100;
+                const interval = 60000 / bpm;
+                
+                function doBeat() {
+                    beatsLeft--;
+                    
+                    beat.classList.add('active');
+                    playBeep();
+                    display.textContent = `${beatsLeft} bounces left`;
+                    
+                    setTimeout(() => {
+                        beat.classList.remove('active');
+                    }, 100);
+                    
+                    if (beatsLeft <= 0) {
+                        clearInterval(metronomeInterval);
+                        display.textContent = "Complete! ✓";
+                        isComplete = true;
+                        continueButton.disabled = false;
+                        continueButton.style.opacity = '1';
+                    }
+                }
+                
+                doBeat();
+                metronomeInterval = setInterval(doBeat, interval);
+                
+                continueButton.disabled = true;
+                continueButton.style.opacity = '0.5';
+            }
+            
+            return {
+                element: container,
+                isComplete: () => isComplete,
+                cleanup: () => {
+                    if (metronomeInterval) clearInterval(metronomeInterval);
+                    if (countdownInterval) clearInterval(countdownInterval);
+                },
+                hasStarted: () => startBtn.disabled
+            };
+        }
+
         const instructionSets = {
             ball: {
                 name: "Ball Set",
@@ -500,45 +621,70 @@
                 tasks: {
                     basketball: [
                         {
-                            content: `
-                                <div><strong>Bounce the basketball 10 times!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 5, medium: 10, hard: 15};
+                                return `
+                                    <div><strong>Bounce the basketball ${counts[diff]} times!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                                `;
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>Spin the basketball on your finger!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
-                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Keep trying until you can hold it for 5 seconds!</p>
-                            `
+                            type: 'metronome',
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 8, medium: 10, hard: 15};
+                                return counts[diff];
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>Pass the basketball around your waist 5 times!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 3, medium: 5, hard: 8};
+                                return `
+                                    <div><strong>Spin the basketball on your finger!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                                    <p style="margin-top: 10px; font-size: 14px; color: #666;">Keep trying until you can hold it for ${counts[diff]} seconds!</p>
+                                `;
+                            }
+                        },
+                        {
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 3, medium: 5, hard: 10};
+                                return `
+                                    <div><strong>Pass the basketball around your waist ${counts[diff]} times!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                                `;
+                            }
                         }
                     ],
                     soccerball: [
                         {
-                            content: `
-                                <div><strong>Kick the soccer ball 5 times!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E⚽%3C/text%3E%3C/svg%3E" alt="Soccer Ball" />
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 3, medium: 5, hard: 10};
+                                return `
+                                    <div><strong>Kick the soccer ball ${counts[diff]} times!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E⚽%3C/text%3E%3C/svg%3E" alt="Soccer Ball" />
+                                `;
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>Juggling Challenge!</strong></div>
-                                <p>Try to juggle the soccer ball 3 times without it touching the ground.</p>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E⚽%3C/text%3E%3C/svg%3E" alt="Soccer Ball" />
-                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Use your feet, knees, or head!</p>
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 2, medium: 3, hard: 5};
+                                return `
+                                    <div><strong>Juggling Challenge!</strong></div>
+                                    <p>Try to juggle the soccer ball ${counts[diff]} times without it touching the ground.</p>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E⚽%3C/text%3E%3C/svg%3E" alt="Soccer Ball" />
+                                    <p style="margin-top: 10px; font-size: 14px; color: #666;">Use your feet, knees, or head!</p>
+                                `;
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>Roll the soccer ball in a circle!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E⚽%3C/text%3E%3C/svg%3E" alt="Soccer Ball" />
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 3, medium: 5, hard: 8};
+                                return `
+                                    <div><strong>Roll the soccer ball in a circle ${counts[diff]} times!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E⚽%3C/text%3E%3C/svg%3E" alt="Soccer Ball" />
+                                `;
+                            }
                         }
                     ]
                 }
@@ -552,46 +698,64 @@
                 tasks: {
                     jumprope: [
                         {
-                            content: `
-                                <div><strong>Jump rope 15 times!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 10, medium: 15, hard: 25};
+                                return `
+                                    <div><strong>Jump rope ${counts[diff]} times!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
+                                `;
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>Criss-Cross Challenge!</strong></div>
-                                <p>Do 5 criss-cross jumps with the jump rope.</p>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
-                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Cross your arms while the rope is in the air!</p>
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 3, medium: 5, hard: 8};
+                                return `
+                                    <div><strong>Criss-Cross Challenge!</strong></div>
+                                    <p>Do ${counts[diff]} criss-cross jumps with the jump rope.</p>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
+                                    <p style="margin-top: 10px; font-size: 14px; color: #666;">Cross your arms while the rope is in the air!</p>
+                                `;
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>Jump rope backwards 10 times!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 5, medium: 10, hard: 15};
+                                return `
+                                    <div><strong>Jump rope backwards ${counts[diff]} times!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🪢%3C/text%3E%3C/svg%3E" alt="Jump Rope" />
+                                `;
+                            }
                         }
                     ],
                     climbingrope: [
                         {
-                            content: `
-                                <div><strong>Climb the rope 3 feet up!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🧗%3C/text%3E%3C/svg%3E" alt="Climbing Rope" />
-                            `
+                            getDifficulty: (diff) => {
+                                const distances = {easy: '2 feet', medium: '3 feet', hard: '5 feet'};
+                                return `
+                                    <div><strong>Climb the rope ${distances[diff]} up!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🧗%3C/text%3E%3C/svg%3E" alt="Climbing Rope" />
+                                `;
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>Hanging Challenge!</strong></div>
-                                <p>Hang from the climbing rope for 10 seconds.</p>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🧗%3C/text%3E%3C/svg%3E" alt="Climbing Rope" />
-                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Keep your feet off the ground!</p>
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 5, medium: 10, hard: 15};
+                                return `
+                                    <div><strong>Hanging Challenge!</strong></div>
+                                    <p>Hang from the climbing rope for ${counts[diff]} seconds.</p>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🧗%3C/text%3E%3C/svg%3E" alt="Climbing Rope" />
+                                    <p style="margin-top: 10px; font-size: 14px; color: #666;">Keep your feet off the ground!</p>
+                                `;
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>Do 3 rope pull-ups!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🧗%3C/text%3E%3C/svg%3E" alt="Climbing Rope" />
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 2, medium: 3, hard: 5};
+                                return `
+                                    <div><strong>Do ${counts[diff]} rope pull-ups!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🧗%3C/text%3E%3C/svg%3E" alt="Climbing Rope" />
+                                `;
+                            }
                         }
                     ]
                 }
@@ -604,35 +768,43 @@
                 tasks: {
                     basketball_hoop: [
                         {
-                            content: `
-                                <div><strong>Free Throw Challenge!</strong></div>
-                                <p>Make 3 baskets from the free throw line.</p>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
-                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Take your time and aim carefully!</p>
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 2, medium: 3, hard: 5};
+                                return `
+                                    <div><strong>Free Throw Challenge!</strong></div>
+                                    <p>Make ${counts[diff]} baskets from the free throw line.</p>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                                    <p style="margin-top: 10px; font-size: 14px; color: #666;">Take your time and aim carefully!</p>
+                                `;
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>Make a layup shot!</strong></div>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 1, medium: 2, hard: 3};
+                                return `
+                                    <div><strong>Make ${counts[diff]} layup shot${counts[diff] > 1 ? 's' : ''}!</strong></div>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                                `;
+                            }
                         },
                         {
-                            content: `
-                                <div><strong>3-Pointer Challenge!</strong></div>
-                                <p>Try to make a shot from the 3-point line!</p>
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
-                                <p style="margin-top: 10px; font-size: 14px; color: #666;">Don't worry if you miss - just have fun!</p>
-                            `
+                            getDifficulty: (diff) => {
+                                const counts = {easy: 1, medium: 2, hard: 3};
+                                return `
+                                    <div><strong>3-Pointer Challenge!</strong></div>
+                                    <p>Try to make ${counts[diff]} shot${counts[diff] > 1 ? 's' : ''} from the 3-point line!</p>
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='50'%3E🏀%3C/text%3E%3C/svg%3E" alt="Basketball" />
+                                    <p style="margin-top: 10px; font-size: 14px; color: #666;">Don't worry if you miss - just have fun!</p>
+                                `;
+                            }
                         }
                     ]
                 }
             }
         };
-        // END OF INSTRUCTION SETS DATA - everything above can be moved to instructionSetsData.js
         
         let selectedSets = [];
-        let toySelections = {}; // Store selections for each toy across all sets
+        let toySelections = {};
 
         let playerPosition = 0;
         let isMoving = false;
@@ -700,12 +872,16 @@
         function displayRandomInstruction() {
             const toys = getSelectedToys();
             
+            if (currentMetronomeTask) {
+                currentMetronomeTask.cleanup();
+                currentMetronomeTask = null;
+            }
+            
             if (toys.length === 0) {
                 instructions.innerHTML = "<div>🎯 Select instruction sets and toys to get started!</div>";
                 return;
             }
 
-            // Pick a random toy from all selected toys
             const randomToyObj = toys[Math.floor(Math.random() * toys.length)];
             const tasks = instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];
             
@@ -714,28 +890,33 @@
                 return;
             }
 
-            // Pick a random task for that toy
             const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
 
-            // Display the full HTML content
-            instructions.innerHTML = randomTask.content;
+            if (randomTask.type === 'metronome') {
+                const beatCount = randomTask.getDifficulty(currentDifficulty);
+                currentMetronomeTask = createMetronomeTask(beatCount);
+                instructions.innerHTML = '';
+                instructions.appendChild(currentMetronomeTask.element);
+            } else {
+                const content = randomTask.getDifficulty(currentDifficulty);
+                instructions.innerHTML = content;
+            }
         }
         
-        // Handle instruction set selection changes
         function updateToyCheckboxes() {
             selectedSets = Array.from(document.querySelectorAll('#instructionSetCheckboxes input:checked')).map(cb => cb.value);
             const container = document.getElementById('toyCheckboxes');
             container.innerHTML = '';
+            
+            console.log('Selected sets:', selectedSets);
             
             if (selectedSets.length === 0) {
                 container.innerHTML = '<p style="color: #666; text-align: center; margin: 0;">Select instruction sets first</p>';
                 return;
             }
             
-            // Display toys from all selected sets
             selectedSets.forEach(setId => {
                 if (instructionSets[setId]) {
-                    // Add set header
                     const setHeader = document.createElement('div');
                     setHeader.style.fontWeight = 'bold';
                     setHeader.style.color = '#667eea';
@@ -766,15 +947,14 @@
                         checkbox.style.accentColor = '#20c997';
                         checkbox.style.cursor = 'pointer';
                         
-                        // Restore previous selection
                         const toyKey = `${setId}_${toy.id}`;
                         if (toySelections[toyKey]) {
                             checkbox.checked = true;
                         }
                         
-                        // Save selection on change
                         checkbox.addEventListener('change', () => {
                             toySelections[toyKey] = checkbox.checked;
+                            console.log('Toy selections:', toySelections);
                         });
                         
                         const text = document.createTextNode(toy.name);
@@ -787,9 +967,11 @@
             });
         }
         
-        // Listen to instruction set checkbox changes
         document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => {
-            cb.addEventListener('change', updateToyCheckboxes);
+            cb.addEventListener('change', () => {
+                console.log('Checkbox changed:', cb.value, cb.checked);
+                updateToyCheckboxes();
+            });
         });
 
         function playDiceRollSound() {
@@ -797,6 +979,15 @@
         }
 
         function rollDice() {
+            const toys = getSelectedToys();
+            
+            if (toys.length === 0) {
+                alert('⚠️ Please select at least one toy from the instruction sets before rolling!');
+                return;
+            }
+            
+            currentDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
+            
             playDiceRollSound();
             rollDiceButton.disabled = true;
             document.getElementById('instructionSetCheckboxes').parentElement.style.display = 'none';
@@ -827,22 +1018,23 @@
                 if (playerPosition === totalSquares) {
                     rollDiceButton.disabled = true;
                     instructions.innerHTML += `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>`;
-                    return; // Don't show continue button if won
+                    return;
                 }
 
-                // Always show continue button after landing
                 instructions.appendChild(continueButton);
                 continueButton.style.display = "block";
 
                 if (showContinueButton) {
-                    // Snake or Ladder - continue to final position
                     continueButton.onclick = () => {
+                        if (currentMetronomeTask && !currentMetronomeTask.isComplete()) {
+                            return;
+                        }
+                        
                         continueButton.style.display = "none";
 
                         animatePlayer(nextPosition, finalPosition, () => {
                             playerPosition = finalPosition;
                             
-                            // Check if won after snake/ladder move
                             if (playerPosition === totalSquares) {
                                 rollDiceButton.disabled = true;
                                 instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>`;
@@ -854,8 +1046,11 @@
                         }, true);
                     };
                 } else {
-                    // Normal square - just re-enable dice
                     continueButton.onclick = () => {
+                        if (currentMetronomeTask && !currentMetronomeTask.isComplete()) {
+                            return;
+                        }
+                        
                         continueButton.style.display = "none";
                         rollDiceButton.disabled = false;
                     };
@@ -881,7 +1076,6 @@
             }
         }
         
-        // Reset button functionality
         const resetBtn = document.getElementById('resetBtn');
         const resetModal = document.getElementById('resetModal');
         const confirmResetBtn = document.getElementById('confirmReset');
@@ -898,36 +1092,29 @@
         confirmResetBtn.addEventListener('click', function() {
             resetModal.style.display = 'none';
             
-            // Reset player position
             playerPosition = 0;
             player.remove();
             
-            // Re-enable roll button
             rollDiceButton.disabled = false;
             
-            // Hide continue button
             continueButton.style.display = 'none';
             
-            // Clear instructions
             instructions.innerHTML = '';
             
-            // Reset dice display
             diceResult.textContent = 'Dice: -';
             
-            // Show setup options again
             document.getElementById('instructionSetCheckboxes').parentElement.style.display = 'block';
             document.getElementById('toyCheckboxContainer').style.display = 'block';
             
-            // Uncheck all instruction sets
             document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => cb.checked = false);
             
-            // Clear toy selections
             selectedSets = [];
             toySelections = {};
             document.getElementById('toyCheckboxes').innerHTML = '<p style="color: #666; text-align: center; margin: 0;">Select instruction sets first</p>';
         });
 
         rollDiceButton.addEventListener('click', rollDice);
+        
         createBoard();
     </script>
 </body>
