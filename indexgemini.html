@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snakes & Ladders: Physical Challenge Edition</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #f39c12;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --bg: #f4f7f6;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        
+        /* Board Layout */
+        #board { display: grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px); border: 5px solid #333; background: white; position: relative; }
+        .square { width: 40px; height: 40px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 10px; position: relative; }
+        .player { width: 20px; height: 20px; background: red; border-radius: 50%; position: absolute; z-index: 10; transition: all 0.5s ease; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        
+        /* UI Elements */
+        .controls { margin-top: 20px; width: 450px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .toy-selection { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        
+        .instructions { display: none; margin-top: 20px; padding: 15px; border-left: 5px solid var(--primary); background: #eef2f7; border-radius: 4px; }
+        .instructions.active { display: block; }
+        .instructions img { max-width: 100%; border-radius: 8px; margin-top: 10px; }
+
+        /* Modifier UI */
+        .advanced-modifiers { margin-top: 15px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+        .toggle-btn { width: 100%; padding: 10px; background: #eee; border: none; cursor: pointer; font-weight: bold; text-align: left; display: flex; justify-content: space-between; }
+        .advanced-content { padding: 15px; background: #fafafa; }
+        .mod-row { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+        .slider-group { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .slider-label { font-size: 0.75em; width: 70px; }
+        input[type=range] { flex: 1; height: 4px; }
+
+        #activeModifierTray { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+        .mod-badge { background: #fff59d; padding: 4px 10px; border-radius: 20px; font-size: 0.8em; border: 1px solid #fbc02d; font-weight: bold; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        
+        button#rollDice { width: 100%; padding: 15px; font-size: 1.2em; background: var(--success); color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        button#rollDice:hover { background: #27ae60; }
+        .difficulty-btns { display: flex; gap: 5px; margin-top: 10px; }
+        .diff-btn { flex: 1; padding: 5px; cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 4px; }
+        .diff-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div id="board"></div>
+
+    <div class="controls">
+        <div id="setupPhase">
+            <h3>Game Setup</h3>
+            <div class="toy-selection">
+                <label><input type="checkbox" class="toy-cb" value="basketball"> Basketball 🏀</label>
+                <label><input type="checkbox" class="toy-cb" value="soccerball"> Soccer Ball ⚽</label>
+                <label><input type="checkbox" class="toy-cb" value="jumprope"> Jump Rope 🪢</label>
+            </div>
+
+            <div class="difficulty-btns">
+                <button class="diff-btn" onclick="setDiff('easy')">Easy</button>
+                <button class="diff-btn" onclick="setDiff('medium')">Medium</button>
+                <button class="diff-btn" onclick="setDiff('hard')">Hard</button>
+            </div>
+
+            <div class="advanced-modifiers">
+                <button class="toggle-btn" onclick="toggleAdvanced()">
+                    <span>⚙️ Advanced Modifier Logic</span>
+                    <span id="advArrow">▼</span>
+                </button>
+                <div id="advancedArea" class="advanced-content" style="display:none;">
+                    <div id="modContainer">Select a toy to see modifiers</div>
+                </div>
+            </div>
+
+            <button id="startButton" onclick="startGame()" style="width:100%; margin-top:15px; padding:10px; background:var(--primary); color:white; border:none; border-radius:5px;">Start Game</button>
+        </div>
+
+        <div id="gamePhase" style="display:none;">
+            <div id="activeModifierTray"></div>
+            <div id="diceResult" style="font-size: 24px; font-weight: bold; text-align: center; margin: 10px 0;">Dice: -</div>
+            <button id="rollDice" onclick="handleRoll()">Roll Dice</button>
+            <div id="instructions" class="instructions"></div>
+        </div>
+    </div>
+
+<script>
+    // --- STATE & CONFIG ---
+    let playerPosition = 0;
+    let currentDiff = 'medium';
+    let toySelections = { basketball: false, soccerball: false, jumprope: false };
+    
+    const snakes = { 16: 6, 47: 26, 49: 11, 56: 53, 62: 19, 98: 78 };
+    const ladders = { 1: 38, 4: 14, 9: 31, 28: 84, 80: 99 };
+
+    let modifierState = {
+        basketball: {
+            left_hand: { label: "Hold ball in Left Hand 🤚", active: false, addChance: 25, removeChance: 50 },
+            right_hand: { label: "Hold ball in Right Hand ✋", active: false, addChance: 25, removeChance: 50 }
+        },
+        soccerball: {
+            between_feet: { label: "Keep ball between feet ⚽", active: false, addChance: 30, removeChance: 60 }
+        },
+        jumprope: {
+            around_neck: { label: "Rope around neck 🪢", active: false, addChance: 20, removeChance: 50 }
+        }
+    };
+
+    // --- INITIALIZATION ---
+    function createBoard() {
+        const board = document.getElementById('board');
+        board.innerHTML = '';
+        for (let i = 100; i >= 1; i--) {
+            const square = document.createElement('div');
+            square.className = 'square';
+            square.id = `square-${i}`;
+            square.textContent = i;
+            if (snakes[i]) square.style.backgroundColor = '#ffcdd2';
+            if (ladders[i]) square.style.backgroundColor = '#c8e6c9';
+            board.appendChild(square);
+        }
+        const player = document.createElement('div');
+        player.id = 'playerPiece';
+        player.className = 'player';
+        document.body.appendChild(player); // Temp spot
+    }
+
+    // --- MODIFIER LOGIC ---
+    function updateModifierLogic() {
+        // Run rolls only on standard squares
+        let log = [];
+        Object.keys(modifierState).forEach(toy => {
+            if (toySelections[toy]) {
+                Object.keys(modifierState[toy]).forEach(key => {
+                    const mod = modifierState[toy][key];
+                    const roll = Math.random() * 100;
+                    if (!mod.active && roll < mod.addChance) {
+                        mod.active = true;
+                    } else if (mod.active && roll < mod.removeChance) {
+                        mod.active = false;
+                    }
+                });
+            } else {
+                // Deactivate all if toy deselected
+                Object.keys(modifierState[toy]).forEach(key => modifierState[toy][key].active = false);
+            }
+        });
+        renderModifierTray();
+        saveGameState();
+    }
+
+    function renderModifierTray() {
+        const tray = document.getElementById('activeModifierTray');
+        tray.innerHTML = '';
+        Object.keys(modifierState).forEach(toy => {
+            Object.keys(modifierState[toy]).forEach(key => {
+                const mod = modifierState[toy][key];
+                if (mod.active && toySelections[toy]) {
+                    const b = document.createElement('span');
+                    b.className = 'mod-badge';
+                    b.textContent = mod.label;
+                    tray.appendChild(b);
+                }
+            });
+        });
+    }
+
+    function refreshModUI() {
+        const container = document.getElementById('modContainer');
+        container.innerHTML = '';
+        let hasAny = false;
+
+        Object.keys(modifierState).forEach(toy => {
+            if (toySelections[toy]) {
+                hasAny = true;
+                const div = document.createElement('div');
+                div.className = 'mod-row';
+                div.innerHTML = `<strong>${toy.toUpperCase()}</strong>`;
+                Object.keys(modifierState[toy]).forEach(key => {
+                    const m = modifierState[toy][key];
+                    const row = document.createElement('div');
+                    row.innerHTML = `
+                        <div style="font-size:0.8em; margin-top:5px;">${m.label}</div>
+                        <div class="slider-group">
+                            <span class="slider-label" style="color:green">Add: ${m.addChance}%</span>
+                            <input type="range" value="${m.addChance}" oninput="updateChance('${toy}','${key}','addChance',this.value)">
+                        </div>
+                        <div class="slider-group">
+                            <span class="slider-label" style="color:red">Rem: ${m.removeChance}%</span>
+                            <input type="range" value="${m.removeChance}" oninput="updateChance('${toy}','${key}','removeChance',this.value)">
+                        </div>
+                    `;
+                    div.appendChild(row);
+                });
+                container.appendChild(div);
+            }
+        });
+        if (!hasAny) container.innerHTML = "Select a toy above to customize physical modifiers.";
+    }
+
+    function updateChance(toy, key, field, val) {
+        modifierState[toy][key][field] = parseInt(val);
+        refreshModUI();
+        saveGameState();
+    }
+
+    // --- GAME FLOW ---
+    function setDiff(d) {
+        currentDiff = d;
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
+        event.target.classList.add('selected');
+
+        const config = {
+            easy: { add: 10, rem: 75 },
+            medium: { add: 25, rem: 50 },
+            hard: { add: 45, rem: 20 }
+        };
+
+        Object.keys(modifierState).forEach(t => {
+            Object.keys(modifierState[t]).forEach(k => {
+                modifierState[t][k].addChance = config[d].add;
+                modifierState[t][k].removeChance = config[d].rem;
+            });
+        });
+        refreshModUI();
+        saveGameState();
+    }
+
+    function handleRoll() {
+        const roll = Math.floor(Math.random() * 6) + 1;
+        document.getElementById('diceResult').textContent = `Dice: ${roll}`;
+        
+        let newPos = playerPosition + roll;
+        if (newPos > 100) newPos = 100;
+
+        // Check for special squares
+        let special = false;
+        if (snakes[newPos]) {
+            newPos = snakes[newPos];
+            special = true;
+        } else if (ladders[newPos]) {
+            newPos = ladders[newPos];
+            special = true;
+        }
+
+        // Only roll for modifiers if it was a standard landing
+        if (!special) {
+            updateModifierLogic();
+        }
+
+        playerPosition = newPos;
+        movePlayer();
+        showTask();
+        saveGameState();
+    }
+
+    function movePlayer() {
+        const sq = document.getElementById(`square-${playerPosition}`);
+        const p = document.getElementById('playerPiece');
+        if (sq) {
+            const rect = sq.getBoundingClientRect();
+            p.style.top = (sq.offsetTop + 10) + 'px';
+            p.style.left = (sq.offsetLeft + 10) + 'px';
+        }
+    }
+
+    function showTask() {
+        const inst = document.getElementById('instructions');
+        inst.classList.add('active');
+        // Simple placeholder task logic
+        inst.innerHTML = `<strong>Square ${playerPosition}</strong><br>Perform 10 repetitions of your active toy skills!`;
+    }
+
+    function startGame() {
+        document.getElementById('setupPhase').style.display = 'none';
+        document.getElementById('gamePhase').style.display = 'block';
+        if (playerPosition === 0) playerPosition = 1;
+        movePlayer();
+        renderModifierTray();
+    }
+
+    function toggleAdvanced() {
+        const area = document.getElementById('advancedArea');
+        const arrow = document.getElementById('advArrow');
+        const isHidden = area.style.display === 'none';
+        area.style.display = isHidden ? 'block' : 'none';
+        arrow.textContent = isHidden ? '▲' : '▼';
+    }
+
+    // --- STATE PERSISTENCE ---
+    function saveGameState() {
+        const state = {
+            pos: playerPosition,
+            toys: toySelections,
+            mods: modifierState,
+            diff: currentDiff
+        };
+        localStorage.setItem('sl_game_state', JSON.stringify(state));
+    }
+
+    function loadGameState() {
+        const saved = localStorage.getItem('sl_game_state');
+        if (saved) {
+            const s = JSON.parse(saved);
+            playerPosition = s.pos;
+            toySelections = s.toys;
+            modifierState = s.mods;
+            currentDiff = s.diff;
+            // Sync UI checkboxes
+            document.querySelectorAll('.toy-cb').forEach(cb => {
+                cb.checked = toySelections[cb.value];
+            });
+        }
+    }
+
+    // Setup Listeners
+    document.querySelectorAll('.toy-cb').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+            toySelections[e.target.value] = e.target.checked;
+            refreshModUI();
+            saveGameState();
+        });
+    });
+
+    window.onload = () => {
+        createBoard();
+        loadGameState();
+        refreshModUI();
+    };
+</script>
+</body>
+</html>
