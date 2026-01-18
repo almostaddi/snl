@@ -607,21 +607,21 @@
                             <span>🎉 Minor Prize:</span>
                             <span class="percentage" id="minorPercent">25%</span>
                         </div>
-                        <input type="range" id="minorSlider" min="0" max="100" value="25">
+                        <input type="range" id="minorSlider" min="0" max="100" step="1" value="25">
                     </div>
                     <div class="slider-container">
                         <div class="slider-label">
                             <span>🏆 Major Prize:</span>
                             <span class="percentage" id="majorPercent">10%</span>
                         </div>
-                        <input type="range" id="majorSlider" min="0" max="100" value="10">
+                        <input type="range" id="majorSlider" min="0" max="100" step="1" value="10">
                     </div>
                     <div class="slider-container">
                         <div class="slider-label">
                             <span>❌ No Prize:</span>
                             <span class="percentage" id="noPrizePercent">65%</span>
                         </div>
-                        <input type="range" id="noPrizeSlider" min="0" max="100" value="65">
+                        <input type="range" id="noPrizeSlider" min="0" max="100" step="1" value="65">
                     </div>
                 </div>
             </div>
@@ -705,6 +705,9 @@
             
             try {
                 const gameState = JSON.parse(saved);
+                
+                console.log('Loading game state:', gameState); // Debug
+                
                 gameStarted = gameState.gameStarted;
                 playerPosition = gameState.playerPosition;
                 selectedSets = gameState.selectedSets || [];
@@ -713,7 +716,7 @@
                 
                 if (gameState.prizeSettings) {
                     prizeSettings = gameState.prizeSettings;
-                    updateSliderDisplays();
+                    updateSliderDisplays(true); // Skip save to prevent overwriting
                 }
                 
                 if (gameStarted) {
@@ -733,8 +736,11 @@
                         if (targetSquare) targetSquare.appendChild(player);
                     }
                     
-                    // Restore the task
-                    if (gameState.lastTaskInfo) {
+                    console.log('Restoring task info:', gameState.lastTaskInfo); // Debug
+                    console.log('Current instruction HTML:', gameState.currentInstruction); // Debug
+                    
+                    // Restore the task - check if we have saved task info first
+                    if (gameState.lastTaskInfo && gameState.lastTaskInfo.taskType) {
                         window.lastTaskInfo = gameState.lastTaskInfo;
                         instructions.classList.add('active');
                         
@@ -746,11 +752,15 @@
                             currentMetronomeTask = createRedLightGreenLightTask(gameState.lastTaskInfo.duration);
                             instructions.innerHTML = '';
                             instructions.appendChild(currentMetronomeTask.element);
-                        } else {
-                            // Regular HTML task
-                            instructions.innerHTML = gameState.currentInstruction;
+                        } else if (gameState.lastTaskInfo.taskType === 'normal') {
+                            // Regular HTML task - restore from saved HTML
+                            if (gameState.currentInstruction) {
+                                instructions.innerHTML = gameState.currentInstruction;
+                                instructions.classList.add('active');
+                            }
                         }
-                    } else if (gameState.currentInstruction) {
+                    } else if (gameState.currentInstruction && gameState.currentInstruction.trim() !== '') {
+                        // Fallback: restore whatever HTML was saved
                         instructions.innerHTML = gameState.currentInstruction;
                         if (gameState.instructionsActive) {
                             instructions.classList.add('active');
@@ -784,7 +794,12 @@
         const majorPercent = document.getElementById('majorPercent');
         const noPrizePercent = document.getElementById('noPrizePercent');
         
-        function updateSliderDisplays() {
+        function updateSliderDisplays(skipSave = false) {
+            // Round to one decimal place
+            prizeSettings.minor = Math.round(prizeSettings.minor * 10) / 10;
+            prizeSettings.major = Math.round(prizeSettings.major * 10) / 10;
+            prizeSettings.noPrize = Math.round(prizeSettings.noPrize * 10) / 10;
+            
             minorPercent.textContent = prizeSettings.minor.toFixed(1) + '%';
             majorPercent.textContent = prizeSettings.major.toFixed(1) + '%';
             noPrizePercent.textContent = prizeSettings.noPrize.toFixed(1) + '%';
@@ -793,12 +808,14 @@
             majorSlider.value = prizeSettings.major;
             noPrizeSlider.value = prizeSettings.noPrize;
             
-            saveGameState();
+            if (!skipSave) {
+                saveGameState();
+            }
         }
         
         minorSlider.addEventListener('input', function() {
-            const newMinor = parseInt(this.value);
-            const maxAllowed = 100 - prizeSettings.major;
+            const newMinor = Math.round(parseFloat(this.value));
+            const maxAllowed = 100 - Math.round(prizeSettings.major);
             
             if (newMinor > maxAllowed) {
                 prizeSettings.minor = maxAllowed;
@@ -811,8 +828,8 @@
         });
         
         majorSlider.addEventListener('input', function() {
-            const newMajor = parseInt(this.value);
-            const maxAllowed = 100 - prizeSettings.minor;
+            const newMajor = Math.round(parseFloat(this.value));
+            const maxAllowed = 100 - Math.round(prizeSettings.minor);
             
             if (newMajor > maxAllowed) {
                 prizeSettings.major = maxAllowed;
@@ -825,9 +842,9 @@
         });
         
         noPrizeSlider.addEventListener('input', function() {
-            const newNoPrize = parseInt(this.value);
+            const newNoPrize = Math.round(parseFloat(this.value));
             const availableForPrizes = 100 - newNoPrize;
-            const currentPrizeTotal = prizeSettings.minor + prizeSettings.major;
+            const currentPrizeTotal = Math.round(prizeSettings.minor) + Math.round(prizeSettings.major);
             
             if (availableForPrizes < currentPrizeTotal) {
                 // Need to reduce prizes
@@ -838,26 +855,18 @@
                     const minorProportion = prizeSettings.minor / currentPrizeTotal;
                     const majorProportion = prizeSettings.major / currentPrizeTotal;
                     
-                    prizeSettings.minor -= reductionNeeded * minorProportion;
-                    prizeSettings.major -= reductionNeeded * majorProportion;
+                    prizeSettings.minor = Math.round(prizeSettings.minor - (reductionNeeded * minorProportion));
+                    prizeSettings.major = Math.round(prizeSettings.major - (reductionNeeded * majorProportion));
                     
-                    // Clean up floating point errors
-                    prizeSettings.minor = Math.max(0, Math.round(prizeSettings.minor * 10) / 10);
-                    prizeSettings.major = Math.max(0, Math.round(prizeSettings.major * 10) / 10);
+                    prizeSettings.minor = Math.max(0, prizeSettings.minor);
+                    prizeSettings.major = Math.max(0, prizeSettings.major);
                 }
             } else if (availableForPrizes > currentPrizeTotal) {
                 // Can increase prizes - add equally to both
                 const increaseAmount = availableForPrizes - currentPrizeTotal;
-                prizeSettings.minor += increaseAmount / 2;
-                prizeSettings.major += increaseAmount / 2;
-            }
-            
-            // Force exact total
-            const actualTotal = prizeSettings.minor + prizeSettings.major;
-            if (Math.abs(actualTotal - availableForPrizes) > 0.01) {
-                const correction = availableForPrizes - actualTotal;
-                prizeSettings.minor += correction / 2;
-                prizeSettings.major += correction / 2;
+                const halfIncrease = increaseAmount / 2;
+                prizeSettings.minor = Math.round(prizeSettings.minor + halfIncrease);
+                prizeSettings.major = Math.round(prizeSettings.major + halfIncrease);
             }
             
             prizeSettings.noPrize = newNoPrize;
@@ -1423,7 +1432,7 @@
                 instructions.classList.add('active');
                 instructions.innerHTML = "<div>🎯 Select instruction sets and toys to get started!</div>";
                 window.lastTaskInfo = null;
-                saveGameState();
+                // Don't save here - this is an error state
                 return;
             }
 
@@ -1434,7 +1443,7 @@
                 instructions.classList.add('active');
                 instructions.innerHTML = "<div>No tasks available for this toy!</div>";
                 window.lastTaskInfo = null;
-                saveGameState();
+                // Don't save here - this is an error state
                 return;
             }
 
@@ -1466,7 +1475,7 @@
                 instructions.innerHTML = content;
             }
             
-            saveGameState();
+            // Don't save here - let the caller save after this completes
         }
         
         function updateToyCheckboxes() {
@@ -1644,9 +1653,9 @@
 
             animatePlayer(playerPosition, nextPosition, () => {
                 playerPosition = nextPosition;
-                saveGameState();
 
                 displayRandomInstruction();
+                saveGameState(); // Save AFTER displaying instruction
 
                 if (playerPosition === totalSquares) {
                     rollDiceButton.disabled = true;
@@ -1668,16 +1677,17 @@
 
                         animatePlayer(nextPosition, finalPosition, () => {
                             playerPosition = finalPosition;
-                            saveGameState();
                             
                             if (playerPosition === totalSquares) {
                                 rollDiceButton.disabled = true;
                                 const prize = determinePrize();
                                 instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>` + displayPrizeResult(prize);
+                                saveGameState();
                             } else {
                                 rollDiceButton.disabled = false;
                                 instructions.innerHTML = `<div><strong>📍 You landed on ${finalPosition}.</strong></div>`;
                                 displayRandomInstruction();
+                                saveGameState(); // Save AFTER displaying instruction
                             }
                         }, true);
                     };
