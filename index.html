@@ -691,7 +691,10 @@
                 toySelections: toySelections,
                 toyDifficulties: toyDifficulties,
                 prizeSettings: prizeSettings,
-                diceResultText: diceResult.textContent
+                diceResultText: diceResult.textContent,
+                currentInstruction: instructions.innerHTML,
+                instructionsActive: instructions.classList.contains('active'),
+                lastTaskInfo: window.lastTaskInfo || null
             };
             localStorage.setItem('snakesLaddersGameState', JSON.stringify(gameState));
         }
@@ -730,15 +733,29 @@
                         if (targetSquare) targetSquare.appendChild(player);
                     }
                     
-                    instructions.classList.add('active');
-                    instructions.innerHTML = `
-                        <div style="font-size: 1.5em; font-weight: bold; color: #667eea; margin-bottom: 15px;">
-                            ↩️ Welcome Back! ↩️
-                        </div>
-                        <div style="font-size: 1em; color: #666;">
-                            You're on square ${playerPosition}. Roll the dice to continue!
-                        </div>
-                    `;
+                    // Restore the task
+                    if (gameState.lastTaskInfo) {
+                        window.lastTaskInfo = gameState.lastTaskInfo;
+                        instructions.classList.add('active');
+                        
+                        if (gameState.lastTaskInfo.taskType === 'metronome') {
+                            currentMetronomeTask = createMetronomeTask(gameState.lastTaskInfo.beatCount);
+                            instructions.innerHTML = '';
+                            instructions.appendChild(currentMetronomeTask.element);
+                        } else if (gameState.lastTaskInfo.taskType === 'redlight') {
+                            currentMetronomeTask = createRedLightGreenLightTask(gameState.lastTaskInfo.duration);
+                            instructions.innerHTML = '';
+                            instructions.appendChild(currentMetronomeTask.element);
+                        } else {
+                            // Regular HTML task
+                            instructions.innerHTML = gameState.currentInstruction;
+                        }
+                    } else if (gameState.currentInstruction) {
+                        instructions.innerHTML = gameState.currentInstruction;
+                        if (gameState.instructionsActive) {
+                            instructions.classList.add('active');
+                        }
+                    }
                 } else {
                     updateToyCheckboxes();
                 }
@@ -1138,7 +1155,7 @@
                                 const counts = {easy: 5, medium: 10, hard: 15};
                                 return `
                                     <div><strong>Bounce the basketball ${counts[diff]} times!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=600&fit=crop" alt="Basketball" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/basketball1/800/600" alt="Basketball" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                 `;
                             }
                         },
@@ -1154,7 +1171,7 @@
                                 const counts = {easy: 3, medium: 5, hard: 8};
                                 return `
                                     <div><strong>Spin the basketball on your finger!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1608245449230-4ac19066d2d0?w=800&h=600&fit=crop" alt="Basketball Spinning" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/basketball2/800/600" alt="Basketball Spinning" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                     <p style="margin-top: 10px; font-size: 14px; color: #666;">Keep trying until you can hold it for ${counts[diff]} seconds!</p>
                                 `;
                             }
@@ -1164,7 +1181,7 @@
                                 const counts = {easy: 3, medium: 5, hard: 10};
                                 return `
                                     <div><strong>Pass the basketball around your waist ${counts[diff]} times!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1515523110800-9415d13b84a8?w=800&h=600&fit=crop" alt="Basketball" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/basketball3/800/600" alt="Basketball" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                 `;
                             }
                         }
@@ -1175,7 +1192,7 @@
                                 const counts = {easy: 3, medium: 5, hard: 10};
                                 return `
                                     <div><strong>Kick the soccer ball ${counts[diff]} times!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=800&h=600&fit=crop" alt="Soccer Ball" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/soccer1/800/600" alt="Soccer Ball" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                 `;
                             }
                         },
@@ -1185,7 +1202,7 @@
                                 return `
                                     <div><strong>Juggling Challenge!</strong></div>
                                     <p>Try to juggle the soccer ball ${counts[diff]} times without it touching the ground.</p>
-                                    <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=600&fit=crop" alt="Soccer Juggling" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/soccer2/800/600" alt="Soccer Juggling" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                     <p style="margin-top: 10px; font-size: 14px; color: #666;">Use your feet, knees, or head!</p>
                                 `;
                             }
@@ -1195,7 +1212,7 @@
                                 const counts = {easy: 3, medium: 5, hard: 8};
                                 return `
                                     <div><strong>Roll the soccer ball in a circle ${counts[diff]} times!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&h=600&fit=crop" alt="Soccer Ball" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/soccer3/800/600" alt="Soccer Ball" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                 `;
                             }
                         }
@@ -1215,7 +1232,7 @@
                                 const counts = {easy: 10, medium: 15, hard: 25};
                                 return `
                                     <div><strong>Jump rope ${counts[diff]} times!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=600&fit=crop" alt="Jump Rope" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/jumprope1/800/600" alt="Jump Rope" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                 `;
                             }
                         },
@@ -1232,7 +1249,7 @@
                                 return `
                                     <div><strong>Criss-Cross Challenge!</strong></div>
                                     <p>Do ${counts[diff]} criss-cross jumps with the jump rope.</p>
-                                    <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=600&fit=crop" alt="Jump Rope" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/jumprope2/800/600" alt="Jump Rope" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                     <p style="margin-top: 10px; font-size: 14px; color: #666;">Cross your arms while the rope is in the air!</p>
                                 `;
                             }
@@ -1242,7 +1259,7 @@
                                 const counts = {easy: 5, medium: 10, hard: 15};
                                 return `
                                     <div><strong>Jump rope backwards ${counts[diff]} times!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1483721310020-03333e577078?w=800&h=600&fit=crop" alt="Jump Rope" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/jumprope3/800/600" alt="Jump Rope" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                 `;
                             }
                         }
@@ -1253,7 +1270,7 @@
                                 const distances = {easy: '2 feet', medium: '3 feet', hard: '5 feet'};
                                 return `
                                     <div><strong>Climb the rope ${distances[diff]} up!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop" alt="Climbing Rope" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/climbrope1/800/600" alt="Climbing Rope" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                 `;
                             }
                         },
@@ -1263,7 +1280,7 @@
                                 return `
                                     <div><strong>Hanging Challenge!</strong></div>
                                     <p>Hang from the climbing rope for ${counts[diff]} seconds.</p>
-                                    <img src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&h=600&fit=crop" alt="Rope Climb" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/climbrope2/800/600" alt="Rope Climb" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                     <p style="margin-top: 10px; font-size: 14px; color: #666;">Keep your feet off the ground!</p>
                                 `;
                             }
@@ -1273,7 +1290,7 @@
                                 const counts = {easy: 2, medium: 3, hard: 5};
                                 return `
                                     <div><strong>Do ${counts[diff]} rope pull-ups!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop" alt="Climbing" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/climbrope3/800/600" alt="Climbing" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                 `;
                             }
                         }
@@ -1293,7 +1310,7 @@
                                 return `
                                     <div><strong>Free Throw Challenge!</strong></div>
                                     <p>Make ${counts[diff]} baskets from the free throw line.</p>
-                                    <img src="https://images.unsplash.com/photo-1559692048-79a3f837883d?w=800&h=600&fit=crop" alt="Basketball Hoop" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/hoop1/800/600" alt="Basketball Hoop" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                     <p style="margin-top: 10px; font-size: 14px; color: #666;">Take your time and aim carefully!</p>
                                 `;
                             }
@@ -1303,7 +1320,7 @@
                                 const counts = {easy: 1, medium: 2, hard: 3};
                                 return `
                                     <div><strong>Make ${counts[diff]} layup shot${counts[diff] > 1 ? 's' : ''}!</strong></div>
-                                    <img src="https://images.unsplash.com/photo-1504450874802-0ba2bcd9b5ae?w=800&h=600&fit=crop" alt="Basketball Layup" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/hoop2/800/600" alt="Basketball Layup" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                 `;
                             }
                         },
@@ -1313,7 +1330,7 @@
                                 return `
                                     <div><strong>3-Pointer Challenge!</strong></div>
                                     <p>Try to make ${counts[diff]} shot${counts[diff] > 1 ? 's' : ''} from the 3-point line!</p>
-                                    <img src="https://images.unsplash.com/photo-1515523110800-9415d13b84a8?w=800&h=600&fit=crop" alt="Basketball 3-pointer" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
+                                    <img src="https://picsum.photos/seed/hoop3/800/600" alt="Basketball 3-pointer" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />
                                     <p style="margin-top: 10px; font-size: 14px; color: #666;">Don't worry if you miss - just have fun!</p>
                                 `;
                             }
@@ -1405,6 +1422,8 @@
             if (toys.length === 0) {
                 instructions.classList.add('active');
                 instructions.innerHTML = "<div>🎯 Select instruction sets and toys to get started!</div>";
+                window.lastTaskInfo = null;
+                saveGameState();
                 return;
             }
 
@@ -1414,19 +1433,31 @@
             if (!tasks || tasks.length === 0) {
                 instructions.classList.add('active');
                 instructions.innerHTML = "<div>No tasks available for this toy!</div>";
+                window.lastTaskInfo = null;
+                saveGameState();
                 return;
             }
 
             const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
 
+            // Save task info for restoration
+            window.lastTaskInfo = {
+                toyId: randomToyObj.toyId,
+                setId: randomToyObj.setId,
+                difficulty: randomToyObj.difficulty,
+                taskType: randomTask.type || 'normal'
+            };
+
             instructions.classList.add('active');
             if (randomTask.type === 'metronome') {
                 const beatCount = randomTask.getDifficulty(randomToyObj.difficulty);
+                window.lastTaskInfo.beatCount = beatCount;
                 currentMetronomeTask = createMetronomeTask(beatCount);
                 instructions.innerHTML = '';
                 instructions.appendChild(currentMetronomeTask.element);
             } else if (randomTask.type === 'redlight') {
                 const duration = randomTask.getDifficulty(randomToyObj.difficulty);
+                window.lastTaskInfo.duration = duration;
                 currentMetronomeTask = createRedLightGreenLightTask(duration);
                 instructions.innerHTML = '';
                 instructions.appendChild(currentMetronomeTask.element);
@@ -1434,6 +1465,8 @@
                 const content = randomTask.getDifficulty(randomToyObj.difficulty);
                 instructions.innerHTML = content;
             }
+            
+            saveGameState();
         }
         
         function updateToyCheckboxes() {
