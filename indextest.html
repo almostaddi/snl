@@ -5,127 +5,756 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snakes and Ladders</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
-        h1 { font-size: 3em; margin-bottom: 30px; text-shadow: 3px 3px 6px rgba(0,0,0,0.3); animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        #gameContainer { background: rgba(255,255,255,0.95); padding: 30px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 1200px; width: 100%; }
-        #board { display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr); border: 4px solid #333; border-radius: 15px; margin: 0 auto 20px; width: 100%; max-width: 700px; aspect-ratio: 1; background: #fff; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); overflow: hidden; }
-        .square { display: flex; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.1); background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%); font-weight: bold; font-size: 0.9em; color: #333; position: relative; transition: all 0.3s ease; }
-        .square:hover { transform: scale(1.05); z-index: 5; }
-        .snake { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; }
-        .snake::before { content: '🐍'; position: absolute; font-size: 3em; opacity: 0.3; }
-        .snake::after { content: attr(data-destination); position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.7); color: white; font-size: 0.7em; padding: 2px 5px; border-radius: 5px; font-weight: bold; }
-        .ladder { background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); color: white; }
-        .ladder::before { content: '🪜'; position: absolute; font-size: 3em; opacity: 0.3; }
-        .ladder::after { content: attr(data-destination); position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); color: white; font-size: 0.7em; padding: 2px 5px; border-radius: 5px; font-weight: bold; }
-        .player { width: 30px; height: 30px; background: radial-gradient(circle, #4dabf7 0%, #1864ab 100%); border-radius: 50%; position: absolute; z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.3); animation: pulse 1s ease-in-out infinite; border: 3px solid white; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        #controls { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 20px; }
-        button { padding: 15px 40px; font-size: 20px; font-weight: bold; cursor: pointer; color: white; border: none; border-radius: 50px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
-        #startButton { background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); box-shadow: 0 8px 20px rgba(81,207,102,0.4); }
-        #startButton:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(81,207,102,0.5); }
-        #rollDice { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); box-shadow: 0 8px 20px rgba(79,172,254,0.4); }
-        #rollDice:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(79,172,254,0.5); }
-        button:disabled { background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%); cursor: not-allowed; box-shadow: none; }
-        #diceResult { font-size: 28px; font-weight: bold; padding: 15px 30px; background: linear-gradient(135deg, #ffd93d 0%, #ffbc00 100%); border-radius: 15px; color: #333; box-shadow: 0 4px 15px rgba(255,188,0,0.3); min-width: 150px; text-align: center; }
-        #instructions { margin-top: 20px; font-size: 18px; text-align: left; min-height: 80px; padding: 50px 80px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; color: #333; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; line-height: 1.8; max-width: 900px; margin-left: auto; margin-right: auto; }
-        #instructions.active { display: block; }
-        #instructions img { margin: 40px 0; max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        #instructions p { margin: 25px 0; font-size: 17px; line-height: 2; }
-        #instructions strong { font-size: 26px; display: block; margin-bottom: 20px; text-align: center; color: #667eea; }
-        #continueButton { margin-top: 15px; padding: 12px 30px; font-size: 18px; background: linear-gradient(135deg, #fa5252 0%, #e03131 100%); box-shadow: 0 6px 20px rgba(250,82,82,0.4); display: block; margin-left: auto; margin-right: auto; }
-        #continueButton:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(250,82,82,0.5); }
-        #buttoncontainer { margin-top: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; width: 100%; }
-        .settings-column-left, .settings-column-right { width: 100%; max-width: 900px; }
-        @media (min-width: 900px) {
-            #buttoncontainer { max-width: 1200px; margin-left: auto; margin-right: auto; flex-wrap: nowrap; }
-            .settings-column-left { width: 50%; max-width: none; }
-            .settings-column-right { width: 50%; max-width: none; }
-        }
-        .prize-settings { margin-top: 20px; padding: 20px; background: white; border-radius: 15px; border: 2px solid #667eea; }
-        .prize-settings h3 { color: #667eea; margin-bottom: 15px; text-align: center; }
-        .slider-container { margin: 15px 0; }
-        .slider-label { display: flex; justify-content: space-between; margin-bottom: 5px; color: #333; font-weight: bold; }
-        .slider-label .percentage { color: #667eea; }
-        input[type="range"] { width: 100%; height: 8px; border-radius: 5px; outline: none; -webkit-appearance: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #667eea; cursor: pointer; }
-        input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #667eea; cursor: pointer; }
-        #minorSlider { background: linear-gradient(to right, #51cf66, #37b24d); }
-        #majorSlider { background: linear-gradient(to right, #ffd93d, #ffbc00); }
-        #noPrizeSlider { background: linear-gradient(to right, #adb5bd, #868e96); }
-        .toy-library-item { border: 2px solid #e9ecef; border-radius: 10px; padding: 12px; margin-bottom: 12px; transition: all 0.3s ease; }
-        .toy-library-item:hover { border-color: #667eea; box-shadow: 0 4px 12px rgba(102,126,234,0.2); }
-        .toy-library-item.disabled { opacity: 0.5; background: #f8f9fa; }
-        .toy-library-item.disabled input, .toy-library-item.disabled select, .toy-library-item.disabled button { pointer-events: none; }
-        .toy-library-item.disabled .toy-checkbox-wrapper input { pointer-events: auto; }
-        .toy-header { display: flex; align-items: center; gap: 10px; font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 10px; }
-        .toy-checkbox-wrapper { display: flex; align-items: center; }
-        .toy-checkbox-wrapper input[type="checkbox"] { width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: #51cf66; }
-        .toy-name { flex: 1; }
-        .toy-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-left: 30px; margin-bottom: 8px; }
-        .toy-controls label { font-size: 0.9em; color: #333; font-weight: 600; }
-        .toy-controls input[type="number"] { width: 60px; padding: 6px; border: 2px solid #667eea; border-radius: 6px; text-align: center; }
-        .set-difficulty { margin-left: 30px; padding: 8px; background: #f8f9fa; border-radius: 6px; margin-top: 8px; }
-        .set-difficulty-item { padding: 6px 0; border-bottom: 1px solid #e9ecef; }
-        .set-difficulty-item:last-child { border-bottom: none; }
-        .difficulty-row { display: flex; justify-content: space-between; align-items: center; }
-        .difficulty-row > span { font-weight: 600; color: #495057; font-size: 0.95em; }
-        .difficulty-controls { display: flex; gap: 10px; align-items: center; }
-        .difficulty-row select { padding: 4px 8px; border: 2px solid #667eea; border-radius: 4px; background: white; color: #333; cursor: pointer; }
-        .gear-btn { background: #667eea; color: white; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; }
-        .gear-btn:hover { background: #5568d3; }
-        .gear-btn.active { background: #51cf66; }
-        .gear-btn:disabled { background: #adb5bd; cursor: default; opacity: 0.5; }
-        .gear-btn:disabled:hover { background: #adb5bd; }
-        .advanced-settings { margin-left: 20px; padding: 8px 12px; background: white; border-radius: 4px; border-left: 3px solid #667eea; font-size: 0.85em; color: #666; display: none; gap: 15px; margin-top: 8px; }
-        .advanced-settings.visible { display: flex; }
-        .advanced-settings label { display: flex; align-items: center; gap: 5px; }
-        .advanced-settings input { width: 50px; padding: 3px 6px; border: 1px solid #dee2e6; border-radius: 3px; text-align: center; }
-        .non-wearable-note { margin-left: 20px; padding: 6px 10px; background: #fff3cd; border-left: 3px solid #ffc107; border-radius: 4px; font-size: 0.8em; color: #856404; margin-top: 5px; }
-        #toyLibraryContainer { background: white; border-radius: 10px; padding: 20px; }
-        .metronome-container { margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 15px; box-shadow: 0 4px 15px rgba(79,172,254,0.3); }
-        .metronome-display { font-size: 48px; font-weight: bold; color: white; text-align: center; margin: 15px 0; min-height: 60px; display: flex; align-items: center; justify-content: center; }
-        .metronome-beat { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.3); margin: 0 auto; transition: all 0.1s ease; }
-        .metronome-beat.active { background: white; transform: scale(1.2); box-shadow: 0 0 20px rgba(255,255,255,0.8); }
-        .metronome-btn { padding: 12px 30px; font-size: 18px; background: white; color: #4facfe; box-shadow: 0 4px 15px rgba(0,0,0,0.2); margin: 10px auto; display: block; }
-        .metronome-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
-        .metronome-btn:disabled { opacity: 0.5; }
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); padding-top: 60px; }
-        .modal-content { background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%); margin: 5% auto; padding: 30px; width: 80%; max-width: 600px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); color: #333; }
-        .modal-content h2 { color: #667eea; margin-bottom: 20px; }
-        .modal-content p { line-height: 1.8; margin-bottom: 15px; }
-        .close-btn { color: #aaa; float: right; font-size: 32px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
-        .close-btn:hover { color: #667eea; transform: rotate(90deg); }
-        #patchNotesBtn, #resetBtn { position: fixed; top: 20px; padding: 10px 20px; font-size: 14px; font-weight: 600; z-index: 10; }
-        #patchNotesBtn { right: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 4px 15px rgba(102,126,234,0.4); }
-        #resetBtn { left: 20px; background: linear-gradient(135deg, #fa5252 0%, #e03131 100%); box-shadow: 0 4px 15px rgba(250,82,82,0.4); }
-        .prize-result { font-size: 2em; text-align: center; margin: 20px 0; padding: 30px; border-radius: 15px; animation: prizeReveal 0.5s ease-out; }
-        @keyframes prizeReveal { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
-        .prize-minor { background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); color: white; }
-        .prize-major { background: linear-gradient(135deg, #ffd93d 0%, #ffbc00 100%); color: #333; }
-        .prize-none { background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%); color: white; }
-        .toy-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 8px 20px; border-radius: 8px; transition: background 0.2s; }
-        .toy-item:hover { background: #e9ecef; }
-        .toy-checkbox { width: 18px; height: 18px; margin-right: 10px; accent-color: #20c997; cursor: pointer; }
-        .quantity-input { width: 60px; padding: 4px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px; text-align: center; font-weight: bold; margin: 0 10px; }
-        #advancedSettings { margin-top: 20px; }
-        .advanced-toggle { padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-        .advanced-arrow { transition: transform 0.2s ease; }
-        .advanced-content { max-height: 0; overflow: hidden; background: white; border-radius: 0 0 10px 10px; border: 2px solid transparent; border-top: none; transition: max-height 0.2s ease, border-color 0s 0.2s; }
-        .advanced-content.open { max-height: 2000px; border: 2px solid #667eea; border-top: none; transition: max-height 0.2s ease; }
-        .modifier-section { margin: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; border: 2px solid #dee2e6; }
-        .modifier-header { font-weight: bold; color: #667eea; font-size: 16px; margin-bottom: 15px; }
-        .modifier-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .modifier-column { display: flex; flex-direction: column; align-items: center; }
-        .modifier-column-header { color: #333; font-size: 14px; font-weight: bold; margin-bottom: 8px; }
-        .modifier-group { display: flex; align-items: center; gap: 5px; }
-        .modifier-input { width: 70px; padding: 6px; border: 2px solid #667eea; border-radius: 6px; font-size: 14px; font-weight: bold; text-align: center; }
-        .percent-symbol { color: #333; font-weight: bold; }
-        .instruction-set-selector { background: white; border-radius: 10px; padding: 15px; border: 2px solid #667eea; margin-bottom: 15px; }
-        .instruction-set-selector label { display: block; padding: 8px; cursor: pointer; color: #333; }
-        .instruction-set-selector input[type="checkbox"] { margin-right: 10px; width: 18px; height: 18px; accent-color: #667eea; }
-        @media (max-width: 600px) { h1 { font-size: 2em; } #gameContainer { padding: 20px; } .square { font-size: 0.7em; } .player { width: 20px; height: 20px; } }
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body { 
+    font-family: 'Segoe UI', sans-serif; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    min-height: 100vh; 
+    padding: 20px; 
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    color: #fff; 
+}
+
+h1 { 
+    font-size: 3em; 
+    margin-bottom: 30px; 
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.3); 
+    animation: float 3s ease-in-out infinite; 
+}
+
+@keyframes float { 
+    0%, 100% { transform: translateY(0); } 
+    50% { transform: translateY(-10px); } 
+}
+
+#gameContainer { 
+    background: rgba(255,255,255,0.95); 
+    padding: 30px; 
+    border-radius: 20px; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+    max-width: 1200px; 
+    width: 100%; 
+}
+
+#board { 
+    display: grid; 
+    grid-template-columns: repeat(10, 1fr); 
+    grid-template-rows: repeat(10, 1fr); 
+    border: 4px solid #333; 
+    border-radius: 15px; 
+    margin: 0 auto 20px; 
+    width: 100%; 
+    max-width: 700px; 
+    aspect-ratio: 1; 
+    background: #fff; 
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1); 
+    overflow: hidden; 
+}
+
+.square { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    border: 1px solid rgba(0,0,0,0.1); 
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%); 
+    font-weight: bold; 
+    font-size: 0.9em; 
+    color: #333; 
+    position: relative; 
+    transition: all 0.3s ease; 
+}
+
+.square:hover { 
+    transform: scale(1.05); 
+    z-index: 5; 
+}
+
+.snake { 
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); 
+    color: white; 
+}
+
+.snake::before { 
+    content: '🐍'; 
+    position: absolute; 
+    font-size: 3em; 
+    opacity: 0.3; 
+}
+
+.snake::after { 
+    content: attr(data-destination); 
+    position: absolute; 
+    bottom: 2px; 
+    right: 2px; 
+    background: rgba(0,0,0,0.7); 
+    color: white; 
+    font-size: 0.7em; 
+    padding: 2px 5px; 
+    border-radius: 5px; 
+    font-weight: bold; 
+}
+
+.ladder { 
+    background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); 
+    color: white; 
+}
+
+.ladder::before { 
+    content: '🪜'; 
+    position: absolute; 
+    font-size: 3em; 
+    opacity: 0.3; 
+}
+
+.ladder::after { 
+    content: attr(data-destination); 
+    position: absolute; 
+    top: 2px; 
+    right: 2px; 
+    background: rgba(0,0,0,0.7); 
+    color: white; 
+    font-size: 0.7em; 
+    padding: 2px 5px; 
+    border-radius: 5px; 
+    font-weight: bold; 
+}
+
+.player { 
+    width: 30px; 
+    height: 30px; 
+    background: radial-gradient(circle, #4dabf7 0%, #1864ab 100%); 
+    border-radius: 50%; 
+    position: absolute; 
+    z-index: 10; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+    animation: pulse 1s ease-in-out infinite; 
+    border: 3px solid white; 
+}
+
+@keyframes pulse { 
+    0%, 100% { transform: scale(1); } 
+    50% { transform: scale(1.1); } 
+}
+
+#controls { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 15px; 
+    margin-bottom: 20px; 
+}
+
+button { 
+    padding: 15px 40px; 
+    font-size: 20px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    color: white; 
+    border: none; 
+    border-radius: 50px; 
+    transition: all 0.3s ease; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+}
+
+#startButton { 
+    background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); 
+    box-shadow: 0 8px 20px rgba(81,207,102,0.4); 
+}
+
+#startButton:hover:not(:disabled) { 
+    transform: translateY(-2px); 
+    box-shadow: 0 12px 25px rgba(81,207,102,0.5); 
+}
+
+#rollDice { 
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+    box-shadow: 0 8px 20px rgba(79,172,254,0.4); 
+}
+
+#rollDice:hover:not(:disabled) { 
+    transform: translateY(-2px); 
+    box-shadow: 0 12px 25px rgba(79,172,254,0.5); 
+}
+
+button:disabled { 
+    background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%); 
+    cursor: not-allowed; 
+    box-shadow: none; 
+}
+
+#diceResult { 
+    font-size: 28px; 
+    font-weight: bold; 
+    padding: 15px 30px; 
+    background: linear-gradient(135deg, #ffd93d 0%, #ffbc00 100%); 
+    border-radius: 15px; 
+    color: #333; 
+    box-shadow: 0 4px 15px rgba(255,188,0,0.3); 
+    min-width: 150px; 
+    text-align: center; 
+}
+
+#instructions { 
+    margin-top: 20px; 
+    font-size: 18px; 
+    text-align: left; 
+    min-height: 80px; 
+    padding: 50px 80px; 
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+    border-radius: 15px; 
+    color: #333; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    display: none; 
+    line-height: 1.8; 
+    max-width: 900px; 
+    margin-left: auto; 
+    margin-right: auto; 
+}
+
+#instructions.active { 
+    display: block; 
+}
+
+#instructions img { 
+    margin: 40px 0; 
+    max-width: 100%; 
+    height: auto; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+}
+
+#instructions p { 
+    margin: 25px 0; 
+    font-size: 17px; 
+    line-height: 2; 
+}
+
+#instructions strong { 
+    font-size: 26px; 
+    display: block; 
+    margin-bottom: 20px; 
+    text-align: center; 
+    color: #667eea; 
+}
+
+#continueButton { 
+    margin-top: 15px; 
+    padding: 12px 30px; 
+    font-size: 18px; 
+    background: linear-gradient(135deg, #fa5252 0%, #e03131 100%); 
+    box-shadow: 0 6px 20px rgba(250,82,82,0.4); 
+    display: block; 
+    margin-left: auto; 
+    margin-right: auto; 
+}
+
+#continueButton:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 8px 25px rgba(250,82,82,0.5); 
+}
+
+#buttoncontainer { 
+    margin-top: 20px; 
+    display: flex; 
+    gap: 15px; 
+    justify-content: center; 
+    flex-wrap: wrap; 
+    width: 100%; 
+}
+
+.settings-column-left, .settings-column-right { 
+    width: 100%; 
+    max-width: 900px; 
+}
+
+@media (min-width: 900px) {
+    #buttoncontainer { 
+        max-width: 1200px; 
+        margin-left: auto; 
+        margin-right: auto; 
+        flex-wrap: nowrap; 
+    }
+    .settings-column-left { 
+        width: 50%; 
+        max-width: none; 
+    }
+    .settings-column-right { 
+        width: 50%; 
+        max-width: none; 
+    }
+}
+
+.prize-settings { 
+    margin-top: 20px; 
+    padding: 20px; 
+    background: white; 
+    border-radius: 15px; 
+    border: 2px solid #667eea; 
+}
+
+.prize-settings h3 { 
+    color: #667eea; 
+    margin-bottom: 15px; 
+    text-align: center; 
+}
+
+.slider-container { 
+    margin: 15px 0; 
+}
+
+.slider-label { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 5px; 
+    color: #333; 
+    font-weight: bold; 
+}
+
+.slider-label .percentage { 
+    color: #667eea; 
+}
+
+input[type="range"] { 
+    width: 100%; 
+    height: 8px; 
+    border-radius: 5px; 
+    outline: none; 
+    -webkit-appearance: none; 
+}
+
+input[type="range"]::-webkit-slider-thumb { 
+    -webkit-appearance: none; 
+    width: 20px; 
+    height: 20px; 
+    border-radius: 50%; 
+    background: #667eea; 
+    cursor: pointer; 
+}
+
+input[type="range"]::-moz-range-thumb { 
+    width: 20px; 
+    height: 20px; 
+    border-radius: 50%; 
+    background: #667eea; 
+    cursor: pointer; 
+}
+
+#minorSlider { 
+    background: linear-gradient(to right, #51cf66, #37b24d); 
+}
+
+#majorSlider { 
+    background: linear-gradient(to right, #ffd93d, #ffbc00); 
+}
+
+#noPrizeSlider { 
+    background: linear-gradient(to right, #adb5bd, #868e96); 
+}
+
+.toy-library-item { 
+    border: 2px solid #e9ecef; 
+    border-radius: 10px; 
+    padding: 12px; 
+    margin-bottom: 12px; 
+    transition: all 0.3s ease; 
+}
+
+.toy-library-item:hover { 
+    border-color: #667eea; 
+    box-shadow: 0 4px 12px rgba(102,126,234,0.2); 
+}
+
+.toy-header { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    font-size: 1.1em; 
+    font-weight: bold; 
+    color: #333; 
+    margin-bottom: 10px; 
+}
+
+.toy-checkbox-wrapper { 
+    display: flex; 
+    align-items: center; 
+}
+
+.toy-checkbox-wrapper input[type="checkbox"] { 
+    width: 20px; 
+    height: 20px; 
+    margin: 0; 
+    cursor: pointer; 
+    accent-color: #51cf66; 
+}
+
+.toy-name { 
+    flex: 1; 
+}
+
+.toy-controls { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+    flex-wrap: wrap; 
+    margin-left: 30px; 
+    margin-bottom: 8px; 
+}
+
+.toy-controls label { 
+    font-size: 0.9em; 
+    color: #333; 
+    font-weight: 600; 
+}
+
+.toy-controls input[type="number"] { 
+    width: 60px; 
+    padding: 6px; 
+    border: 2px solid #667eea; 
+    border-radius: 6px; 
+    text-align: center; 
+}
+
+.set-difficulty { 
+    margin-left: 30px; 
+    padding: 8px; 
+    background: #f8f9fa; 
+    border-radius: 6px; 
+    margin-top: 8px; 
+}
+
+.toy-controls input[type="number"]:disabled { 
+    opacity: 0.5;
+    cursor: default;
+    background: #f8f9fa;
+}
+
+.difficulty-row select:disabled {
+    opacity: 0.5;
+    cursor: default;
+    background: #f8f9fa;
+}
+
+.advanced-settings input:disabled {
+    opacity: 0.5;
+    cursor: default;
+    background: #f8f9fa;
+}
+
+.set-difficulty input[type="checkbox"]:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.set-difficulty input[type="checkbox"]:disabled + span,
+.set-difficulty-item:has(input[type="checkbox"]:disabled) {
+    opacity: 0.5;
+}
+
+.set-difficulty-item { 
+    padding: 6px 0; 
+    border-bottom: 1px solid #e9ecef; 
+}
+
+.set-difficulty-item:last-child { 
+    border-bottom: none; 
+}
+
+.difficulty-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+.difficulty-row > span { 
+    font-weight: 600; 
+    color: #495057; 
+    font-size: 0.95em; 
+}
+
+.difficulty-controls { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+}
+
+.difficulty-row select { 
+    padding: 4px 8px; 
+    border: 2px solid #667eea; 
+    border-radius: 4px; 
+    background: white; 
+    color: #333; 
+    cursor: pointer; 
+}
+
+.gear-btn { 
+    background: #667eea; 
+    color: white; 
+    border: none; 
+    width: 28px; 
+    height: 28px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-size: 14px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    transition: background 0.2s ease; 
+}
+
+.gear-btn:hover { 
+    background: #5568d3; 
+}
+
+.gear-btn.active { 
+    background: #51cf66; 
+}
+
+.gear-btn:disabled { 
+    background: #adb5bd; 
+    cursor: default; 
+    opacity: 0.5; 
+}
+
+.gear-btn:disabled:hover { 
+    background: #adb5bd; 
+}
+
+.advanced-settings { 
+    margin-left: 20px; 
+    padding: 8px 12px; 
+    background: white; 
+    border-radius: 4px; 
+    border-left: 3px solid #667eea; 
+    font-size: 0.85em; 
+    color: #666; 
+    display: none; 
+    gap: 15px; 
+    margin-top: 8px; 
+}
+
+.advanced-settings.visible { 
+    display: flex; 
+}
+
+.advanced-settings label { 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+}
+
+.advanced-settings input { 
+    width: 50px; 
+    padding: 3px 6px; 
+    border: 1px solid #dee2e6; 
+    border-radius: 3px; 
+    text-align: center; 
+}
+
+#toyLibraryContainer { 
+    background: white; 
+    border-radius: 10px; 
+    padding: 20px; 
+    color: #333;
+}
+
+.metronome-container { 
+    margin: 20px 0; 
+    padding: 20px; 
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+    border-radius: 15px; 
+    box-shadow: 0 4px 15px rgba(79,172,254,0.3); 
+}
+
+.metronome-display { 
+    font-size: 48px; 
+    font-weight: bold; 
+    color: white; 
+    text-align: center; 
+    margin: 15px 0; 
+    min-height: 60px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.metronome-beat { 
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%; 
+    background: rgba(255,255,255,0.3); 
+    margin: 0 auto; 
+    transition: all 0.1s ease; 
+}
+
+.metronome-beat.active { 
+    background: white; 
+    transform: scale(1.2); 
+    box-shadow: 0 0 20px rgba(255,255,255,0.8); 
+}
+
+.metronome-btn { 
+    padding: 12px 30px; 
+    font-size: 18px; 
+    background: white; 
+    color: #4facfe; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+    margin: 10px auto; 
+    display: block; 
+}
+
+.metronome-btn:hover:not(:disabled) { 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3); 
+}
+
+.metronome-btn:disabled { 
+    opacity: 0.5; 
+}
+
+.modal { 
+    display: none; 
+    position: fixed; 
+    z-index: 2000; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.7); 
+    backdrop-filter: blur(5px); 
+    padding-top: 60px; 
+}
+
+.modal-content { 
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%); 
+    margin: 5% auto; 
+    padding: 30px; 
+    width: 80%; 
+    max-width: 600px; 
+    border-radius: 20px; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4); 
+    color: #333; 
+}
+
+.modal-content h2 { 
+    color: #667eea; 
+    margin-bottom: 20px; 
+}
+
+.modal-content p { 
+    line-height: 1.8; 
+    margin-bottom: 15px; 
+}
+
+.close-btn { 
+    color: #aaa; 
+    float: right; 
+    font-size: 32px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+}
+
+.close-btn:hover { 
+    color: #667eea; 
+    transform: rotate(90deg); 
+}
+
+#patchNotesBtn, #resetBtn { 
+    position: fixed; 
+    top: 20px; 
+    padding: 10px 20px; 
+    font-size: 14px; 
+    font-weight: 600; 
+    z-index: 10; 
+}
+
+#patchNotesBtn { 
+    right: 20px; 
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    box-shadow: 0 4px 15px rgba(102,126,234,0.4); 
+}
+
+#resetBtn { 
+    left: 20px; 
+    background: linear-gradient(135deg, #fa5252 0%, #e03131 100%); 
+    box-shadow: 0 4px 15px rgba(250,82,82,0.4); 
+}
+
+.prize-result { 
+    font-size: 2em; 
+    text-align: center; 
+    margin: 20px 0; 
+    padding: 30px; 
+    border-radius: 15px; 
+    animation: prizeReveal 0.5s ease-out; 
+}
+
+@keyframes prizeReveal { 
+    0% { transform: scale(0); opacity: 0; } 
+    50% { transform: scale(1.2); } 
+    100% { transform: scale(1); opacity: 1; } 
+}
+
+.prize-minor { 
+    background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); 
+    color: white; 
+}
+
+.prize-major { 
+    background: linear-gradient(135deg, #ffd93d 0%, #ffbc00 100%); 
+    color: #333; 
+}
+
+.prize-none { 
+    background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%); 
+    color: white; 
+}
+
+.instruction-set-selector { 
+    background: white; 
+    border-radius: 10px; 
+    padding: 15px; 
+    border: 2px solid #667eea; 
+    margin-bottom: 15px; 
+}
+
+.instruction-set-selector label { 
+    display: block; 
+    padding: 8px; 
+    cursor: pointer; 
+    color: #333; 
+}
+
+.instruction-set-selector input[type="checkbox"] { 
+    margin-right: 10px; 
+    width: 18px; 
+    height: 18px; 
+    accent-color: #667eea; 
+}
+
+@media (max-width: 600px) { 
+    h1 { 
+        font-size: 2em; 
+    } 
+    #gameContainer { 
+        padding: 20px; 
+    } 
+    .square { 
+        font-size: 0.7em; 
+    } 
+    .player { 
+        width: 20px; 
+        height: 20px; 
+    } 
+}
     </style>
 </head>
 <body>
@@ -140,19 +769,17 @@
         <div id="instructions"></div>
         <div id="buttoncontainer">
             <div class="settings-column-left">
-                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px;">👤 Player Name:</label>
+                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px;">👤 Player Name:</label>
                 <input type="text" id="playerNameInput" placeholder="Enter your name" style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box;">
                 
-                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px;">📦 Select Instruction Sets:</label>
+                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px;">📦 Select Instruction Sets:</label>
                 <div id="instructionSetCheckboxes" class="instruction-set-selector">
-                    <label><input type="checkbox" value="ball"> Ball Set ⚾</label>
-                    <label><input type="checkbox" value="rope"> Rope Set 🪢</label>
-                    <label><input type="checkbox" value="basketball_game"> Basketball Game Set 🏀</label>
+                    <label><input type="checkbox" value="dressup"> Dressup Set 🎨</label>
+                    <label><input type="checkbox" value="apple"> Apple Set 🍎</label>
+                    <label><input type="checkbox" value="digging"> Digging Set ⛏️</label>
                 </div>
 
-                <div id="toyLibraryContainer">
-                    <!-- Toys will be populated here by JavaScript -->
-                </div>
+                <div id="toyLibraryContainer"></div>
             </div>
             
             <div class="settings-column-right">
@@ -176,6 +803,7 @@
     </div>
     <button id="resetBtn">🔄 Reset</button>
     <button id="patchNotesBtn">📋 Notes</button>
+    
     <div id="patchNotesModal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -183,6 +811,7 @@
             <p><strong>Ver 0.5:</strong> Modifier system with add/remove chances & toy quantities</p>
         </div>
     </div>
+    
     <div id="resetModal" class="modal">
         <div class="modal-content">
             <h2>⚠️ Reset Game?</h2>
@@ -193,31 +822,66 @@
             </div>
         </div>
     </div>
+    
     <script>
-const board=document.getElementById('board'),diceResult=document.getElementById('diceResult'),instructions=document.getElementById('instructions'),startButton=document.getElementById('startButton'),rollDiceButton=document.getElementById('rollDice'),continueButton=document.createElement('button');
-continueButton.id="continueButton";continueButton.textContent="✓ Complete";
-const boardSize=10,totalSquares=100,player=document.createElement('div');
+// DOM Elements
+const board = document.getElementById('board');
+const diceResult = document.getElementById('diceResult');
+const instructions = document.getElementById('instructions');
+const startButton = document.getElementById('startButton');
+const rollDiceButton = document.getElementById('rollDice');
+const continueButton = document.createElement('button');
+continueButton.id = "continueButton";
+continueButton.textContent = "✓ Complete";
+
+// Game Constants
+const boardSize = 10;
+const totalSquares = 100;
+const player = document.createElement('div');
 player.classList.add('player');
-const snakes={16:6,47:26,49:11,56:53,62:19,64:60,87:24,93:73,95:75,98:78},ladders={1:38,4:14,9:31,21:42,28:84,36:44,51:67,71:91,80:99};
-let audioContext=null,currentMetronomeTask=null,toyDifficulties={},gameStarted=false,playerPosition=0,selectedSets=[],toySelections={},prizeSettings={minor:25,major:10,noPrize:65},toyQuantities={},toyModifiers={},advancedSettingsOpen=false,playerName='',toySetEnabled={};
+
+const snakes = {16:6, 47:26, 49:11, 56:53, 62:19, 64:60, 87:24, 93:73, 95:75, 98:78};
+const ladders = {1:38, 4:14, 9:31, 21:42, 28:84, 36:44, 51:67, 71:91, 80:99};
+
+// Game State
+let audioContext = null;
+let currentMetronomeTask = null;
+let toyDifficulties = {};
+let gameStarted = false;
+let playerPosition = 0;
+let selectedSets = [];
+let toySelections = {};
+let prizeSettings = {major: 20, minor: 30, noPrize: 50};
+let toyQuantities = {};
+let toyModifiers = {};
+let advancedSettingsOpen = false;
+let playerName = '';
+let toySetEnabled = {};
+let toyChecked = {};
 
 // Body part capacity system
 const bodyParts = {
-    leftHand: { name: "Left Hand", capacity: 5, occupied: 0, items: [] },
-    rightHand: { name: "Right Hand", capacity: 5, occupied: 0, items: [] },
-    bothHands: { name: "Both Hands", capacity: 10, occupied: 0, items: [] },
-    leftFoot: { name: "Left Foot", capacity: 3, occupied: 0, items: [] },
-    rightFoot: { name: "Right Foot", capacity: 3, occupied: 0, items: [] },
-    head: { name: "Head", capacity: 3, occupied: 0, items: [] },
-    back: { name: "Back", capacity: 8, occupied: 0, items: [] }
+    leftHand: { name: "Left Hand", capacity: 1, occupied: 0, items: [] },
+    rightHand: { name: "Right Hand", capacity: 1, occupied: 0, items: [] },
+    bothHands: { name: "Both Hands", capacity: 1, occupied: 0, items: [] },
+    leftFoot: { name: "Left Foot", capacity: 1, occupied: 0, items: [] },
+    rightFoot: { name: "Right Foot", capacity: 1, occupied: 0, items: [] },
+    head: { name: "Head", capacity: 1, occupied: 0, items: [] },
+    back: { name: "Back", capacity: 1, occupied: 0, items: [] }
 };
 
-// Toy size/weight - how much capacity each toy takes
 const toyCapacity = {
-    basketball: 5,
-    soccerball: 5,
-    jumprope: 2,
-    climbingrope: 8
+    basketball: 1,
+    soccerball: 1,
+    jumprope: 1,
+    climbingrope: 1,
+    stickers: 0.05,
+    silly_shirt: 1,
+    wristband: 1,
+    hand: 1,
+    stick: 1,
+    metal_stick: 1,
+    tail: 1
 };
 
 function isToyWearable(toyId) {
@@ -261,48 +925,240 @@ function getTaskConditions() {
     };
 }
 
-const instructionSets={ball:{name:"Ball Set",toys:[{id:"basketball",name:"Basketball 🏀"},{id:"soccerball",name:"Soccer Ball ⚽"}],tasks:{basketball:[{getDifficulty:d=>`<strong>Basketball Dribbling</strong><p>Work on your ball handling! Bounce the ball ${d=='easy'?5:d=='medium'?10:15} times in a row without losing control.</p><img src="https://picsum.photos/seed/bb1/800/600"/>`},{type:'metronome',getDifficulty:d=>d=='easy'?8:d=='medium'?10:15},{getDifficulty:d=>`<strong>Ball Spinning</strong><p>Show off your skills! Spin the basketball on your finger for ${d=='easy'?3:d=='medium'?5:8} seconds.</p><img src="https://picsum.photos/seed/bb2/800/600"/>`},{
-            canSelect: (conditions) => {
-                return true;
-            },
-            getDifficulty: (d, conditions) => {
-                const isHoldingBasketball = conditions.isHolding('basketball');
-                const holdingParts = conditions.getBodyPartsHolding('basketball');
-                
-                const times = d=='easy'?3:d=='medium'?5:10;
-                
-                if (isHoldingBasketball) {
-                    const partNames = holdingParts.map(p => p.name).join(' and ');
-                    return `<strong>Around the Waist</strong><p>${conditions.name}, pass the basketball (that you are already holding in your ${partNames}) around your waist ${times} times to improve coordination.</p><img src="https://picsum.photos/seed/bb3/800/600"/>`;
-                } else {
-                    return `<strong>Around the Waist</strong><p>${conditions.name}, pass the basketball around your waist ${times} times to improve coordination.</p><img src="https://picsum.photos/seed/bb3/800/600"/>`;
-                }
+// Instruction Sets
+const instructionSets = {
+    dressup: {
+        name: "Dressup Set",
+        toys: [
+            {id: "stickers", name: "Stickers 🎨"},
+            {id: "silly_shirt", name: "Silly Shirt 👕"},
+            {id: "wristband", name: "Wristband ⌚"},
+            {id: "hand", name: "Hand ✋"}
+        ],
+        tasks: {
+            stickers: [
+                {getDifficulty: d => `<strong>Sticker Challenge</strong><p>Apply ${d=='easy'?3:d=='medium'?5:8} stickers to yourself.</p><img src="https://picsum.photos/seed/sticker1/800/600"/>`}
+            ],
+            silly_shirt: [
+                {getDifficulty: d => `<strong>Wear the Silly Shirt</strong><p>Put on the silly shirt and pose for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><img src="https://picsum.photos/seed/shirt1/800/600"/>`}
+            ],
+            wristband: [
+                {getDifficulty: d => `<strong>Wristband Spin</strong><p>Spin the wristband around your wrist ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/wrist1/800/600"/>`}
+            ],
+            hand: [
+                {getDifficulty: d => `<strong>Hand Wave</strong><p>Wave your hand ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/hand1/800/600"/>`}
+            ]
+        }
+    },
+    apple: {
+        name: "Apple Set",
+        toys: [
+            {id: "stick", name: "Stick 🪵"},
+            {id: "metal_stick", name: "Metal Stick 🔩"},
+            {id: "tail", name: "Tail 🦊"}
+        ],
+        tasks: {
+            stick: [
+                {getDifficulty: d => `<strong>Stick Balance</strong><p>Balance the stick on your hand for ${d=='easy'?3:d=='medium'?5:8} seconds.</p><img src="https://picsum.photos/seed/stick1/800/600"/>`}
+            ],
+            metal_stick: [
+                {getDifficulty: d => `<strong>Metal Stick Tap</strong><p>Tap the metal stick on the ground ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/metal1/800/600"/>`}
+            ],
+            tail: [
+                {getDifficulty: d => `<strong>Tail Wag</strong><p>Wag your tail ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/tail1/800/600"/>`}
+            ]
+        }
+    },
+    digging: {
+        name: "Digging Set",
+        toys: [
+            {id: "stick", name: "Stick 🪵"},
+            {id: "hand", name: "Hand ✋"}
+        ],
+        tasks: {
+            stick: [
+                {getDifficulty: d => `<strong>Dig with Stick</strong><p>Use the stick to make ${d=='easy'?3:d=='medium'?5:8} digging motions.</p><img src="https://picsum.photos/seed/dig1/800/600"/>`}
+            ],
+            hand: [
+                {getDifficulty: d => `<strong>Hand Digging</strong><p>Make digging motions with your hands ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/dighand1/800/600"/>`}
+            ]
+        }
+    }
+};
+
+// Storage Functions
+function saveGameState() {
+    localStorage.setItem('snakesLaddersGameState', JSON.stringify({
+        gameStarted,
+        playerPosition,
+        selectedSets,
+        toySelections,
+        toyDifficulties,
+        prizeSettings,
+        toyQuantities,
+        toyModifiers,
+        advancedSettingsOpen,
+        bodyPartState,
+        playerName,
+        toySetEnabled,
+        toyChecked,
+        diceResultText: diceResult.textContent,
+        currentInstruction: instructions.innerHTML,
+        instructionsActive: instructions.classList.contains('active'),
+        lastTaskInfo: window.lastTaskInfo || null
+    }));
+}
+
+function loadGameState() {
+    const saved = localStorage.getItem('snakesLaddersGameState');
+    if (!saved) return false;
+    
+    try {
+        const gs = JSON.parse(saved);
+        gameStarted = gs.gameStarted;
+        playerPosition = gs.playerPosition;
+        selectedSets = gs.selectedSets || [];
+        toySelections = gs.toySelections || {};
+        toyDifficulties = gs.toyDifficulties || {};
+        toyQuantities = gs.toyQuantities || {};
+        toyModifiers = gs.toyModifiers || {};
+        advancedSettingsOpen = gs.advancedSettingsOpen || false;
+        playerName = gs.playerName || '';
+        toySetEnabled = gs.toySetEnabled || {};
+        toyChecked = gs.toyChecked || {};
+        
+        if (gs.bodyPartState) {
+            bodyPartState = gs.bodyPartState;
+        }
+        
+        if (gs.prizeSettings) {
+            prizeSettings = gs.prizeSettings;
+            updateSliderDisplays(true);
+        }
+        
+        document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => {
+            cb.checked = selectedSets.includes(cb.value);
+        });
+        
+        if (gameStarted) {
+            startButton.style.display = 'none';
+            rollDiceButton.style.display = 'block';
+            diceResult.style.display = 'block';
+            diceResult.textContent = gs.diceResultText || 'Dice: -';
+            
+            const leftCol = document.querySelector('.settings-column-left');
+            const rightCol = document.querySelector('.settings-column-right');
+            if (leftCol) leftCol.style.display = 'none';
+            if (rightCol) rightCol.style.display = 'none';
+            
+            createBoard();
+            
+            if (playerPosition > 0) {
+                const sq = document.getElementById(`square-${playerPosition}`);
+                if (sq) sq.appendChild(player);
             }
-        }],soccerball:[{getDifficulty:d=>`<strong>Kick the Ball</strong><p>Practice your kicking! Kick the soccer ball ${d=='easy'?3:d=='medium'?5:10} times.</p><img src="https://picsum.photos/seed/sc1/800/600"/>`},{getDifficulty:d=>`<strong>Juggling Challenge</strong><p>Keep the ball in the air! Juggle the soccer ball ${d=='easy'?2:d=='medium'?3:5} times without it touching the ground.</p><img src="https://picsum.photos/seed/sc2/800/600"/>`},{getDifficulty:d=>`<strong>Roll in a Circle</strong><p>Use your foot to roll the soccer ball in a circle ${d=='easy'?3:d=='medium'?5:8} times.</p><img src="https://picsum.photos/seed/sc3/800/600"/>`}]}},rope:{name:"Rope Set",toys:[{id:"jumprope",name:"Jump Rope 🪢"},{id:"climbingrope",name:"Climbing Rope 🧗"}],tasks:{jumprope:[{getDifficulty:d=>`<strong>Jump Rope</strong><p>Get your heart pumping! Jump rope ${d=='easy'?10:d=='medium'?15:25} times in a row.</p><img src="https://picsum.photos/seed/jr1/800/600"/>`},{type:'redlight',getDifficulty:d=>d=='easy'?15000:d=='medium'?20000:30000},{getDifficulty:d=>`<strong>Criss-Cross Jumps</strong><p>Advanced move! Do ${d=='easy'?3:d=='medium'?5:8} criss-cross jumps by crossing your arms while jumping.</p><img src="https://picsum.photos/seed/jr2/800/600"/>`},{getDifficulty:d=>`<strong>Backwards Jump</strong><p>Challenge yourself! Jump rope backwards ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/jr3/800/600"/>`}],climbingrope:[{getDifficulty:d=>`<strong>Climb the Rope</strong><p>Build your strength! Climb up the rope ${d=='easy'?'2 feet':d=='medium'?'3 feet':'5 feet'}.</p><img src="https://picsum.photos/seed/cr1/800/600"/>`},{getDifficulty:d=>`<strong>Hanging Challenge</strong><p>Test your grip! Hang from the climbing rope for ${d=='easy'?5:d=='medium'?10:15} seconds with your feet off the ground.</p><img src="https://picsum.photos/seed/cr2/800/600"/>`},{getDifficulty:d=>`<strong>Pull-Ups</strong><p>Show your upper body strength! Do ${d=='easy'?2:d=='medium'?3:5} rope pull-ups.</p><img src="https://picsum.photos/seed/cr3/800/600"/>`}]}},basketball_game:{name:"Basketball Game Set",toys:[{id:"basketball",name:"Basketball 🏀"},{id:"basketball_hoop",name:"Basketball Hoop 🏀🎯"}],tasks:{basketball:[{getDifficulty:d=>`<strong>Basketball Dribbling</strong><p>Work on your ball handling! Bounce the ball ${d=='easy'?5:d=='medium'?10:15} times in a row without losing control.</p><img src="https://picsum.photos/seed/bb1/800/600"/>`},{type:'metronome',getDifficulty:d=>d=='easy'?8:d=='medium'?10:15},{getDifficulty:d=>`<strong>Ball Spinning</strong><p>Show off your skills! Spin the basketball on your finger for ${d=='easy'?3:d=='medium'?5:8} seconds.</p><img src="https://picsum.photos/seed/bb2/800/600"/>`},{canSelect:(conditions)=>true,getDifficulty:(d,conditions)=>{const isHoldingBasketball=conditions.isHolding('basketball');const holdingParts=conditions.getBodyPartsHolding('basketball');const times=d=='easy'?3:d=='medium'?5:10;if(isHoldingBasketball){const partNames=holdingParts.map(p=>p.name).join(' and ');return `<strong>Around the Waist</strong><p>${conditions.name}, pass the basketball (that you are already holding in your ${partNames}) around your waist ${times} times to improve coordination.</p><img src="https://picsum.photos/seed/bb3/800/600"/>`}else{return `<strong>Around the Waist</strong><p>${conditions.name}, pass the basketball around your waist ${times} times to improve coordination.</p><img src="https://picsum.photos/seed/bb3/800/600"/>`}}}],basketball_hoop:[{getDifficulty:d=>`<strong>Free Throw Challenge</strong><p>Aim carefully! Make ${d=='easy'?2:d=='medium'?3:5} baskets from the free throw line.</p><img src="https://picsum.photos/seed/hp1/800/600"/>`},{getDifficulty:d=>`<strong>Layup Shot</strong><p>Get close and score! Make ${d=='easy'?1:d=='medium'?2:3} layup shot${d=='easy'?'':'s'}.</p><img src="https://picsum.photos/seed/hp2/800/600"/>`},{getDifficulty:d=>`<strong>Three-Pointer</strong><p>From downtown! Try to make ${d=='easy'?1:d=='medium'?2:3} shot${d=='easy'?'':'s'} from the 3-point line.</p><img src="https://picsum.photos/seed/hp3/800/600"/>`}]}}};
+            
+            if (gs.lastTaskInfo && gs.lastTaskInfo.taskType) {
+                window.lastTaskInfo = gs.lastTaskInfo;
+                instructions.classList.add('active');
+                
+                if (gs.lastTaskInfo.taskType === 'metronome') {
+                    currentMetronomeTask = createMetronomeTask(gs.lastTaskInfo.beatCount);
+                    instructions.innerHTML = '';
+                    instructions.appendChild(currentMetronomeTask.element);
+                } else if (gs.lastTaskInfo.taskType === 'redlight') {
+                    currentMetronomeTask = createRedLightGreenLightTask(gs.lastTaskInfo.duration);
+                    instructions.innerHTML = '';
+                    instructions.appendChild(currentMetronomeTask.element);
+                } else if (gs.currentInstruction) {
+                    instructions.innerHTML = gs.currentInstruction;
+                }
+            } else if (gs.currentInstruction && gs.currentInstruction.trim() !== '') {
+                instructions.innerHTML = gs.currentInstruction;
+                if (gs.instructionsActive) instructions.classList.add('active');
+            }
+        } else {
+            document.getElementById('playerNameInput').value = playerName;
+            renderToyLibrary();
+        }
+        
+        return true;
+    } catch (e) {
+        console.error('Load error:', e);
+        return false;
+    }
+}
 
-function saveGameState(){const data=JSON.stringify({gameStarted,playerPosition,selectedSets,toySelections,toyDifficulties,prizeSettings,toyQuantities,toyModifiers,advancedSettingsOpen,bodyPartState,playerName,toySetEnabled,diceResultText:diceResult.textContent,currentInstruction:instructions.innerHTML,instructionsActive:instructions.classList.contains('active'),lastTaskInfo:window.lastTaskInfo||null});try{window.storage.set('snakesLaddersGameState',data)}catch(e){}}
+// Prize Functions
+function updateSliderDisplays(skipSave = false) {
+    prizeSettings.minor = Math.round(prizeSettings.minor * 10) / 10;
+    prizeSettings.major = Math.round(prizeSettings.major * 10) / 10;
+    prizeSettings.noPrize = Math.round(prizeSettings.noPrize * 10) / 10;
+    
+    document.getElementById('minorPercent').textContent = prizeSettings.minor.toFixed(1) + '%';
+    document.getElementById('majorPercent').textContent = prizeSettings.major.toFixed(1) + '%';
+    document.getElementById('noPrizePercent').textContent = prizeSettings.noPrize.toFixed(1) + '%';
+    
+    document.getElementById('minorSlider').value = prizeSettings.minor;
+    document.getElementById('majorSlider').value = prizeSettings.major;
+    document.getElementById('noPrizeSlider').value = prizeSettings.noPrize;
+    
+    if (!skipSave) saveGameState();
+}
 
-async function loadGameState(){try{const result=await window.storage.get('snakesLaddersGameState');if(!result)return false;const gs=JSON.parse(result.value);gameStarted=gs.gameStarted;playerPosition=gs.playerPosition;selectedSets=gs.selectedSets||[];toySelections=gs.toySelections||{};toyDifficulties=gs.toyDifficulties||{};toyQuantities=gs.toyQuantities||{};toyModifiers=gs.toyModifiers||{};advancedSettingsOpen=gs.advancedSettingsOpen||false;playerName=gs.playerName||'';toySetEnabled=gs.toySetEnabled||{};if(gs.bodyPartState){bodyPartState=gs.bodyPartState}if(gs.prizeSettings){prizeSettings=gs.prizeSettings;updateSliderDisplays(true)}if(gameStarted){startButton.style.display='none';rollDiceButton.style.display='block';diceResult.style.display='block';diceResult.textContent=gs.diceResultText||'Dice: -';const leftCol=document.querySelector('.settings-column-left');const rightCol=document.querySelector('.settings-column-right');if(leftCol)leftCol.style.display='none';if(rightCol)rightCol.style.display='none';createBoard();if(playerPosition>0){const sq=document.getElementById(`square-${playerPosition}`);if(sq)sq.appendChild(player)}if(gs.lastTaskInfo&&gs.lastTaskInfo.taskType){window.lastTaskInfo=gs.lastTaskInfo;instructions.classList.add('active');if(gs.lastTaskInfo.taskType==='metronome'){currentMetronomeTask=createMetronomeTask(gs.lastTaskInfo.beatCount);instructions.innerHTML='';instructions.appendChild(currentMetronomeTask.element)}else if(gs.lastTaskInfo.taskType==='redlight'){currentMetronomeTask=createRedLightGreenLightTask(gs.lastTaskInfo.duration);instructions.innerHTML='';instructions.appendChild(currentMetronomeTask.element)}else if(gs.currentInstruction){instructions.innerHTML=gs.currentInstruction}}else if(gs.currentInstruction&&gs.currentInstruction.trim()!==''){instructions.innerHTML=gs.currentInstruction;if(gs.instructionsActive)instructions.classList.add('active')}}else{document.getElementById('playerNameInput').value=playerName;selectedSets.forEach(setId=>{const checkbox=document.querySelector(`#instructionSetCheckboxes input[value="${setId}"]`);if(checkbox)checkbox.checked=true});renderToyLibrary()}return true}catch(e){return false}}
+document.getElementById('minorSlider').addEventListener('input', function() {
+    const newMinor = Math.round(parseFloat(this.value));
+    const maxAllowed = 100 - Math.round(prizeSettings.major);
+    prizeSettings.minor = newMinor > maxAllowed ? maxAllowed : newMinor;
+    prizeSettings.noPrize = 100 - prizeSettings.minor - prizeSettings.major;
+    updateSliderDisplays();
+});
 
-function updateSliderDisplays(skipSave=false){prizeSettings.minor=Math.round(prizeSettings.minor*10)/10;prizeSettings.major=Math.round(prizeSettings.major*10)/10;prizeSettings.noPrize=Math.round(prizeSettings.noPrize*10)/10;document.getElementById('minorPercent').textContent=prizeSettings.minor.toFixed(1)+'%';document.getElementById('majorPercent').textContent=prizeSettings.major.toFixed(1)+'%';document.getElementById('noPrizePercent').textContent=prizeSettings.noPrize.toFixed(1)+'%';document.getElementById('minorSlider').value=prizeSettings.minor;document.getElementById('majorSlider').value=prizeSettings.major;document.getElementById('noPrizeSlider').value=prizeSettings.noPrize;if(!skipSave)saveGameState()}
+document.getElementById('majorSlider').addEventListener('input', function() {
+    const newMajor = Math.round(parseFloat(this.value));
+    const maxAllowed = 100 - Math.round(prizeSettings.minor);
+    prizeSettings.major = newMajor > maxAllowed ? maxAllowed : newMajor;
+    prizeSettings.noPrize = 100 - prizeSettings.minor - prizeSettings.major;
+    updateSliderDisplays();
+});
 
-document.getElementById('minorSlider').addEventListener('input',function(){const newMinor=Math.round(parseFloat(this.value)),maxAllowed=100-Math.round(prizeSettings.major);prizeSettings.minor=newMinor>maxAllowed?maxAllowed:newMinor;prizeSettings.noPrize=100-prizeSettings.minor-prizeSettings.major;updateSliderDisplays()});
+document.getElementById('noPrizeSlider').addEventListener('input', function() {
+    const newNoPrize = Math.round(parseFloat(this.value));
+    const available = 100 - newNoPrize;
+    const currentTotal = Math.round(prizeSettings.minor) + Math.round(prizeSettings.major);
+    
+    if (available < currentTotal && currentTotal > 0) {
+        const reduction = currentTotal - available;
+        const minorProp = prizeSettings.minor / currentTotal;
+        const majorProp = prizeSettings.major / currentTotal;
+        prizeSettings.minor = Math.max(0, Math.round(prizeSettings.minor - reduction * minorProp));
+        prizeSettings.major = Math.max(0, Math.round(prizeSettings.major - reduction * majorProp));
+    } else if (available > currentTotal) {
+        const increase = available - currentTotal;
+        const half = increase / 2;
+        prizeSettings.minor = Math.round(prizeSettings.minor + half);
+        prizeSettings.major = Math.round(prizeSettings.major + half);
+    }
+    
+    prizeSettings.noPrize = newNoPrize;
+    updateSliderDisplays();
+});
 
-document.getElementById('majorSlider').addEventListener('input',function(){const newMajor=Math.round(parseFloat(this.value)),maxAllowed=100-Math.round(prizeSettings.minor);prizeSettings.major=newMajor>maxAllowed?maxAllowed:newMajor;prizeSettings.noPrize=100-prizeSettings.minor-prizeSettings.major;updateSliderDisplays()});
+function determinePrize() {
+    const roll = Math.random() * 100;
+    return roll < prizeSettings.major ? 'major' : 
+           roll < prizeSettings.major + prizeSettings.minor ? 'minor' : 'none';
+}
 
-document.getElementById('noPrizeSlider').addEventListener('input',function(){const newNoPrize=Math.round(parseFloat(this.value)),available=100-newNoPrize,currentTotal=Math.round(prizeSettings.minor)+Math.round(prizeSettings.major);if(available<currentTotal&&currentTotal>0){const reduction=currentTotal-available,minorProp=prizeSettings.minor/currentTotal,majorProp=prizeSettings.major/currentTotal;prizeSettings.minor=Math.max(0,Math.round(prizeSettings.minor-reduction*minorProp));prizeSettings.major=Math.max(0,Math.round(prizeSettings.major-reduction*majorProp))}else if(available>currentTotal){const increase=available-currentTotal,half=increase/2;prizeSettings.minor=Math.round(prizeSettings.minor+half);prizeSettings.major=Math.round(prizeSettings.major+half)}prizeSettings.noPrize=newNoPrize;updateSliderDisplays()});
+function displayPrizeResult(prize) {
+    return prize === 'major' ? 
+        '<div class="prize-result prize-major">🏆 MAJOR PRIZE! 🏆<br>Congratulations!</div>' :
+        prize === 'minor' ? 
+        '<div class="prize-result prize-minor">🎉 Minor Prize! 🎉<br>Nice job!</div>' :
+        '<div class="prize-result prize-none">❌ No Prize<br>Better luck next time!</div>';
+}
 
-function determinePrize(){const roll=Math.random()*100;return roll<prizeSettings.major?'major':roll<prizeSettings.major+prizeSettings.minor?'minor':'none'}
-
-function displayPrizeResult(prize){return prize==='major'?'<div class="prize-result prize-major">🏆 MAJOR PRIZE! 🏆<br>Congratulations!</div>':prize==='minor'?'<div class="prize-result prize-minor">🎉 Minor Prize! 🎉<br>Nice job!</div>':'<div class="prize-result prize-none">❌ No Prize<br>Better luck next time!</div>'}
-
-function toggleAdvanced(){const content=document.getElementById('advancedContent'),arrow=document.getElementById('arrow');if(advancedSettingsOpen){content.classList.remove('open');arrow.style.transform='rotate(0deg)';advancedSettingsOpen=false}else{advancedSettingsOpen=true;content.classList.add('open');arrow.style.transform='rotate(180deg)';updateAdvancedSettings()}saveGameState()}
-window.toggleAdvanced=toggleAdvanced;
-
-function updateAdvancedSettings(){const currentSelectedSets=Array.from(document.querySelectorAll('#instructionSetCheckboxes input:checked')).map(cb=>cb.value);const currentSetToys=new Set();currentSelectedSets.forEach(setId=>{if(instructionSets[setId]){instructionSets[setId].toys.forEach(toy=>{currentSetToys.add(`${setId}_${toy.id}`)})}});const selectedToys=Object.keys(toyQuantities).filter(k=>toyQuantities[k]>0&&currentSetToys.has(k));const content=document.getElementById('advancedContent');content.innerHTML='';if(selectedToys.length===0){const emptyMsg=document.createElement('div');emptyMsg.style.cssText='padding: 20px; text-align: center; color: #666;';emptyMsg.textContent='No toys selected';content.appendChild(emptyMsg);return}selectedToys.forEach(toyKey=>{let foundSet=null,foundToy=null;for(const[setId,setData]of Object.entries(instructionSets)){for(const toy of setData.toys){if(`${setId}_${toy.id}`===toyKey){foundSet=setData;foundToy=toy;break}}if(foundToy)break}if(!foundSet||!foundToy)return;const section=document.createElement('div');section.className='modifier-section';const header=document.createElement('div');header.className='modifier-header';header.textContent=foundToy.name;section.appendChild(header);const controls=document.createElement('div');controls.className='modifier-controls';const toyId=toyKey.split('_')[1];const isWearable=isToyWearable(toyId);if(isWearable){controls.style.gridTemplateColumns='1fr 1fr 1fr'}else{controls.style.gridTemplateColumns='1fr'}if(isWearable){const addColumn=document.createElement('div');addColumn.className='modifier-column';const addHeader=document.createElement('div');addHeader.className='modifier-column-header';addHeader.textContent='Add Chance';addColumn.appendChild(addHeader);const addGroup=document.createElement('div');addGroup.className='modifier-group';const addInput=document.createElement('input');addInput.type='number';addInput.className='modifier-input';addInput.id=`add_${toyKey}`;addInput.min='0';addInput.max='100';addInput.value=toyModifiers[toyKey]?toyModifiers[toyKey].addChance:25;addGroup.appendChild(addInput);const addPercent=document.createElement('span');addPercent.className='percent-symbol';addPercent.textContent='%';addGroup.appendChild(addPercent);addColumn.appendChild(addGroup);controls.appendChild(addColumn);const removeColumn=document.createElement('div');removeColumn.className='modifier-column';const removeHeader=document.createElement('div');removeHeader.className='modifier-column-header';removeHeader.textContent='Remove Chance';removeColumn.appendChild(removeHeader);const removeGroup=document.createElement('div');removeGroup.className='modifier-group';const removeInput=document.createElement('input');removeInput.type='number';removeInput.className='modifier-input';removeInput.id=`remove_${toyKey}`;removeInput.min='0';removeInput.max='100';removeInput.value=toyModifiers[toyKey]?toyModifiers[toyKey].removeChance:15;removeGroup.appendChild(removeInput);const removePercent=document.createElement('span');removePercent.className='percent-symbol';removePercent.textContent='%';removeGroup.appendChild(removePercent);removeColumn.appendChild(removeGroup);controls.appendChild(removeColumn)};const difficultyColumn=document.createElement('div');difficultyColumn.className='modifier-column';const difficultyHeader=document.createElement('div');difficultyHeader.className='modifier-column-header';difficultyHeader.textContent='Task Difficulty';difficultyColumn.appendChild(difficultyHeader);const difficultySelect=document.createElement('select');difficultySelect.className='modifier-input';difficultySelect.id=`adv_difficulty_${toyKey}`;difficultySelect.style.cssText='width: auto; padding: 6px 12px; cursor: pointer;';['easy','medium','hard'].forEach(level=>{const opt=document.createElement('option');opt.value=level;opt.textContent=level=='easy'?'Easy 😊':level=='medium'?'Medium 😐':'Hard 😤';if(level==(toyDifficulties[toyKey]||'medium'))opt.selected=true;difficultySelect.appendChild(opt)});difficultyColumn.appendChild(difficultySelect);controls.appendChild(difficultyColumn);section.appendChild(controls);content.appendChild(section);if(isWearable){document.getElementById(`add_${toyKey}`).oninput=e=>{const val=Math.max(0,Math.min(100,parseInt(e.target.value)||0));e.target.value=val;if(!toyModifiers[toyKey])toyModifiers[toyKey]={addChance:25,removeChance:15};toyModifiers[toyKey].addChance=val;const mainDifficultySelect=document.getElementById(`difficulty_${toyKey}`);if(mainDifficultySelect){const customOpt=Array.from(mainDifficultySelect.options).find(o=>o.value==='custom');if(customOpt){customOpt.style.display='block';mainDifficultySelect.value='custom'}}saveGameState()};document.getElementById(`remove_${toyKey}`).oninput=e=>{const val=Math.max(0,Math.min(100,parseInt(e.target.value)||0));e.target.value=val;if(!toyModifiers[toyKey])toyModifiers[toyKey]={addChance:25,removeChance:15};toyModifiers[toyKey].removeChance=val;const mainDifficultySelect=document.getElementById(`difficulty_${toyKey}`);if(mainDifficultySelect){const customOpt=Array.from(mainDifficultySelect.options).find(o=>o.value==='custom');if(customOpt){customOpt.style.display='block';mainDifficultySelect.value='custom'}}saveGameState()}}document.getElementById(`adv_difficulty_${toyKey}`).onchange=e=>{toyDifficulties[toyKey]=e.target.value;const mainDifficultySelect=document.getElementById(`difficulty_${toyKey}`);if(mainDifficultySelect){const customOpt=Array.from(mainDifficultySelect.options).find(o=>o.value==='custom');if(customOpt){customOpt.style.display='block';mainDifficultySelect.value='custom'}}saveGameState()}})}
-
-function applyPreset(toyKey,difficulty){const presets={easy:{addChance:10,removeChance:30},medium:{addChance:25,removeChance:15},hard:{addChance:50,removeChance:5}};if(presets[difficulty]){toyModifiers[toyKey]={...presets[difficulty]};toyDifficulties[toyKey]=difficulty;const addInput=document.getElementById(`add_${toyKey}`);const removeInput=document.getElementById(`remove_${toyKey}`);if(addInput)addInput.value=toyModifiers[toyKey].addChance;if(removeInput)removeInput.value=toyModifiers[toyKey].removeChance;saveGameState()}}
-
+// Body Part Functions
 function canAddToyToBodyPart(bodyPart, toyId) {
     const toySize = toyCapacity[toyId] || 0;
     const available = bodyPartState[bodyPart].capacity - bodyPartState[bodyPart].occupied;
@@ -330,34 +1186,6 @@ function removeToyFromBodyPart(bodyPart, toyId) {
         return true;
     }
     return false;
-}
-
-function isBodyPartFull(bodyPart) {
-    return bodyPartState[bodyPart].occupied >= bodyPartState[bodyPart].capacity;
-}
-
-function getBodyPartStatus(bodyPart) {
-    return {
-        occupied: bodyPartState[bodyPart].occupied,
-        capacity: bodyPartState[bodyPart].capacity,
-        available: bodyPartState[bodyPart].capacity - bodyPartState[bodyPart].occupied,
-        items: [...bodyPartState[bodyPart].items],
-        isFull: isBodyPartFull(bodyPart)
-    };
-}
-
-function shouldRollAddTask(toyKey) {
-    const modifier = toyModifiers[toyKey];
-    if (!modifier) return false;
-    const roll = Math.random() * 100;
-    return roll < modifier.addChance;
-}
-
-function shouldRollRemoveTask(toyKey) {
-    const modifier = toyModifiers[toyKey];
-    if (!modifier) return false;
-    const roll = Math.random() * 100;
-    return roll < modifier.removeChance;
 }
 
 function getAvailableBodyPartsForToy(toyId) {
@@ -393,6 +1221,7 @@ function getBodyPartsHoldingToy(toyId) {
     return holding;
 }
 
+// Add/Remove Task Functions
 function createAddToyTask(toyKey, toyName) {
     const toyId = toyKey.split('_')[1];
     
@@ -456,6 +1285,20 @@ function createRemoveToyTask(toyKey, toyName) {
     };
 }
 
+function shouldRollAddTask(toyKey) {
+    const modifier = toyModifiers[toyKey];
+    if (!modifier) return false;
+    const roll = Math.random() * 100;
+    return roll < modifier.addChance;
+}
+
+function shouldRollRemoveTask(toyKey) {
+    const modifier = toyModifiers[toyKey];
+    if (!modifier) return false;
+    const roll = Math.random() * 100;
+    return roll < modifier.removeChance;
+}
+
 function rollForAddRemoveTasks() {
     const addTasks = [];
     const removeTasks = [];
@@ -502,65 +1345,900 @@ function rollForAddRemoveTasks() {
     return null;
 }
 
-function createMetronomeTask(beatCount){let metronomeInterval=null,countdownInterval=null,isComplete=false;const wrapper=document.createElement('div');const textDiv=document.createElement('div');textDiv.innerHTML='<strong>🏀 Bounce to the Beat!</strong><p>Bounce the basketball in rhythm.</p>';wrapper.appendChild(textDiv);const container=document.createElement('div');container.className='metronome-container';container.innerHTML=`<div class="metronome-beat" id="metronomeBeat"></div><div class="metronome-display" id="metronomeDisplay">Ready?</div><button class="metronome-btn" id="startMetronome">▶️ Start</button>`;wrapper.appendChild(container);const startBtn=container.querySelector('#startMetronome'),display=container.querySelector('#metronomeDisplay'),beat=container.querySelector('#metronomeBeat');startBtn.addEventListener('click',function(){startBtn.disabled=true;let count=3;display.textContent=count;countdownInterval=setInterval(()=>{count--;if(count>0){display.textContent=count}else{clearInterval(countdownInterval);display.textContent="Bounce!";startMetronome()}},1000)});function playBeep(){if(!audioContext){audioContext=new(window.AudioContext||window.webkitAudioContext)()}const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.connect(gain);gain.connect(audioContext.destination);osc.type='sine';osc.frequency.value=440;gain.gain.setValueAtTime(0.3,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,audioContext.currentTime+0.05);osc.start(audioContext.currentTime);osc.stop(audioContext.currentTime+0.05)}function startMetronome(){let beatsLeft=beatCount;const bpm=100,interval=60000/bpm;function doBeat(){beatsLeft--;beat.classList.add('active');playBeep();display.textContent=`${beatsLeft} bounces left`;setTimeout(()=>{beat.classList.remove('active')},100);if(beatsLeft<=0){clearInterval(metronomeInterval);display.textContent="Complete! ✓";isComplete=true;continueButton.disabled=false;continueButton.style.opacity='1'}}doBeat();metronomeInterval=setInterval(doBeat,interval);continueButton.disabled=true;continueButton.style.opacity='0.5'}return{element:wrapper,isComplete:()=>isComplete,cleanup:()=>{if(metronomeInterval)clearInterval(metronomeInterval);if(countdownInterval)clearInterval(countdownInterval)},hasStarted:()=>startBtn.disabled}}
-
-function createRedLightGreenLightTask(totalDuration){let gameInterval=null,countdownInterval=null,isComplete=false,timeRemaining=totalDuration;const imagePatterns=[{image:'chair.jpg',name:'Chair',type:'red'},{image:'broom.jpg',name:'Broom',type:'green'},{image:'hat.jpg',name:'Hat',type:'red'},{image:'ball.jpg',name:'Ball',type:'green'},{image:'books.jpg',name:'Books',type:'red'},{image:'car.jpg',name:'Car',type:'green'},{image:'tree.jpg',name:'Tree',type:'red'},{image:'guitar.jpg',name:'Guitar',type:'green'},{image:'apple.jpg',name:'Apple',type:'red'},{image:'bike.jpg',name:'Bike',type:'green'}];const lightPatterns=[{duration:2000},{duration:1500},{duration:1500},{duration:2500},{duration:1000},{duration:3000},{duration:2000},{duration:1500}];const container=document.createElement('div');container.className='metronome-container';container.style.background='linear-gradient(135deg, #845ef7 0%, #5f3dc4 100%)';container.innerHTML=`<div><strong>🚦 Red Light, Green Light!</strong></div><p style="color: white; margin: 10px 0;">🟢 GREEN = Jump! | 🔴 RED = Stop!</p><div style="background: rgba(255, 255, 255, 0.2); border-radius: 15px; padding: 20px; margin: 15px 0;"><div style="width: 150px; height: 150px; margin: 0 auto 10px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden;" id="imageContainer"><div style="font-size: 3em; color: #845ef7;">🚦</div></div><div style="color: white; font-size: 1.2em; font-weight: bold;" id="imageName">Get Ready!</div></div><div style="width: 120px; height: 120px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 4em; transition: all 0.3s ease;" id="lightIndicator">⏸️</div><div class="metronome-display" id="lightDisplay">Press Start!</div><div style="color: white; font-size: 18px; margin: 10px 0;" id="timeDisplay"></div><button class="metronome-btn" id="startRedLight">▶️ Start</button>`;const startBtn=container.querySelector('#startRedLight'),display=container.querySelector('#lightDisplay'),lightIndicator=container.querySelector('#lightIndicator'),timeDisplay=container.querySelector('#timeDisplay'),imageContainer=container.querySelector('#imageContainer'),imageName=container.querySelector('#imageName');startBtn.addEventListener('click',function(){startBtn.disabled=true;let count=3;imageContainer.innerHTML=`<div style="font-size: 4em; color: #845ef7;">${count}</div>`;imageName.textContent='Starting...';lightIndicator.textContent='⏳';display.textContent='Get ready...';countdownInterval=setInterval(()=>{count--;if(count>0){imageContainer.innerHTML=`<div style="font-size: 4em; color: #845ef7;">${count}</div>`}else{clearInterval(countdownInterval);startGame()}},1000)});function startGame(){let currentImageIndex=0,currentPatternIndex=0;function showNextLight(){if(timeRemaining<=0){clearInterval(gameInterval);display.textContent="Game Complete! ✓";lightIndicator.textContent="✓";lightIndicator.style.background="linear-gradient(135deg, #51cf66 0%, #37b24d 100%)";imageContainer.innerHTML='<div style="font-size: 4em; color: #51cf66;">🎉</div>';imageName.textContent="Great Job!";timeDisplay.textContent="";isComplete=true;continueButton.disabled=false;continueButton.style.opacity='1';return}const currentImage=imagePatterns[currentImageIndex],pattern=lightPatterns[currentPatternIndex];imageContainer.innerHTML=`<img src="${currentImage.image}" alt="${currentImage.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'font-size: 3em; color: #845ef7;\\'>${currentImage.name[0]}</div>';">`;imageName.textContent=currentImage.name;lightIndicator.textContent=currentImage.type==='green'?'🟢':'🔴';display.textContent=currentImage.type==='green'?'GREEN LIGHT - JUMP!':'RED LIGHT - STOP!';if(currentImage.type==='green'){lightIndicator.style.background='linear-gradient(135deg, #51cf66 0%, #37b24d 100%)';lightIndicator.style.transform='scale(1.2)'}else{lightIndicator.style.background='linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)';lightIndicator.style.transform='scale(1)'}const displayDuration=Math.min(pattern.duration,timeRemaining);timeRemaining-=displayDuration;timeDisplay.textContent=`${Math.ceil(timeRemaining/1000)}s remaining`;setTimeout(()=>{currentImageIndex++;if(currentImageIndex>=imagePatterns.length){currentImageIndex=0}currentPatternIndex++;if(currentPatternIndex>=lightPatterns.length){currentPatternIndex=0}showNextLight()},displayDuration)}continueButton.disabled=true;continueButton.style.opacity='0.5';showNextLight()}return{element:container,isComplete:()=>isComplete,cleanup:()=>{if(gameInterval)clearInterval(gameInterval);if(countdownInterval)clearInterval(countdownInterval)},hasStarted:()=>startBtn.disabled}}
-
-function createBoard(){let reverse=false,currentNumber=1;for(let row=0;row<boardSize;row++){for(let col=0;col<boardSize;col++){const actualCol=reverse?boardSize-col-1:col,square=document.createElement('div');square.classList.add('square');square.textContent=currentNumber;square.id=`square-${currentNumber}`;square.style.gridRow=boardSize-row;square.style.gridColumn=actualCol+1;if(snakes[currentNumber]){square.classList.add('snake');square.setAttribute('data-destination','↓'+snakes[currentNumber])}else if(ladders[currentNumber]){square.classList.add('ladder');square.setAttribute('data-destination','↑'+ladders[currentNumber])}board.appendChild(square);currentNumber++}reverse=!reverse}}
-
-function animatePlayer(start,end,callback,instant=false){if(instant){const targetSquare=document.getElementById(`square-${end}`);if(targetSquare)targetSquare.appendChild(player);if(callback)callback();return}let current=start;const step=current<end?1:-1;const interval=setInterval(()=>{current+=step;const currentSquare=document.getElementById(`square-${current}`);if(currentSquare)currentSquare.appendChild(player);if(current===end){clearInterval(interval);if(callback)callback()}},200)}
-
-function getSelectedToys(){const allToys=[];for(const[toyKey,quantity]of Object.entries(toyQuantities)){if(quantity>0){const[setId,toyId]=toyKey.split('_');allToys.push({toyId,setId,difficulty:toyDifficulties[toyKey]||'medium'})}}return allToys}
-
-function displayRandomInstruction(){const toys=getSelectedToys();if(currentMetronomeTask){currentMetronomeTask.cleanup();currentMetronomeTask=null}if(toys.length===0){instructions.classList.add('active');instructions.innerHTML="<div>🎯 Select instruction sets and toys to get started!</div>";window.lastTaskInfo=null;return}const randomToyObj=toys[Math.floor(Math.random()*toys.length)],tasks=instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];if(!tasks||tasks.length===0){instructions.classList.add('active');instructions.innerHTML="<div>No tasks available for this toy!</div>";window.lastTaskInfo=null;return}
-const conditions=getTaskConditions();
-const availableTasks=tasks.filter(task=>!task.canSelect||task.canSelect(conditions));
-if(availableTasks.length===0){instructions.classList.add('active');instructions.innerHTML="<div>No available tasks for current conditions!</div>";window.lastTaskInfo=null;return}
-const randomTask=availableTasks[Math.floor(Math.random()*availableTasks.length)];window.lastTaskInfo={toyId:randomToyObj.toyId,setId:randomToyObj.setId,difficulty:randomToyObj.difficulty,taskType:randomTask.type||'normal'};instructions.classList.add('active');if(randomTask.type==='metronome'){const beatCount=randomTask.getDifficulty(randomToyObj.difficulty,conditions);window.lastTaskInfo.beatCount=beatCount;currentMetronomeTask=createMetronomeTask(beatCount);instructions.innerHTML='';instructions.appendChild(currentMetronomeTask.element)}else if(randomTask.type==='redlight'){const duration=randomTask.getDifficulty(randomToyObj.difficulty,conditions);window.lastTaskInfo.duration=duration;currentMetronomeTask=createRedLightGreenLightTask(duration);instructions.innerHTML='';instructions.appendChild(currentMetronomeTask.element)}else{const content=randomTask.getDifficulty(randomToyObj.difficulty,conditions);instructions.innerHTML=content}}
-
-function displayRandomInstructionWithAddRemove(addRemoveTask){const toys=getSelectedToys();if(currentMetronomeTask){currentMetronomeTask.cleanup();currentMetronomeTask=null}if(toys.length===0){instructions.classList.add('active');instructions.innerHTML="<div>🎯 Select instruction sets and toys to get started!</div>";window.lastTaskInfo=null;return}const randomToyObj=toys[Math.floor(Math.random()*toys.length)],tasks=instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];if(!tasks||tasks.length===0){instructions.classList.add('active');instructions.innerHTML="<div>No tasks available for this toy!</div>";window.lastTaskInfo=null;return}
-const conditions=getTaskConditions();
-const availableTasks=tasks.filter(task=>!task.canSelect||task.canSelect(conditions));
-if(availableTasks.length===0){instructions.classList.add('active');instructions.innerHTML="<div>No available tasks for current conditions!</div>";window.lastTaskInfo=null;return}
-const randomTask=availableTasks[Math.floor(Math.random()*availableTasks.length)];window.lastTaskInfo={toyId:randomToyObj.toyId,setId:randomToyObj.setId,difficulty:randomToyObj.difficulty,taskType:randomTask.type||'normal'};instructions.classList.add('active');
-
-let addRemoveHTML='';
-if(addRemoveTask){const html=addRemoveTask.getHTML();const parser=new DOMParser();const doc=parser.parseFromString(html,'text/html');const strong=doc.querySelector('strong');const paragraphs=doc.querySelectorAll('p');let text='';if(strong)text+=`<strong>${strong.textContent}</strong>`;paragraphs.forEach(p=>text+=`<p>${p.textContent}</p>`);addRemoveHTML=text}
-
-if(randomTask.type==='metronome'){const beatCount=randomTask.getDifficulty(randomToyObj.difficulty,conditions);window.lastTaskInfo.beatCount=beatCount;currentMetronomeTask=createMetronomeTask(beatCount);instructions.innerHTML=addRemoveHTML;instructions.appendChild(currentMetronomeTask.element)}else if(randomTask.type==='redlight'){const duration=randomTask.getDifficulty(randomToyObj.difficulty,conditions);window.lastTaskInfo.duration=duration;currentMetronomeTask=createRedLightGreenLightTask(duration);instructions.innerHTML=addRemoveHTML;instructions.appendChild(currentMetronomeTask.element)}else{const content=randomTask.getDifficulty(randomToyObj.difficulty,conditions);instructions.innerHTML=addRemoveHTML+content}}
-
-function updateToyCheckboxes(){renderToyLibrary();}
-
-function renderToyLibrary(){selectedSets=Array.from(document.querySelectorAll('#instructionSetCheckboxes input:checked')).map(cb=>cb.value);const container=document.getElementById('toyLibraryContainer');if(!container)return;container.innerHTML='';if(selectedSets.length===0){container.innerHTML='<p style="color: #666; text-align: center; padding: 20px; background: white; border-radius: 10px; border: 2px solid #667eea;">Select instruction sets above to see available toys</p>';return}const setEmojis={ball:'⚾',rope:'🪢',basketball_game:'🏀'};const allToys={};selectedSets.forEach(setId=>{if(instructionSets[setId]){instructionSets[setId].toys.forEach(toy=>{if(!allToys[toy.id]){allToys[toy.id]={id:toy.id,name:toy.name,sets:[]}}allToys[toy.id].sets.push({setId,setName:instructionSets[setId].name,emoji:setEmojis[setId]||''})})}});for(const[toyId,toyData]of Object.entries(allToys)){const toyItem=document.createElement('div');toyItem.className='toy-library-item';const toyKeys=toyData.sets.map(s=>`${s.setId}_${toyId}`);toyKeys.forEach(key=>{if(toyQuantities[key]===undefined)toyQuantities[key]=0;if(!toyModifiers[key])toyModifiers[key]={addChance:25,removeChance:15};if(!toyDifficulties[key])toyDifficulties[key]='medium';if(toySetEnabled[key]===undefined)toySetEnabled[key]=true});const enabledKeys=toyKeys.filter(key=>toySetEnabled[key]);const totalQty=enabledKeys.reduce((sum,key)=>sum+(toyQuantities[key]||0),0);if(totalQty===0)toyItem.classList.add('disabled');const header=document.createElement('div');header.className='toy-header';const checkboxWrapper=document.createElement('div');checkboxWrapper.className='toy-checkbox-wrapper';const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=totalQty>0;checkbox.onchange=()=>{if(checkbox.checked){toyKeys.forEach(key=>{if(toySetEnabled[key]&&(!toyQuantities[key]||toyQuantities[key]===0)){toyQuantities[key]=1}})}else{toyKeys.forEach(key=>{toyQuantities[key]=0})}renderToyLibrary();saveGameState()};checkboxWrapper.appendChild(checkbox);const nameSpan=document.createElement('span');nameSpan.className='toy-name';nameSpan.textContent=toyData.name;header.appendChild(checkboxWrapper);header.appendChild(nameSpan);toyItem.appendChild(header);const controls=document.createElement('div');controls.className='toy-controls';const qtyLabel=document.createElement('label');qtyLabel.textContent='Qty:';controls.appendChild(qtyLabel);const qtyInput=document.createElement('input');qtyInput.type='number';qtyInput.min='1';qtyInput.value=totalQty||1;qtyInput.id=`qty_total_${toyId}`;qtyInput.onchange=()=>{const newQty=Math.max(1,parseInt(qtyInput.value)||1);toyKeys.forEach(key=>{if(toySetEnabled[key]){toyQuantities[key]=newQty}});checkbox.checked=enabledKeys.length>0;renderToyLibrary();saveGameState()};controls.appendChild(qtyInput);toyItem.appendChild(controls);const setDifficultyContainer=document.createElement('div');setDifficultyContainer.className='set-difficulty';toyData.sets.forEach(setInfo=>{const toyKey=`${setInfo.setId}_${toyId}`;const setItem=document.createElement('div');setItem.className='set-difficulty-item';const diffRow=document.createElement('div');diffRow.className='difficulty-row';const setCheckboxWrapper=document.createElement('div');setCheckboxWrapper.style.cssText='display:flex;align-items:center;gap:8px;';const setCheckbox=document.createElement('input');setCheckbox.type='checkbox';setCheckbox.checked=toySetEnabled[toyKey]!==false;setCheckbox.style.cssText='width:16px;height:16px;cursor:pointer;accent-color:#667eea;';setCheckbox.onchange=()=>{toySetEnabled[toyKey]=setCheckbox.checked;if(!setCheckbox.checked){toyQuantities[toyKey]=0}else{const currentTotal=enabledKeys.reduce((sum,key)=>sum+(toyQuantities[key]||0),0);toyQuantities[toyKey]=currentTotal||1}const anyEnabled=toyKeys.some(k=>toySetEnabled[k]);checkbox.checked=anyEnabled;renderToyLibrary();saveGameState()};setCheckboxWrapper.appendChild(setCheckbox);const setNameSpan=document.createElement('span');setNameSpan.textContent=`${setInfo.emoji} ${setInfo.setName}`;setCheckboxWrapper.appendChild(setNameSpan);diffRow.appendChild(setCheckboxWrapper);const diffControls=document.createElement('div');diffControls.className='difficulty-controls';const diffSelect=document.createElement('select');diffSelect.id=`difficulty_${toyKey}`;diffSelect.disabled=!toySetEnabled[toyKey];['easy','medium','hard'].forEach(level=>{const opt=document.createElement('option');opt.value=level;opt.textContent=level=='easy'?'Easy 😊':level=='medium'?'Medium 😐':'Hard 😤';if(level===(toyDifficulties[toyKey]||'medium'))opt.selected=true;diffSelect.appendChild(opt)});diffSelect.onchange=()=>{toyDifficulties[toyKey]=diffSelect.value;applyPreset(toyKey,diffSelect.value);saveGameState()};diffControls.appendChild(diffSelect);const isWearable=isToyWearable(toyId);const gearBtn=document.createElement('button');gearBtn.className='gear-btn';gearBtn.textContent='⚙️';gearBtn.title=isWearable?'Advanced Settings':'This toy cannot be worn/held';gearBtn.disabled=!isWearable||!toySetEnabled[toyKey];gearBtn.id=`gear_${toyKey}`;if(isWearable){gearBtn.onclick=(e)=>{e.preventDefault();const advSettings=setItem.querySelector('.advanced-settings');if(advSettings.classList.contains('visible')){advSettings.classList.remove('visible');gearBtn.classList.remove('active')}else{advSettings.classList.add('visible');gearBtn.classList.add('active')}}}diffControls.appendChild(gearBtn);diffRow.appendChild(diffControls);setItem.appendChild(diffRow);if(isWearable){const advSettings=document.createElement('div');advSettings.className='advanced-settings';const addLabel=document.createElement('label');addLabel.textContent='Add: ';const addInput=document.createElement('input');addInput.type='number';addInput.min='0';addInput.max='100';addInput.value=toyModifiers[toyKey]?.addChance||25;addInput.id=`add_${toyKey}`;addInput.disabled=!toySetEnabled[toyKey];addInput.oninput=(e)=>{const val=Math.max(0,Math.min(100,parseInt(e.target.value)||0));e.target.value=val;if(!toyModifiers[toyKey])toyModifiers[toyKey]={addChance:25,removeChance:15};toyModifiers[toyKey].addChance=val;saveGameState()};addLabel.appendChild(addInput);const addPercent=document.createTextNode('%');addLabel.appendChild(addPercent);advSettings.appendChild(addLabel);const removeLabel=document.createElement('label');removeLabel.textContent='Remove: ';const removeInput=document.createElement('input');removeInput.type='number';removeInput.min='0';removeInput.max='100';removeInput.value=toyModifiers[toyKey]?.removeChance||15;removeInput.id=`remove_${toyKey}`;removeInput.disabled=!toySetEnabled[toyKey];removeInput.oninput=(e)=>{const val=Math.max(0,Math.min(100,parseInt(e.target.value)||0));e.target.value=val;if(!toyModifiers[toyKey])toyModifiers[toyKey]={addChance:25,removeChance:15};toyModifiers[toyKey].removeChance=val;saveGameState()};removeLabel.appendChild(removeInput);const removePercent=document.createTextNode('%');removeLabel.appendChild(removePercent);advSettings.appendChild(removeLabel);setItem.appendChild(advSettings)}setDifficultyContainer.appendChild(setItem)});toyItem.appendChild(setDifficultyContainer);container.appendChild(toyItem)}saveGameState()}
-
-document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb=>{cb.addEventListener('change',()=>{renderToyLibrary();saveGameState()})});;
-
-document.getElementById('playerNameInput').addEventListener('input',function(){playerName=this.value;saveGameState()});
-
-function startGame(){const toys=getSelectedToys();if(toys.length===0){alert('⚠️ Please select at least one toy from the instruction sets before starting!');return}playerName=document.getElementById('playerNameInput').value.trim();if(!playerName){alert('⚠️ Please enter your name before starting!');return}gameStarted=true;saveGameState();startButton.style.display='none';const leftCol=document.querySelector('.settings-column-left');const rightCol=document.querySelector('.settings-column-right');if(leftCol)leftCol.style.display='none';if(rightCol)rightCol.style.display='none';instructions.classList.add('active');instructions.innerHTML=`<div style="font-size: 2em; font-weight: bold; color: #667eea; margin-bottom: 20px;">🍀 Good Luck${playerName?' '+playerName:''}! 🍀</div><div style="font-size: 1.2em; color: #666; margin-bottom: 20px;">Roll the dice to begin!</div>`;rollDiceButton.style.display='block';diceResult.style.display='block'}
-
-function rollDice(){rollDiceButton.disabled=true;const diceRoll=Math.floor(Math.random()*6)+1;diceResult.textContent=`Dice: ${diceRoll} 🎲`;let nextPosition=playerPosition+diceRoll;if(nextPosition>totalSquares)nextPosition=totalSquares;let finalPosition=nextPosition,showContinueButton=false;const isSnake=snakes[nextPosition],isLadder=ladders[nextPosition];if(isSnake||isLadder){finalPosition=isSnake?snakes[nextPosition]:ladders[nextPosition];showContinueButton=true}
+// Metronome Task
+function createMetronomeTask(beatCount) {
+    let metronomeInterval = null;
+    let countdownInterval = null;
+    let isComplete = false;
     
-const addRemoveTask=rollForAddRemoveTasks();
+    const wrapper = document.createElement('div');
+    const textDiv = document.createElement('div');
+    textDiv.innerHTML = '<strong>🏀 Bounce to the Beat!</strong><p>Bounce the basketball in rhythm.</p>';
+    wrapper.appendChild(textDiv);
+    
+    const container = document.createElement('div');
+    container.className = 'metronome-container';
+    container.innerHTML = `
+        <div class="metronome-beat" id="metronomeBeat"></div>
+        <div class="metronome-display" id="metronomeDisplay">Ready?</div>
+        <button class="metronome-btn" id="startMetronome">▶️ Start</button>
+    `;
+    wrapper.appendChild(container);
+    
+    const startBtn = container.querySelector('#startMetronome');
+    const display = container.querySelector('#metronomeDisplay');
+    const beat = container.querySelector('#metronomeBeat');
+    
+    startBtn.addEventListener('click', function() {
+        startBtn.disabled = true;
+        let count = 3;
+        display.textContent = count;
+        
+        countdownInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                display.textContent = count;
+            } else {
+                clearInterval(countdownInterval);
+                display.textContent = "Bounce!";
+                startMetronome();
+            }
+        }, 1000);
+    });
+    
+    function playBeep() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.type = 'sine';
+        osc.frequency.value = 440;
+        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.05);
+    }
+    
+    function startMetronome() {
+        let beatsLeft = beatCount;
+        const bpm = 100;
+        const interval = 60000 / bpm;
+        
+        function doBeat() {
+            beatsLeft--;
+            beat.classList.add('active');
+            playBeep();
+            display.textContent = `${beatsLeft} bounces left`;
+            
+            setTimeout(() => {
+                beat.classList.remove('active');
+            }, 100);
+            
+            if (beatsLeft <= 0) {
+                clearInterval(metronomeInterval);
+                display.textContent = "Complete! ✓";
+                isComplete = true;
+                continueButton.disabled = false;
+                continueButton.style.opacity = '1';
+            }
+        }
+        
+        doBeat();
+        metronomeInterval = setInterval(doBeat, interval);
+        continueButton.disabled = true;
+        continueButton.style.opacity = '0.5';
+    }
+    
+    return {
+        element: wrapper,
+        isComplete: () => isComplete,
+        cleanup: () => {
+            if (metronomeInterval) clearInterval(metronomeInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
+        },
+        hasStarted: () => startBtn.disabled
+    };
+}
 
-animatePlayer(playerPosition,nextPosition,()=>{playerPosition=nextPosition;
+// Red Light Green Light Task
+function createRedLightGreenLightTask(totalDuration) {
+    let gameInterval = null;
+    let countdownInterval = null;
+    let isComplete = false;
+    let timeRemaining = totalDuration;
+    
+    const imagePatterns = [
+        {image: 'chair.jpg', name: 'Chair', type: 'red'},
+        {image: 'broom.jpg', name: 'Broom', type: 'green'},
+        {image: 'hat.jpg', name: 'Hat', type: 'red'},
+        {image: 'ball.jpg', name: 'Ball', type: 'green'},
+        {image: 'books.jpg', name: 'Books', type: 'red'},
+        {image: 'car.jpg', name: 'Car', type: 'green'},
+        {image: 'tree.jpg', name: 'Tree', type: 'red'},
+        {image: 'guitar.jpg', name: 'Guitar', type: 'green'},
+        {image: 'apple.jpg', name: 'Apple', type: 'red'},
+        {image: 'bike.jpg', name: 'Bike', type: 'green'}
+    ];
+    
+    const lightPatterns = [
+        {duration: 2000}, {duration: 1500}, {duration: 1500}, {duration: 2500},
+        {duration: 1000}, {duration: 3000}, {duration: 2000}, {duration: 1500}
+    ];
+    
+    const container = document.createElement('div');
+    container.className = 'metronome-container';
+    container.style.background = 'linear-gradient(135deg, #845ef7 0%, #5f3dc4 100%)';
+    container.innerHTML = `
+        <div><strong>🚦 Red Light, Green Light!</strong></div>
+        <p style="color: white; margin: 10px 0;">🟢 GREEN = Jump! | 🔴 RED = Stop!</p>
+        <div style="background: rgba(255, 255, 255, 0.2); border-radius: 15px; padding: 20px; margin: 15px 0;">
+            <div style="width: 150px; height: 150px; margin: 0 auto 10px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden;" id="imageContainer">
+                <div style="font-size: 3em; color: #845ef7;">🚦</div>
+            </div>
+            <div style="color: white; font-size: 1.2em; font-weight: bold;" id="imageName">Get Ready!</div>
+        </div>
+        <div style="width: 120px; height: 120px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 4em; transition: all 0.3s ease;" id="lightIndicator">⏸️</div>
+        <div class="metronome-display" id="lightDisplay">Press Start!</div>
+        <div style="color: white; font-size: 18px; margin: 10px 0;" id="timeDisplay"></div>
+        <button class="metronome-btn" id="startRedLight">▶️ Start</button>
+    `;
+    
+    const startBtn = container.querySelector('#startRedLight');
+    const display = container.querySelector('#lightDisplay');
+    const lightIndicator = container.querySelector('#lightIndicator');
+    const timeDisplay = container.querySelector('#timeDisplay');
+    const imageContainer = container.querySelector('#imageContainer');
+    const imageName = container.querySelector('#imageName');
+    
+    startBtn.addEventListener('click', function() {
+        startBtn.disabled = true;
+        let count = 3;
+        imageContainer.innerHTML = `<div style="font-size: 4em; color: #845ef7;">${count}</div>`;
+        imageName.textContent = 'Starting...';
+        lightIndicator.textContent = '⏳';
+        display.textContent = 'Get ready...';
+        
+        countdownInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                imageContainer.innerHTML = `<div style="font-size: 4em; color: #845ef7;">${count}</div>`;
+            } else {
+                clearInterval(countdownInterval);
+                startGame();
+            }
+        }, 1000);
+    });
+    
+    function startGame() {
+        let currentImageIndex = 0;
+        let currentPatternIndex = 0;
+        
+        function showNextLight() {
+            if (timeRemaining <= 0) {
+                clearInterval(gameInterval);
+                display.textContent = "Game Complete! ✓";
+                lightIndicator.textContent = "✓";
+                lightIndicator.style.background = "linear-gradient(135deg, #51cf66 0%, #37b24d 100%)";
+                imageContainer.innerHTML = '<div style="font-size: 4em; color: #51cf66;">🎉</div>';
+                imageName.textContent = "Great Job!";
+                timeDisplay.textContent = "";
+                isComplete = true;
+                continueButton.disabled = false;
+                continueButton.style.opacity = '1';
+                return;
+            }
+            
+            const currentImage = imagePatterns[currentImageIndex];
+            const pattern = lightPatterns[currentPatternIndex];
+            
+            imageContainer.innerHTML = `<img src="${currentImage.image}" alt="${currentImage.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'font-size: 3em; color: #845ef7;\\'>${currentImage.name[0]}</div>';">`;
+            imageName.textContent = currentImage.name;
+            lightIndicator.textContent = currentImage.type === 'green' ? '🟢' : '🔴';
+            display.textContent = currentImage.type === 'green' ? 'GREEN LIGHT - JUMP!' : 'RED LIGHT - STOP!';
+            
+            if (currentImage.type === 'green') {
+                lightIndicator.style.background = 'linear-gradient(135deg, #51cf66 0%, #37b24d 100%)';
+                lightIndicator.style.transform = 'scale(1.2)';
+            } else {
+                lightIndicator.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)';
+                lightIndicator.style.transform = 'scale(1)';
+            }
+            
+            const displayDuration = Math.min(pattern.duration, timeRemaining);
+            timeRemaining -= displayDuration;
+            timeDisplay.textContent = `${Math.ceil(timeRemaining / 1000)}s remaining`;
+            
+            setTimeout(() => {
+                currentImageIndex++;
+                if (currentImageIndex >= imagePatterns.length) {
+                    currentImageIndex = 0;
+                }
+                currentPatternIndex++;
+                if (currentPatternIndex >= lightPatterns.length) {
+                    currentPatternIndex = 0;
+                }
+                showNextLight();
+            }, displayDuration);
+        }
+        
+        continueButton.disabled = true;
+        continueButton.style.opacity = '0.5';
+        showNextLight();
+    }
+    
+    return {
+        element: container,
+        isComplete: () => isComplete,
+        cleanup: () => {
+            if (gameInterval) clearInterval(gameInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
+        },
+        hasStarted: () => startBtn.disabled
+    };
+}
 
-if(addRemoveTask){addRemoveTask.execute()}
+// Board Functions
+function createBoard() {
+    let reverse = false;
+    let currentNumber = 1;
+    
+    for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+            const actualCol = reverse ? boardSize - col - 1 : col;
+            const square = document.createElement('div');
+            square.classList.add('square');
+            square.textContent = currentNumber;
+            square.id = `square-${currentNumber}`;
+            square.style.gridRow = boardSize - row;
+            square.style.gridColumn = actualCol + 1;
+            
+            if (snakes[currentNumber]) {
+                square.classList.add('snake');
+                square.setAttribute('data-destination', '↓' + snakes[currentNumber]);
+            } else if (ladders[currentNumber]) {
+                square.classList.add('ladder');
+                square.setAttribute('data-destination', '↑' + ladders[currentNumber]);
+            }
+            
+            board.appendChild(square);
+            currentNumber++;
+        }
+        reverse = !reverse;
+    }
+}
 
-displayRandomInstructionWithAddRemove(addRemoveTask);
-saveGameState();
+function animatePlayer(start, end, callback, instant = false) {
+    if (instant) {
+        const targetSquare = document.getElementById(`square-${end}`);
+        if (targetSquare) targetSquare.appendChild(player);
+        if (callback) callback();
+        return;
+    }
+    
+    let current = start;
+    const step = current < end ? 1 : -1;
+    
+    const interval = setInterval(() => {
+        current += step;
+        const currentSquare = document.getElementById(`square-${current}`);
+        if (currentSquare) currentSquare.appendChild(player);
+        
+        if (current === end) {
+            clearInterval(interval);
+            if (callback) callback();
+        }
+    }, 200);
+}
 
-if(playerPosition===totalSquares){rollDiceButton.disabled=true;const prize=determinePrize();instructions.innerHTML=`<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>`+displayPrizeResult(prize);return}
+// Toy Selection Functions
+function getSelectedToys() {
+    const allToys = [];
+    for (const [toyKey, quantity] of Object.entries(toyQuantities)) {
+        if (quantity > 0) {
+            const [setId, toyId] = toyKey.split('_');
+            
+            if (toyChecked[toyId] && toySetEnabled[toyKey]) {
+                allToys.push({
+                    toyId,
+                    setId,
+                    difficulty: toyDifficulties[toyKey] || 'medium'
+                });
+            }
+        }
+    }
+    return allToys;
+}
 
-instructions.appendChild(continueButton);continueButton.style.display="block";
+function displayRandomInstruction() {
+    const toys = getSelectedToys();
+    
+    if (currentMetronomeTask) {
+        currentMetronomeTask.cleanup();
+        currentMetronomeTask = null;
+    }
+    
+    if (toys.length === 0) {
+        instructions.classList.add('active');
+        instructions.innerHTML = "<div>🎯 Select instruction sets and toys to get started!</div>";
+        window.lastTaskInfo = null;
+        return;
+    }
+    
+    const randomToyObj = toys[Math.floor(Math.random() * toys.length)];
+    const tasks = instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];
+    
+    if (!tasks || tasks.length === 0) {
+        instructions.classList.add('active');
+        instructions.innerHTML = "<div>No tasks available for this toy!</div>";
+        window.lastTaskInfo = null;
+        return;
+    }
+    
+    const conditions = getTaskConditions();
+    const availableTasks = tasks.filter(task => !task.canSelect || task.canSelect(conditions));
+    
+    if (availableTasks.length === 0) {
+        instructions.classList.add('active');
+        instructions.innerHTML = "<div>No available tasks for current conditions!</div>";
+        window.lastTaskInfo = null;
+        return;
+    }
+    
+    const randomTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
+    window.lastTaskInfo = {
+        toyId: randomToyObj.toyId,
+        setId: randomToyObj.setId,
+        difficulty: randomToyObj.difficulty,
+        taskType: randomTask.type || 'normal'
+    };
+    
+    instructions.classList.add('active');
+    
+    if (randomTask.type === 'metronome') {
+        const beatCount = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        window.lastTaskInfo.beatCount = beatCount;
+        currentMetronomeTask = createMetronomeTask(beatCount);
+        instructions.innerHTML = '';
+        instructions.appendChild(currentMetronomeTask.element);
+    } else if (randomTask.type === 'redlight') {
+        const duration = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        window.lastTaskInfo.duration = duration;
+        currentMetronomeTask = createRedLightGreenLightTask(duration);
+        instructions.innerHTML = '';
+        instructions.appendChild(currentMetronomeTask.element);
+    } else {
+        const content = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        instructions.innerHTML = content;
+    }
+}
 
-if(showContinueButton){continueButton.onclick=()=>{if(currentMetronomeTask&&!currentMetronomeTask.isComplete())return;continueButton.style.display="none";animatePlayer(nextPosition,finalPosition,()=>{playerPosition=finalPosition;if(playerPosition===totalSquares){rollDiceButton.disabled=true;const prize=determinePrize();instructions.innerHTML=`<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>`+displayPrizeResult(prize);saveGameState()}else{rollDiceButton.disabled=false;instructions.innerHTML=`<div><strong>📍 You landed on ${finalPosition}.</strong></div>`;displayRandomInstruction();saveGameState()}},true)}}else{continueButton.onclick=()=>{if(currentMetronomeTask&&!currentMetronomeTask.isComplete())return;continueButton.style.display="none";rollDiceButton.disabled=false}}});}
+function displayRandomInstructionWithAddRemove(addRemoveTask) {
+    const toys = getSelectedToys();
+    
+    if (currentMetronomeTask) {
+        currentMetronomeTask.cleanup();
+        currentMetronomeTask = null;
+    }
+    
+    if (toys.length === 0) {
+        instructions.classList.add('active');
+        instructions.innerHTML = "<div>🎯 Select instruction sets and toys to get started!</div>";
+        window.lastTaskInfo = null;
+        return;
+    }
+    
+    const randomToyObj = toys[Math.floor(Math.random() * toys.length)];
+    const tasks = instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];
+    
+    if (!tasks || tasks.length === 0) {
+        instructions.classList.add('active');
+        instructions.innerHTML = "<div>No tasks available for this toy!</div>";
+        window.lastTaskInfo = null;
+        return;
+    }
+    
+    const conditions = getTaskConditions();
+    const availableTasks = tasks.filter(task => !task.canSelect || task.canSelect(conditions));
+    
+    if (availableTasks.length === 0) {
+        instructions.classList.add('active');
+        instructions.innerHTML = "<div>No available tasks for current conditions!</div>";
+        window.lastTaskInfo = null;
+        return;
+    }
+    
+    const randomTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
+    window.lastTaskInfo = {
+        toyId: randomToyObj.toyId,
+        setId: randomToyObj.setId,
+        difficulty: randomToyObj.difficulty,
+        taskType: randomTask.type || 'normal'
+    };
+    
+    instructions.classList.add('active');
+    
+    let addRemoveHTML = '';
+    if (addRemoveTask) {
+        const html = addRemoveTask.getHTML();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const strong = doc.querySelector('strong');
+        const paragraphs = doc.querySelectorAll('p');
+        let text = '';
+        if (strong) text += `<strong>${strong.textContent}</strong>`;
+        paragraphs.forEach(p => text += `<p>${p.textContent}</p>`);
+        addRemoveHTML = text;
+    }
+    
+    if (randomTask.type === 'metronome') {
+        const beatCount = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        window.lastTaskInfo.beatCount = beatCount;
+        currentMetronomeTask = createMetronomeTask(beatCount);
+        instructions.innerHTML = addRemoveHTML;
+        instructions.appendChild(currentMetronomeTask.element);
+    } else if (randomTask.type === 'redlight') {
+        const duration = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        window.lastTaskInfo.duration = duration;
+        currentMetronomeTask = createRedLightGreenLightTask(duration);
+        instructions.innerHTML = addRemoveHTML;
+        instructions.appendChild(currentMetronomeTask.element);
+    } else {
+        const content = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        instructions.innerHTML = addRemoveHTML + content;
+    }
+}
 
-const modal=document.getElementById('patchNotesModal'),btn=document.getElementById('patchNotesBtn'),span=document.getElementsByClassName('close-btn')[0];btn.onclick=()=>modal.style.display='block';span.onclick=()=>modal.style.display='none';window.onclick=e=>{if(e.target==modal)modal.style.display='none'};
+// Render Toy Library
+function renderToyLibrary() {
+    selectedSets = Array.from(document.querySelectorAll('#instructionSetCheckboxes input:checked'))
+        .map(cb => cb.value);
+    
+    const container = document.getElementById('toyLibraryContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (selectedSets.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px; background: white; border-radius: 10px; border: 2px solid #667eea;">Select instruction sets above to see available toys</p>';
+        return;
+    }
+    
+    const setEmojis = {dressup: '🎨', apple: '🍎', digging: '⛏️'};
+    const allToys = {};
+    
+    selectedSets.forEach(setId => {
+        if (instructionSets[setId]) {
+            instructionSets[setId].toys.forEach(toy => {
+                if (!allToys[toy.id]) {
+                    allToys[toy.id] = {id: toy.id, name: toy.name, sets: []};
+                }
+                allToys[toy.id].sets.push({
+                    setId,
+                    setName: instructionSets[setId].name,
+                    emoji: setEmojis[setId] || ''
+                });
+            });
+        }
+    });
+    
+    for (const [toyId, toyData] of Object.entries(allToys)) {
+        const toyItem = document.createElement('div');
+        toyItem.className = 'toy-library-item';
+        
+        const toyKeys = toyData.sets.map(s => `${s.setId}_${toyId}`);
+        
+        toyKeys.forEach(key => {
+            if (toyQuantities[key] === undefined) toyQuantities[key] = 1;
+            if (!toyModifiers[key]) toyModifiers[key] = {addChance: 25, removeChance: 15};
+            if (!toyDifficulties[key]) toyDifficulties[key] = 'medium';
+            if (toySetEnabled[key] === undefined) toySetEnabled[key] = true;
+        });
+        
+        if (toyChecked[toyId] === undefined) toyChecked[toyId] = true;
+        
+        const enabledKeys = toyKeys.filter(key => toySetEnabled[key]);
+        
+        const toyQuantity = toyQuantities[toyKeys[0]] || 1;
+        
+        const header = document.createElement('div');
+        header.className = 'toy-header';
+        
+        const checkboxWrapper = document.createElement('div');
+        checkboxWrapper.className = 'toy-checkbox-wrapper';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = toyChecked[toyId];
+        checkbox.style.cursor = 'pointer';
+        checkbox.onchange = () => {
+            toyChecked[toyId] = checkbox.checked;
+            renderToyLibrary();
+            saveGameState();
+        };
+        checkboxWrapper.appendChild(checkbox);
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'toy-name';
+        nameSpan.textContent = toyData.name;
+        
+        header.appendChild(checkboxWrapper);
+        header.appendChild(nameSpan);
+        toyItem.appendChild(header);
+        
+        const controls = document.createElement('div');
+        controls.className = 'toy-controls';
+        
+        const qtyLabel = document.createElement('label');
+        qtyLabel.textContent = 'Qty:';
+        controls.appendChild(qtyLabel);
+        
+        const qtyInput = document.createElement('input');
+        qtyInput.type = 'number';
+        qtyInput.min = '1';
+        qtyInput.value = toyQuantity;
+        qtyInput.id = `qty_total_${toyId}`;
+        qtyInput.disabled = !toyChecked[toyId];
+        qtyInput.onchange = () => {
+            const newQty = Math.max(1, parseInt(qtyInput.value) || 1);
+            toyKeys.forEach(key => {
+                toyQuantities[key] = newQty;
+            });
+            renderToyLibrary();
+            saveGameState();
+        };
+        controls.appendChild(qtyInput);
+        toyItem.appendChild(controls);
+        
+        const setDifficultyContainer = document.createElement('div');
+        setDifficultyContainer.className = 'set-difficulty';
+        
+        toyData.sets.forEach(setInfo => {
+            const toyKey = `${setInfo.setId}_${toyId}`;
+            const setItem = document.createElement('div');
+            setItem.className = 'set-difficulty-item';
+            
+            const diffRow = document.createElement('div');
+            diffRow.className = 'difficulty-row';
+            
+            const setCheckboxWrapper = document.createElement('div');
+            setCheckboxWrapper.style.cssText = 'display:flex;align-items:center;gap:8px;';
+            
+            const setCheckbox = document.createElement('input');
+            setCheckbox.type = 'checkbox';
+            setCheckbox.checked = toySetEnabled[toyKey];
+            setCheckbox.style.cssText = 'width:16px;height:16px;cursor:pointer;accent-color:#667eea;';
+            
+            setCheckbox.disabled = !toyChecked[toyId];
+            
+            setCheckbox.onchange = () => {
+                toySetEnabled[toyKey] = setCheckbox.checked;
+                renderToyLibrary();
+                saveGameState();
+            };
+            setCheckboxWrapper.appendChild(setCheckbox);
+            
+            const setNameSpan = document.createElement('span');
+            setNameSpan.textContent = `${setInfo.emoji} ${setInfo.setName}`;
+            setCheckboxWrapper.appendChild(setNameSpan);
+            diffRow.appendChild(setCheckboxWrapper);
+            
+            const diffControls = document.createElement('div');
+            diffControls.className = 'difficulty-controls';
+            
+            const diffSelect = document.createElement('select');
+            diffSelect.id = `difficulty_${toyKey}`;
+            diffSelect.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey];
+            
+            ['easy', 'medium', 'hard'].forEach(level => {
+                const opt = document.createElement('option');
+                opt.value = level;
+                opt.textContent = level == 'easy' ? 'Easy 😊' : level == 'medium' ? 'Medium 😐' : 'Hard 😤';
+                if (level == (toyDifficulties[toyKey] || 'medium')) opt.selected = true;
+                diffSelect.appendChild(opt);
+            });
+            
+            diffSelect.onchange = () => {
+                toyDifficulties[toyKey] = diffSelect.value;
+                applyPreset(toyKey, diffSelect.value);
+                saveGameState();
+            };
+            diffControls.appendChild(diffSelect);
+            
+            const isWearable = isToyWearable(toyId);
+            const gearBtn = document.createElement('button');
+            gearBtn.className = 'gear-btn';
+            gearBtn.textContent = '⚙️';
+            gearBtn.title = isWearable ? 'Advanced Settings' : 'This toy cannot be worn/held';
+            gearBtn.disabled = !isWearable || !toyChecked[toyId] || !toySetEnabled[toyKey];
+            gearBtn.id = `gear_${toyKey}`;
+            
+            if (isWearable) {
+                gearBtn.onclick = (e) => {
+                    e.preventDefault();
+                    const advSettings = setItem.querySelector('.advanced-settings');
+                    if (advSettings.classList.contains('visible')) {
+                        advSettings.classList.remove('visible');
+                        gearBtn.classList.remove('active');
+                    } else {
+                        advSettings.classList.add('visible');
+                        gearBtn.classList.add('active');
+                    }
+                };
+            }
+            diffControls.appendChild(gearBtn);
+            diffRow.appendChild(diffControls);
+            setItem.appendChild(diffRow);
+            
+            if (isWearable) {
+                const advSettings = document.createElement('div');
+                advSettings.className = 'advanced-settings';
+                
+                const addLabel = document.createElement('label');
+                addLabel.textContent = 'Add: ';
+                const addInput = document.createElement('input');
+                addInput.type = 'number';
+                addInput.min = '0';
+                addInput.max = '100';
+                addInput.value = toyModifiers[toyKey]?.addChance || 25;
+                addInput.id = `add_${toyKey}`;
+                addInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey];
+                addInput.oninput = (e) => {
+                    const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
+                    e.target.value = val;
+                    if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 25, removeChance: 15};
+                    toyModifiers[toyKey].addChance = val;
+                    saveGameState();
+                };
+                addLabel.appendChild(addInput);
+                const addPercent = document.createTextNode('%');
+                addLabel.appendChild(addPercent);
+                advSettings.appendChild(addLabel);
+                
+                const removeLabel = document.createElement('label');
+                removeLabel.textContent = 'Remove: ';
+                const removeInput = document.createElement('input');
+                removeInput.type = 'number';
+                removeInput.min = '0';
+                removeInput.max = '100';
+                removeInput.value = toyModifiers[toyKey]?.removeChance || 15;
+                removeInput.id = `remove_${toyKey}`;
+                removeInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey];
+                removeInput.oninput = (e) => {
+                    const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
+                    e.target.value = val;
+                    if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 25, removeChance: 15};
+                    toyModifiers[toyKey].removeChance = val;
+                    saveGameState();
+                };
+                removeLabel.appendChild(removeInput);
+                const removePercent = document.createTextNode('%');
+                removeLabel.appendChild(removePercent);
+                advSettings.appendChild(removeLabel);
+                
+                setItem.appendChild(advSettings);
+            }
+            
+            setDifficultyContainer.appendChild(setItem);
+        });
+        
+        toyItem.appendChild(setDifficultyContainer);
+        container.appendChild(toyItem);
+    }
+    
+    saveGameState();
+}
 
-const resetBtn=document.getElementById('resetBtn'),resetModal=document.getElementById('resetModal'),confirmResetBtn=document.getElementById('confirmReset'),cancelResetBtn=document.getElementById('cancelReset');resetBtn.addEventListener('click',()=>resetModal.style.display='block');cancelResetBtn.addEventListener('click',()=>resetModal.style.display='none');confirmResetBtn.addEventListener('click',async function(){resetModal.style.display='none';try{await window.storage.delete('snakesLaddersGameState')}catch(e){}gameStarted=false;playerPosition=0;playerName='';player.remove();bodyPartState=JSON.parse(JSON.stringify(bodyParts));startButton.style.display='block';rollDiceButton.style.display='none';rollDiceButton.disabled=false;continueButton.style.display='none';instructions.classList.remove('active');instructions.innerHTML='';diceResult.textContent='Dice: -';diceResult.style.display='none';document.getElementById('playerNameInput').value='';const leftCol=document.querySelector('.settings-column-left');const rightCol=document.querySelector('.settings-column-right');if(leftCol)leftCol.style.display='block';if(rightCol)rightCol.style.display='block';document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb=>cb.checked=false);selectedSets=[];toySelections={};toyDifficulties={};toyQuantities={};toyModifiers={};advancedSettingsOpen=false;toySetEnabled={};prizeSettings={minor:25,major:10,noPrize:65};updateSliderDisplays();renderToyLibrary()});
+function applyPreset(toyKey, difficulty) {
+    const presets = {
+        easy: {addChance: 10, removeChance: 30},
+        medium: {addChance: 25, removeChance: 15},
+        hard: {addChance: 50, removeChance: 5}
+    };
+    
+    if (presets[difficulty]) {
+        toyModifiers[toyKey] = {...presets[difficulty]};
+        toyDifficulties[toyKey] = difficulty;
+        
+        const addInput = document.getElementById(`add_${toyKey}`);
+        const removeInput = document.getElementById(`remove_${toyKey}`);
+        if (addInput) addInput.value = toyModifiers[toyKey].addChance;
+        if (removeInput) removeInput.value = toyModifiers[toyKey].removeChance;
+        
+        saveGameState();
+    }
+}
 
-startButton.addEventListener('click',startGame);rollDiceButton.addEventListener('click',rollDice);createBoard();renderToyLibrary();loadGameState();
+// Event Listeners
+document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => {
+    cb.addEventListener('change', () => {
+        renderToyLibrary();
+        saveGameState();
+    });
+});
+
+document.getElementById('playerNameInput').addEventListener('input', function() {
+    playerName = this.value;
+    saveGameState();
+});
+
+function startGame() {
+    const toys = getSelectedToys();
+    if (toys.length === 0) {
+        alert('⚠️ Please select at least one toy from the instruction sets before starting!');
+        return;
+    }
+    
+    playerName = document.getElementById('playerNameInput').value.trim();
+    if (!playerName) {
+        alert('⚠️ Please enter your name before starting!');
+        return;
+    }
+    
+    gameStarted = true;
+    saveGameState();
+    
+    startButton.style.display = 'none';
+    const leftCol = document.querySelector('.settings-column-left');
+    const rightCol = document.querySelector('.settings-column-right');
+    if (leftCol) leftCol.style.display = 'none';
+    if (rightCol) rightCol.style.display = 'none';
+    
+    instructions.classList.add('active');
+    instructions.innerHTML = `
+        <div style="font-size: 2em; font-weight: bold; color: #667eea; margin-bottom: 20px;">
+            🍀 Good Luck${playerName ? ' ' + playerName : ''}! 🍀
+        </div>
+        <div style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
+            Roll the dice to begin!
+        </div>
+    `;
+    
+    rollDiceButton.style.display = 'block';
+    diceResult.style.display = 'block';
+}
+
+function rollDice() {
+    rollDiceButton.disabled = true;
+    const diceRoll = Math.floor(Math.random() * 6) + 1;
+    diceResult.textContent = `Dice: ${diceRoll} 🎲`;
+    
+    let nextPosition = playerPosition + diceRoll;
+    if (nextPosition > totalSquares) nextPosition = totalSquares;
+    
+    let finalPosition = nextPosition;
+    let showContinueButton = false;
+    
+    const isSnake = snakes[nextPosition];
+    const isLadder = ladders[nextPosition];
+    
+    if (isSnake || isLadder) {
+        finalPosition = isSnake ? snakes[nextPosition] : ladders[nextPosition];
+        showContinueButton = true;
+    }
+    
+    const addRemoveTask = rollForAddRemoveTasks();
+    
+    animatePlayer(playerPosition, nextPosition, () => {
+        playerPosition = nextPosition;
+        
+        if (addRemoveTask) {
+            addRemoveTask.execute();
+        }
+        
+        displayRandomInstructionWithAddRemove(addRemoveTask);
+        saveGameState();
+        
+        if (playerPosition === totalSquares) {
+            rollDiceButton.disabled = true;
+            const prize = determinePrize();
+            instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>` + displayPrizeResult(prize);
+            return;
+        }
+        
+        instructions.appendChild(continueButton);
+        continueButton.style.display = "block";
+        
+        if (showContinueButton) {
+            continueButton.onclick = () => {
+                if (currentMetronomeTask && !currentMetronomeTask.isComplete()) return;
+                continueButton.style.display = "none";
+                animatePlayer(nextPosition, finalPosition, () => {
+                    playerPosition = finalPosition;
+                    if (playerPosition === totalSquares) {
+                        rollDiceButton.disabled = true;
+                        const prize = determinePrize();
+                        instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>` + displayPrizeResult(prize);
+                        saveGameState();
+                    } else {
+                        rollDiceButton.disabled = false;
+                        instructions.innerHTML = `<div><strong>📍 You landed on ${finalPosition}.</strong></div>`;
+                        displayRandomInstruction();
+                        saveGameState();
+                    }
+                }, true);
+            };
+        } else {
+            continueButton.onclick = () => {
+                if (currentMetronomeTask && !currentMetronomeTask.isComplete()) return;
+                continueButton.style.display = "none";
+                rollDiceButton.disabled = false;
+            };
+        }
+    });
+}
+
+// Modal Functions
+const modal = document.getElementById('patchNotesModal');
+const btn = document.getElementById('patchNotesBtn');
+const span = document.getElementsByClassName('close-btn')[0];
+
+btn.onclick = () => modal.style.display = 'block';
+span.onclick = () => modal.style.display = 'none';
+window.onclick = e => {
+    if (e.target == modal) modal.style.display = 'none';
+};
+
+// Reset Functions
+const resetBtn = document.getElementById('resetBtn');
+const resetModal = document.getElementById('resetModal');
+const confirmResetBtn = document.getElementById('confirmReset');
+const cancelResetBtn = document.getElementById('cancelReset');
+
+resetBtn.addEventListener('click', () => resetModal.style.display = 'block');
+cancelResetBtn.addEventListener('click', () => resetModal.style.display = 'none');
+
+confirmResetBtn.addEventListener('click', function() {
+    resetModal.style.display = 'none';
+    localStorage.removeItem('snakesLaddersGameState');
+    
+    gameStarted = false;
+    playerPosition = 0;
+    playerName = '';
+    player.remove();
+    bodyPartState = JSON.parse(JSON.stringify(bodyParts));
+    
+    startButton.style.display = 'block';
+    rollDiceButton.style.display = 'none';
+    rollDiceButton.disabled = false;
+    continueButton.style.display = 'none';
+    instructions.classList.remove('active');
+    instructions.innerHTML = '';
+    diceResult.textContent = 'Dice: -';
+    diceResult.style.display = 'none';
+    
+    document.getElementById('playerNameInput').value = '';
+    
+    const leftCol = document.querySelector('.settings-column-left');
+    const rightCol = document.querySelector('.settings-column-right');
+    if (leftCol) leftCol.style.display = 'block';
+    if (rightCol) rightCol.style.display = 'block';
+    
+    document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => cb.checked = false);
+    
+    toySetEnabled = {};
+    toyChecked = {};
+    selectedSets = [];
+    toySelections = {};
+    toyDifficulties = {};
+    toyQuantities = {};
+    toyModifiers = {};
+    advancedSettingsOpen = false;
+    prizeSettings = {minor: 25, major: 10, noPrize: 65};
+    
+    updateSliderDisplays();
+    renderToyLibrary();
+});
+
+// Initialize
+startButton.addEventListener('click', startGame);
+rollDiceButton.addEventListener('click', rollDice);
+createBoard();
+renderToyLibrary();
+
+loadGameState();
     </script>
 </body>
 </html>
