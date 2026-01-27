@@ -869,13 +869,24 @@ let toyChecked = {};
 
 // Body part capacity system
 const bodyParts = {
-    Mo: { name: "Mo", capacity: 1, occupied: 0, items: [] },
-    Ba: { name: "Ba", capacity: 1, occupied: 0, items: [] },
-    Bu: { name: "Bu", capacity: 1, occupied: 0, items: [] },
-    As: { name: "As", capacity: 1, occupied: 0, items: [] },
-    Ni: { name: "Ni", capacity: 1, occupied: 0, items: [] },
-    Ha: { name: "Ha", capacity: 1, occupied: 0, items: [] },
-    Bo: { name: "Bo", capacity: 1, occupied: 0, items: [] }
+    Mo: { name: "Mo", items: [] },
+    Ba: { name: "Ba", items: [] },
+    Bu: { name: "Bu", items: [] },
+    As: { name: "As", items: [] },
+    Ni: { name: "Ni", items: [] },
+    Ha: { name: "Ha", items: [] },
+    Bo: { name: "Bo", items: [] }
+};
+
+// Clothestickers max count per body part
+const clothestickersMaxCount = {
+    'Ba': 20,
+    'Ni': 2,
+    'Mo': 3,
+    'Bu': 1,
+    'As': 1,
+    'Ha': 1,
+    'Bo': 1
 };
 
 const toyCapacity = {
@@ -894,29 +905,28 @@ const toyCapacity = {
     vibranium: 1
 };
 
-// Specific capacity overrides for toy+bodypart combinations
-// Format: "bodyPart_toyId": maxCount
-const bodyPartToyCapacity = {
-    'Ba_stickers': 20,  // Ba can hold 20 clothestickers
-    'Ni_stickers': 2    // Ni can hold 2 clothestickers
-};
-
 function isToyWearable(toyId) {
     return toyCapacity.hasOwnProperty(toyId);
 }
 
-function getMaxToyCountForBodyPart(bodyPart, toyId) {
-    const key = `${bodyPart}_${toyId}`;
-    if (bodyPartToyCapacity.hasOwnProperty(key)) {
-        return bodyPartToyCapacity[key];
-    }
-    // Default: body part capacity divided by toy size
-    const toySize = toyCapacity[toyId] || 1;
-    return Math.floor(bodyPartState[bodyPart].capacity / toySize);
+function isBodyPartEmpty(bodyPart) {
+    return bodyPartState[bodyPart].items.length === 0;
 }
 
-function getToyCountInBodyPart(bodyPart, toyId) {
-    return bodyPartState[bodyPart].items.filter(item => item === toyId).length;
+function hasClothestickers(bodyPart) {
+    return bodyPartState[bodyPart].items.some(item => item === 'stickers');
+}
+
+function hasRegularToys(bodyPart) {
+    return bodyPartState[bodyPart].items.some(item => item !== 'stickers');
+}
+
+function getClothestickerCount(bodyPart) {
+    return bodyPartState[bodyPart].items.filter(item => item === 'stickers').length;
+}
+
+function getClothestickerMax(bodyPart) {
+    return clothestickersMaxCount[bodyPart] || 1;
 }
 
 let bodyPartState = JSON.parse(JSON.stringify(bodyParts));
@@ -940,7 +950,7 @@ function getTaskConditions() {
             return parts;
         },
         isBodyPartOccupied: (bodyPartKey) => {
-            return bodyPartState[bodyPartKey] && bodyPartState[bodyPartKey].occupied > 0;
+            return bodyPartState[bodyPartKey] && !isBodyPartEmpty(bodyPartKey);
         },
         canBodyPartHold: (bodyPartKey, toyId) => {
             return canAddToyToBodyPart(bodyPartKey, toyId);
@@ -970,8 +980,8 @@ const instructionSets = {
         tasks: {
             stickers: [
                 {getDifficulty: d => `<strong>Clothesticker Challenge</strong><p>Apply ${d=='easy'?3:d=='medium'?5:8} clothestickers to yourself.</p><img src="https://picsum.photos/seed/sticker1/800/600"/>`},
-                {type: 'add', bodyPart: 'Ba'},
-                {type: 'remove', bodyPart: 'Ba'}
+                {type: 'add', bodyPart: 'Ba', quantity: d => d=='easy'?3:d=='medium'?5:8},
+                {type: 'remove', bodyPart: 'Ba', quantity: d => d=='easy'?3:d=='medium'?5:8}
             ],
             silly_shirt: [
                 {getDifficulty: d => `<strong>Wear the Clampshirt</strong><p>Put on the clampshirt and pose for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><img src="https://picsum.photos/seed/shirt1/800/600"/>`},
@@ -1227,15 +1237,25 @@ function displayPrizeResult(prize) {
 
 // Body Part Functions
 function canAddToyToBodyPart(bodyPart, toyId) {
-    const maxCount = getMaxToyCountForBodyPart(bodyPart, toyId);
-    const currentCount = getToyCountInBodyPart(bodyPart, toyId);
-    return currentCount < maxCount;
+    if (toyId === 'stickers') {
+        // Clothestickers case
+        // Can't add if body part has regular toys
+        if (hasRegularToys(bodyPart)) {
+            return false;
+        }
+        // Check if under max count
+        const currentCount = getClothestickerCount(bodyPart);
+        const maxCount = getClothestickerMax(bodyPart);
+        return currentCount < maxCount;
+    } else {
+        // Regular toy case
+        // Body part must be completely empty (no regular toys AND no clothestickers)
+        return isBodyPartEmpty(bodyPart);
+    }
 }
 
 function addToyToBodyPart(bodyPart, toyId) {
     if (canAddToyToBodyPart(bodyPart, toyId)) {
-        const toySize = toyCapacity[toyId] || 0;
-        bodyPartState[bodyPart].occupied += toySize;
         bodyPartState[bodyPart].items.push(toyId);
         saveGameState();
         return true;
@@ -1246,8 +1266,6 @@ function addToyToBodyPart(bodyPart, toyId) {
 function removeToyFromBodyPart(bodyPart, toyId) {
     const index = bodyPartState[bodyPart].items.indexOf(toyId);
     if (index > -1) {
-        const toySize = toyCapacity[toyId] || 0;
-        bodyPartState[bodyPart].occupied -= toySize;
         bodyPartState[bodyPart].items.splice(index, 1);
         saveGameState();
         return true;
@@ -1256,16 +1274,16 @@ function removeToyFromBodyPart(bodyPart, toyId) {
 }
 
 function getAvailableBodyPartsForToy(toyId) {
-    const toySize = toyCapacity[toyId] || 0;
     const available = [];
     
     for (const [partKey, part] of Object.entries(bodyPartState)) {
-        const availableSpace = part.capacity - part.occupied;
-        if (availableSpace >= toySize) {
+        if (canAddToyToBodyPart(partKey, toyId)) {
             available.push({
                 key: partKey,
                 name: part.name,
-                available: availableSpace
+                available: toyId === 'stickers' ? 
+                    (getClothestickerMax(partKey) - getClothestickerCount(partKey)) : 
+                    1
             });
         }
     }
@@ -1289,64 +1307,138 @@ function getBodyPartsHoldingToy(toyId) {
 }
 
 // Add/Remove Task Functions
-function createAddToyTaskWithBodyPart(toyKey, toyName, bodyPart) {
+function createAddToyTaskWithBodyPart(toyKey, toyName, bodyPart, quantity = 1) {
     const [setId, ...toyIdParts] = toyKey.split('_');
     const toyId = toyIdParts.join('_');
     
-    let heldCount = 0;
-    for (const part of Object.values(bodyPartState)) {
-        heldCount += part.items.filter(item => item === toyId).length;
-    }
-    
-    const totalAvailable = toyQuantities[toyKey] || 0;
-    if (heldCount >= totalAvailable) {
-        return null;
-    }
-    
-    // Check if the specific body part can hold this toy
-    if (!canAddToyToBodyPart(bodyPart, toyId)) {
-        return null;
-    }
-    
-    return {
-        type: 'add',
-        toyId: toyId,
-        toyKey: toyKey,
-        toyName: toyName,
-        bodyPart: bodyPart,
-        bodyPartName: bodyPartState[bodyPart].name,
-        execute: function() {
-            return addToyToBodyPart(this.bodyPart, this.toyId);
-        },
-        getHTML: function() {
-            return `<strong>📥 Pick Up Task</strong><p>Pick up the ${this.toyName} and hold it in your ${this.bodyPartName}.</p><p style="color: #666; font-size: 0.9em;">This toy will stay with you until a task tells you to put it down.</p>`;
+    // For clothestickers, check if we can add the requested quantity
+    if (toyId === 'stickers') {
+        const currentCount = getClothestickerCount(bodyPart);
+        const maxCount = getClothestickerMax(bodyPart);
+        const spaceAvailable = maxCount - currentCount;
+        
+        // If we can't add any or if body part has regular toys, return null
+        if (spaceAvailable <= 0 || hasRegularToys(bodyPart)) {
+            return null;
         }
-    };
+        
+        // Cap the quantity at what's available
+        const actualQuantity = Math.min(quantity, spaceAvailable);
+        
+        return {
+            type: 'add',
+            toyId: toyId,
+            toyKey: toyKey,
+            toyName: toyName,
+            bodyPart: bodyPart,
+            bodyPartName: bodyPartState[bodyPart].name,
+            quantity: actualQuantity,
+            execute: function() {
+                // Add multiple clothestickers
+                for (let i = 0; i < this.quantity; i++) {
+                    if (!addToyToBodyPart(this.bodyPart, this.toyId)) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+            getHTML: function() {
+                return `<strong>📥 Pick Up Task</strong><p>Pick up ${this.quantity} ${this.toyName} and hold them in your ${this.bodyPartName}.</p><p style="color: #666; font-size: 0.9em;">These will stay with you until a task tells you to put them down.</p>`;
+            }
+        };
+    } else {
+        // Regular toy - check if body part is empty
+        let heldCount = 0;
+        for (const part of Object.values(bodyPartState)) {
+            heldCount += part.items.filter(item => item === toyId).length;
+        }
+        
+        const totalAvailable = toyQuantities[toyKey] || 0;
+        if (heldCount >= totalAvailable) {
+            return null;
+        }
+        
+        // Check if the specific body part can hold this toy
+        if (!canAddToyToBodyPart(bodyPart, toyId)) {
+            return null;
+        }
+        
+        return {
+            type: 'add',
+            toyId: toyId,
+            toyKey: toyKey,
+            toyName: toyName,
+            bodyPart: bodyPart,
+            bodyPartName: bodyPartState[bodyPart].name,
+            quantity: 1,
+            execute: function() {
+                return addToyToBodyPart(this.bodyPart, this.toyId);
+            },
+            getHTML: function() {
+                return `<strong>📥 Pick Up Task</strong><p>Pick up the ${this.toyName} and hold it in your ${this.bodyPartName}.</p><p style="color: #666; font-size: 0.9em;">This toy will stay with you until a task tells you to put it down.</p>`;
+            }
+        };
+    }
 }
 
-function createRemoveToyTaskWithBodyPart(toyKey, toyName, bodyPart) {
+function createRemoveToyTaskWithBodyPart(toyKey, toyName, bodyPart, quantity = 1) {
     const [setId, ...toyIdParts] = toyKey.split('_');
     const toyId = toyIdParts.join('_');
     
-    // Check if this specific body part is holding the toy
-    if (!bodyPartState[bodyPart].items.includes(toyId)) {
-        return null;
-    }
-    
-    return {
-        type: 'remove',
-        toyId: toyId,
-        toyKey: toyKey,
-        toyName: toyName,
-        bodyPart: bodyPart,
-        bodyPartName: bodyPartState[bodyPart].name,
-        execute: function() {
-            return removeToyFromBodyPart(this.bodyPart, this.toyId);
-        },
-        getHTML: function() {
-            return `<strong>📤 Put Down Task</strong><p>Put down the ${this.toyName} from your ${this.bodyPartName}.</p><p style="color: #666; font-size: 0.9em;">You can now use this body part freely again.</p>`;
+    // For clothestickers, check if we have enough to remove
+    if (toyId === 'stickers') {
+        const currentCount = getClothestickerCount(bodyPart);
+        
+        if (currentCount <= 0) {
+            return null;
         }
-    };
+        
+        // Cap the quantity at what's actually there
+        const actualQuantity = Math.min(quantity, currentCount);
+        
+        return {
+            type: 'remove',
+            toyId: toyId,
+            toyKey: toyKey,
+            toyName: toyName,
+            bodyPart: bodyPart,
+            bodyPartName: bodyPartState[bodyPart].name,
+            quantity: actualQuantity,
+            execute: function() {
+                // Remove multiple clothestickers
+                for (let i = 0; i < this.quantity; i++) {
+                    if (!removeToyFromBodyPart(this.bodyPart, this.toyId)) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+            getHTML: function() {
+                return `<strong>📤 Put Down Task</strong><p>Put down ${this.quantity} ${this.toyName} from your ${this.bodyPartName}.</p><p style="color: #666; font-size: 0.9em;">You can now use this space again.</p>`;
+            }
+        };
+    } else {
+        // Regular toy - check if this specific body part is holding the toy
+        if (!bodyPartState[bodyPart].items.includes(toyId)) {
+            return null;
+        }
+        
+        return {
+            type: 'remove',
+            toyId: toyId,
+            toyKey: toyKey,
+            toyName: toyName,
+            bodyPart: bodyPart,
+            bodyPartName: bodyPartState[bodyPart].name,
+            quantity: 1,
+            execute: function() {
+                return removeToyFromBodyPart(this.bodyPart, this.toyId);
+            },
+            getHTML: function() {
+                return `<strong>📤 Put Down Task</strong><p>Put down the ${this.toyName} from your ${this.bodyPartName}.</p><p style="color: #666; font-size: 0.9em;">You can now use this body part freely again.</p>`;
+            }
+        };
+    }
 }
 
 function createAddToyTask(toyKey, toyName) {
@@ -1455,6 +1547,7 @@ function rollForAddRemoveTasks() {
             if (!instructionSets[setId] || !instructionSets[setId].tasks[toyId]) continue;
             
             const tasks = instructionSets[setId].tasks[toyId];
+            const difficulty = toyDifficulties[toyKey] || 'medium';
             
             // Find add and remove tasks with body parts
             const addTask = tasks.find(task => task.type === 'add' && task.bodyPart);
@@ -1470,7 +1563,8 @@ function rollForAddRemoveTasks() {
                     if (toy) toyName = toy.name;
                 }
                 
-                const task = createAddToyTaskWithBodyPart(toyKey, toyName, addTask.bodyPart);
+                const taskQuantity = addTask.quantity ? addTask.quantity(difficulty) : 1;
+                const task = createAddToyTaskWithBodyPart(toyKey, toyName, addTask.bodyPart, taskQuantity);
                 if (task) addTasks.push(task);
             }
             
@@ -1482,7 +1576,8 @@ function rollForAddRemoveTasks() {
                     if (toy) toyName = toy.name;
                 }
                 
-                const task = createRemoveToyTaskWithBodyPart(toyKey, toyName, removeTask.bodyPart);
+                const taskQuantity = removeTask.quantity ? removeTask.quantity(difficulty) : 1;
+                const task = createRemoveToyTaskWithBodyPart(toyKey, toyName, removeTask.bodyPart, taskQuantity);
                 if (task) removeTasks.push(task);
             }
         }
