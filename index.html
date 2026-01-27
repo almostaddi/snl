@@ -780,9 +780,10 @@ input[type="range"]::-moz-range-thumb {
                 
                 <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px;">📦 Select Instruction Sets:</label>
                 <div id="instructionSetCheckboxes" class="instruction-set-selector">
-                    <label><input type="checkbox" value="dressup"> Dressup Set 🎨</label>
-                    <label><input type="checkbox" value="apple"> Apple Set 🍎</label>
-                    <label><input type="checkbox" value="digging"> Digging Set ⛏️</label>
+                    <label><input type="checkbox" value="apple"> Analyse Set 🍎</label>
+                    <label><input type="checkbox" value="digging"> Deepthread Set ⛏️</label>
+                    <label><input type="checkbox" value="dressup"> Pinplay Set 🎨</label>
+                    <label><input type="checkbox" value="tnd"> TnD 🎯</label>
                 </div>
 
                 <div id="toyLibraryContainer"></div>
@@ -868,13 +869,13 @@ let toyChecked = {};
 
 // Body part capacity system
 const bodyParts = {
-    leftHand: { name: "Left Hand", capacity: 1, occupied: 0, items: [] },
-    rightHand: { name: "Right Hand", capacity: 1, occupied: 0, items: [] },
-    bothHands: { name: "Both Hands", capacity: 1, occupied: 0, items: [] },
-    leftFoot: { name: "Left Foot", capacity: 1, occupied: 0, items: [] },
-    rightFoot: { name: "Right Foot", capacity: 1, occupied: 0, items: [] },
-    head: { name: "Head", capacity: 1, occupied: 0, items: [] },
-    back: { name: "Back", capacity: 1, occupied: 0, items: [] }
+    Mo: { name: "Mo", capacity: 1, occupied: 0, items: [] },
+    Ba: { name: "Ba", capacity: 1, occupied: 0, items: [] },
+    Bu: { name: "Bu", capacity: 1, occupied: 0, items: [] },
+    As: { name: "As", capacity: 1, occupied: 0, items: [] },
+    Ni: { name: "Ni", capacity: 1, occupied: 0, items: [] },
+    Ha: { name: "Ha", capacity: 1, occupied: 0, items: [] },
+    Bo: { name: "Bo", capacity: 1, occupied: 0, items: [] }
 };
 
 const toyCapacity = {
@@ -886,13 +887,36 @@ const toyCapacity = {
     silly_shirt: 1,
     wristband: 1,
     hand: 1,
-    stick: 1,
+    stick_a: 1,
+    stick_m: 1,
     metal_stick: 1,
-    tail: 1
+    tail: 1,
+    vibranium: 1
+};
+
+// Specific capacity overrides for toy+bodypart combinations
+// Format: "bodyPart_toyId": maxCount
+const bodyPartToyCapacity = {
+    'Ba_stickers': 20,  // Ba can hold 20 clothestickers
+    'Ni_stickers': 2    // Ni can hold 2 clothestickers
 };
 
 function isToyWearable(toyId) {
     return toyCapacity.hasOwnProperty(toyId);
+}
+
+function getMaxToyCountForBodyPart(bodyPart, toyId) {
+    const key = `${bodyPart}_${toyId}`;
+    if (bodyPartToyCapacity.hasOwnProperty(key)) {
+        return bodyPartToyCapacity[key];
+    }
+    // Default: body part capacity divided by toy size
+    const toySize = toyCapacity[toyId] || 1;
+    return Math.floor(bodyPartState[bodyPart].capacity / toySize);
+}
+
+function getToyCountInBodyPart(bodyPart, toyId) {
+    return bodyPartState[bodyPart].items.filter(item => item === toyId).length;
 }
 
 let bodyPartState = JSON.parse(JSON.stringify(bodyParts));
@@ -935,60 +959,95 @@ function getTaskConditions() {
 // Instruction Sets
 const instructionSets = {
     dressup: {
-        name: "Dressup Set",
+        name: "Pinplay Set",
         toys: [
-            {id: "stickers", name: "Stickers 🎨"},
-            {id: "silly_shirt", name: "Silly Shirt 👕"},
-            {id: "wristband", name: "Wristband ⌚"},
-            {id: "hand", name: "Hand ✋"}
+            {id: "stickers", name: "Clothestickers 🎨"},
+            {id: "silly_shirt", name: "Clampshirt 👕"},
+            {id: "wristband", name: "Spikeyband ⌚"},
+            {id: "hand", name: "Hand ✋"},
+            {id: "vibranium", name: "Vibranium 💎"}
         ],
         tasks: {
             stickers: [
-                {getDifficulty: d => `<strong>Sticker Challenge</strong><p>Apply ${d=='easy'?3:d=='medium'?5:8} stickers to yourself.</p><img src="https://picsum.photos/seed/sticker1/800/600"/>`}
+                {getDifficulty: d => `<strong>Clothesticker Challenge</strong><p>Apply ${d=='easy'?3:d=='medium'?5:8} clothestickers to yourself.</p><img src="https://picsum.photos/seed/sticker1/800/600"/>`},
+                {type: 'add', bodyPart: 'Ba'},
+                {type: 'remove', bodyPart: 'Ba'}
             ],
             silly_shirt: [
-                {getDifficulty: d => `<strong>Wear the Silly Shirt</strong><p>Put on the silly shirt and pose for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><img src="https://picsum.photos/seed/shirt1/800/600"/>`}
+                {getDifficulty: d => `<strong>Wear the Clampshirt</strong><p>Put on the clampshirt and pose for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><img src="https://picsum.photos/seed/shirt1/800/600"/>`},
+                {type: 'add', bodyPart: 'Ni'},
+                {type: 'remove', bodyPart: 'Ni'}
             ],
             wristband: [
-                {getDifficulty: d => `<strong>Wristband Spin</strong><p>Spin the wristband around your wrist ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/wrist1/800/600"/>`}
+                {getDifficulty: d => `<strong>Spikeyband Spin</strong><p>Spin the spikeyband around your wrist ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/wrist1/800/600"/>`}
             ],
             hand: [
                 {getDifficulty: d => `<strong>Hand Wave</strong><p>Wave your hand ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/hand1/800/600"/>`},
                 {type: 'redlight', getDifficulty: d => d=='easy'?15000:d=='medium'?20000:25000}
+            ],
+            vibranium: [
+                {getDifficulty: d => `<strong>Vibranium Hold</strong><p>Hold the vibranium steady for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><img src="https://picsum.photos/seed/vibranium1/800/600"/>`}
             ]
         }
     },
     apple: {
-        name: "Apple Set",
+        name: "Analyse Set",
         toys: [
-            {id: "stick", name: "Stick 🪵"},
-            {id: "metal_stick", name: "Metal Stick 🔩"},
-            {id: "tail", name: "Tail 🦊"}
+            {id: "stick_a", name: "Dillstick A 🪵"},
+            {id: "metal_stick", name: "Metal Dillstick 🔩"},
+            {id: "tail", name: "Plugtail 🦊"},
+            {id: "vibranium", name: "Vibranium 💎"}
         ],
         tasks: {
-            stick: [
-                {getDifficulty: d => `<strong>Stick Balance</strong><p>Balance the stick on your hand for ${d=='easy'?3:d=='medium'?5:8} seconds.</p><img src="https://picsum.photos/seed/stick1/800/600"/>`}
+            stick_a: [
+                {getDifficulty: d => `<strong>Dillstick A Balance</strong><p>Balance the dillstick A on your hand for ${d=='easy'?3:d=='medium'?5:8} seconds.</p><img src="https://picsum.photos/seed/stick1/800/600"/>`},
+                {type: 'add', bodyPart: 'Bu'},
+                {type: 'remove', bodyPart: 'Bu'}
             ],
             metal_stick: [
-                {getDifficulty: d => `<strong>Metal Stick Tap</strong><p>Tap the metal stick on the ground ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/metal1/800/600"/>`}
+                {getDifficulty: d => `<strong>Metal Dillstick Tap</strong><p>Tap the metal dillstick on the ground ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/metal1/800/600"/>`},
+                {type: 'add', bodyPart: 'Bu'},
+                {type: 'remove', bodyPart: 'Bu'}
             ],
             tail: [
-                {getDifficulty: d => `<strong>Tail Wag</strong><p>Wag your tail ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/tail1/800/600"/>`}
+                {getDifficulty: d => `<strong>Plugtail Wag</strong><p>Wag your plugtail ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/tail1/800/600"/>`},
+                {type: 'add', bodyPart: 'Bu'},
+                {type: 'remove', bodyPart: 'Bu'}
+            ],
+            vibranium: [
+                {getDifficulty: d => `<strong>Vibranium Shake</strong><p>Shake the vibranium ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/vibranium2/800/600"/>`}
             ]
         }
     },
     digging: {
-        name: "Digging Set",
+        name: "Deepthread Set",
         toys: [
-            {id: "stick", name: "Stick 🪵"},
+            {id: "stick_m", name: "Dillstick M 🪵"},
             {id: "hand", name: "Hand ✋"}
         ],
         tasks: {
-            stick: [
-                {getDifficulty: d => `<strong>Dig with Stick</strong><p>Use the stick to make ${d=='easy'?3:d=='medium'?5:8} digging motions.</p><img src="https://picsum.photos/seed/dig1/800/600"/>`}
+            stick_m: [
+                {getDifficulty: d => `<strong>Dig with Dillstick M</strong><p>Use the dillstick M to make ${d=='easy'?3:d=='medium'?5:8} digging motions.</p><img src="https://picsum.photos/seed/dig1/800/600"/>`},
+                {type: 'add', bodyPart: 'Mo'},
+                {type: 'remove', bodyPart: 'Mo'}
             ],
             hand: [
                 {getDifficulty: d => `<strong>Hand Digging</strong><p>Make digging motions with your hands ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/dighand1/800/600"/>`}
+            ]
+        }
+    },
+    tnd: {
+        name: "TnD",
+        toys: [
+            {id: "vibranium", name: "Vibranium 💎"},
+            {id: "hand", name: "Hand ✋"}
+        ],
+        tasks: {
+            vibranium: [
+                {getDifficulty: d => `<strong>Vibranium Control</strong><p>Control the vibranium settings for ${d=='easy'?10:d=='medium'?20:30} seconds.</p><img src="https://picsum.photos/seed/vibranium3/800/600"/>`}
+            ],
+            hand: [
+                {getDifficulty: d => `<strong>Hand Gesture</strong><p>Make hand gestures ${d=='easy'?8:d=='medium'?12:16} times.</p><img src="https://picsum.photos/seed/handtnd1/800/600"/>`}
             ]
         }
     }
@@ -1168,14 +1227,14 @@ function displayPrizeResult(prize) {
 
 // Body Part Functions
 function canAddToyToBodyPart(bodyPart, toyId) {
-    const toySize = toyCapacity[toyId] || 0;
-    const available = bodyPartState[bodyPart].capacity - bodyPartState[bodyPart].occupied;
-    return available >= toySize;
+    const maxCount = getMaxToyCountForBodyPart(bodyPart, toyId);
+    const currentCount = getToyCountInBodyPart(bodyPart, toyId);
+    return currentCount < maxCount;
 }
 
 function addToyToBodyPart(bodyPart, toyId) {
-    const toySize = toyCapacity[toyId] || 0;
     if (canAddToyToBodyPart(bodyPart, toyId)) {
+        const toySize = toyCapacity[toyId] || 0;
         bodyPartState[bodyPart].occupied += toySize;
         bodyPartState[bodyPart].items.push(toyId);
         saveGameState();
@@ -1230,8 +1289,69 @@ function getBodyPartsHoldingToy(toyId) {
 }
 
 // Add/Remove Task Functions
+function createAddToyTaskWithBodyPart(toyKey, toyName, bodyPart) {
+    const [setId, ...toyIdParts] = toyKey.split('_');
+    const toyId = toyIdParts.join('_');
+    
+    let heldCount = 0;
+    for (const part of Object.values(bodyPartState)) {
+        heldCount += part.items.filter(item => item === toyId).length;
+    }
+    
+    const totalAvailable = toyQuantities[toyKey] || 0;
+    if (heldCount >= totalAvailable) {
+        return null;
+    }
+    
+    // Check if the specific body part can hold this toy
+    if (!canAddToyToBodyPart(bodyPart, toyId)) {
+        return null;
+    }
+    
+    return {
+        type: 'add',
+        toyId: toyId,
+        toyKey: toyKey,
+        toyName: toyName,
+        bodyPart: bodyPart,
+        bodyPartName: bodyPartState[bodyPart].name,
+        execute: function() {
+            return addToyToBodyPart(this.bodyPart, this.toyId);
+        },
+        getHTML: function() {
+            return `<strong>📥 Pick Up Task</strong><p>Pick up the ${this.toyName} and hold it in your ${this.bodyPartName}.</p><p style="color: #666; font-size: 0.9em;">This toy will stay with you until a task tells you to put it down.</p>`;
+        }
+    };
+}
+
+function createRemoveToyTaskWithBodyPart(toyKey, toyName, bodyPart) {
+    const [setId, ...toyIdParts] = toyKey.split('_');
+    const toyId = toyIdParts.join('_');
+    
+    // Check if this specific body part is holding the toy
+    if (!bodyPartState[bodyPart].items.includes(toyId)) {
+        return null;
+    }
+    
+    return {
+        type: 'remove',
+        toyId: toyId,
+        toyKey: toyKey,
+        toyName: toyName,
+        bodyPart: bodyPart,
+        bodyPartName: bodyPartState[bodyPart].name,
+        execute: function() {
+            return removeToyFromBodyPart(this.bodyPart, this.toyId);
+        },
+        getHTML: function() {
+            return `<strong>📤 Put Down Task</strong><p>Put down the ${this.toyName} from your ${this.bodyPartName}.</p><p style="color: #666; font-size: 0.9em;">You can now use this body part freely again.</p>`;
+        }
+    };
+}
+
 function createAddToyTask(toyKey, toyName) {
-    const toyId = toyKey.split('_')[1];
+    const [setId, ...toyIdParts] = toyKey.split('_');
+    const toyId = toyIdParts.join('_');
     
     let heldCount = 0;
     for (const part of Object.values(bodyPartState)) {
@@ -1268,7 +1388,8 @@ function createAddToyTask(toyKey, toyName) {
 }
 
 function createRemoveToyTask(toyKey, toyName) {
-    const toyId = toyKey.split('_')[1];
+    const [setId, ...toyIdParts] = toyKey.split('_');
+    const toyId = toyIdParts.join('_');
     const holdingParts = getBodyPartsHoldingToy(toyId);
     
     if (holdingParts.length === 0) {
@@ -1307,18 +1428,41 @@ function shouldRollRemoveTask(toyKey) {
     return roll < modifier.removeChance;
 }
 
+function toyHasAddRemoveTasks(toyKey) {
+    const [setId, ...toyIdParts] = toyKey.split('_');
+    const toyId = toyIdParts.join('_');
+    
+    if (!instructionSets[setId] || !instructionSets[setId].tasks[toyId]) return false;
+    
+    const tasks = instructionSets[setId].tasks[toyId];
+    const hasAdd = tasks.some(task => task.type === 'add');
+    const hasRemove = tasks.some(task => task.type === 'remove');
+    
+    return hasAdd && hasRemove;
+}
+
 function rollForAddRemoveTasks() {
     const addTasks = [];
     const removeTasks = [];
     
     for (const [toyKey, quantity] of Object.entries(toyQuantities)) {
         if (quantity > 0) {
-            const toyId = toyKey.split('_')[1];
+            const [setId, ...toyIdParts] = toyKey.split('_');
+            const toyId = toyIdParts.join('_');
             
             if (!isToyWearable(toyId)) continue;
             
+            if (!instructionSets[setId] || !instructionSets[setId].tasks[toyId]) continue;
+            
+            const tasks = instructionSets[setId].tasks[toyId];
+            
+            // Find add and remove tasks with body parts
+            const addTask = tasks.find(task => task.type === 'add' && task.bodyPart);
+            const removeTask = tasks.find(task => task.type === 'remove' && task.bodyPart);
+            
+            if (!addTask || !removeTask) continue;
+            
             if (shouldRollAddTask(toyKey)) {
-                const setId = toyKey.split('_')[0];
                 let toyName = toyId;
                 
                 if (instructionSets[setId]) {
@@ -1326,12 +1470,11 @@ function rollForAddRemoveTasks() {
                     if (toy) toyName = toy.name;
                 }
                 
-                const task = createAddToyTask(toyKey, toyName);
+                const task = createAddToyTaskWithBodyPart(toyKey, toyName, addTask.bodyPart);
                 if (task) addTasks.push(task);
             }
             
             if (shouldRollRemoveTask(toyKey)) {
-                const setId = toyKey.split('_')[0];
                 let toyName = toyId;
                 
                 if (instructionSets[setId]) {
@@ -1339,7 +1482,7 @@ function rollForAddRemoveTasks() {
                     if (toy) toyName = toy.name;
                 }
                 
-                const task = createRemoveToyTask(toyKey, toyName);
+                const task = createRemoveToyTaskWithBodyPart(toyKey, toyName, removeTask.bodyPart);
                 if (task) removeTasks.push(task);
             }
         }
@@ -1646,7 +1789,8 @@ function getSelectedToys() {
     const allToys = [];
     for (const [toyKey, quantity] of Object.entries(toyQuantities)) {
         if (quantity > 0) {
-            const [setId, toyId] = toyKey.split('_');
+            const [setId, ...toyIdParts] = toyKey.split('_');
+            const toyId = toyIdParts.join('_');
             
             if (toyChecked[toyId] && toySetEnabled[toyKey]) {
                 allToys.push({
@@ -1686,7 +1830,12 @@ function displayRandomInstruction() {
     }
     
     const conditions = getTaskConditions();
-    const availableTasks = tasks.filter(task => !task.canSelect || task.canSelect(conditions));
+    const availableTasks = tasks.filter(task => {
+        // Filter out add/remove tasks - they're handled separately
+        if (task.type === 'add' || task.type === 'remove') return false;
+        // Check canSelect condition if it exists
+        return !task.canSelect || task.canSelect(conditions);
+    });
     
     if (availableTasks.length === 0) {
         instructions.classList.add('active');
@@ -1749,7 +1898,12 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
     }
     
     const conditions = getTaskConditions();
-    const availableTasks = tasks.filter(task => !task.canSelect || task.canSelect(conditions));
+    const availableTasks = tasks.filter(task => {
+        // Filter out add/remove tasks - they're handled separately
+        if (task.type === 'add' || task.type === 'remove') return false;
+        // Check canSelect condition if it exists
+        return !task.canSelect || task.canSelect(conditions);
+    });
     
     if (availableTasks.length === 0) {
         instructions.classList.add('active');
@@ -1799,7 +1953,7 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
     }
 }
 
-// Render Toy Library
+// Render Toy Library  
 function renderToyLibrary() {
     selectedSets = Array.from(document.querySelectorAll('#instructionSetCheckboxes input:checked'))
         .map(cb => cb.value);
@@ -1814,7 +1968,7 @@ function renderToyLibrary() {
         return;
     }
     
-    const setEmojis = {dressup: '🎨', apple: '🍎', digging: '⛏️'};
+    const setEmojis = {dressup: '🎨', apple: '🍎', digging: '⛏️', tnd: '🎯'};
     const allToys = {};
     
     selectedSets.forEach(setId => {
@@ -1840,7 +1994,7 @@ function renderToyLibrary() {
         
         toyKeys.forEach(key => {
             if (toyQuantities[key] === undefined) toyQuantities[key] = 1;
-            if (!toyModifiers[key]) toyModifiers[key] = {addChance: 25, removeChance: 15};
+            if (!toyModifiers[key]) toyModifiers[key] = {addChance: 10, removeChance: 20};
             if (!toyDifficulties[key]) toyDifficulties[key] = 'medium';
             if (toySetEnabled[key] === undefined) toySetEnabled[key] = true;
         });
@@ -1956,14 +2110,15 @@ function renderToyLibrary() {
             diffControls.appendChild(diffSelect);
             
             const isWearable = isToyWearable(toyId);
+            const hasAddRemove = toyHasAddRemoveTasks(toyKey);
             const gearBtn = document.createElement('button');
             gearBtn.className = 'gear-btn';
             gearBtn.textContent = '⚙️';
-            gearBtn.title = isWearable ? 'Advanced Settings' : 'This toy cannot be worn/held';
-            gearBtn.disabled = !isWearable || !toyChecked[toyId] || !toySetEnabled[toyKey];
+            gearBtn.title = !isWearable ? 'This toy cannot be worn/held' : !hasAddRemove ? 'This toy has no add/remove tasks' : 'Advanced Settings';
+            gearBtn.disabled = !isWearable || !hasAddRemove || !toyChecked[toyId] || !toySetEnabled[toyKey];
             gearBtn.id = `gear_${toyKey}`;
             
-            if (isWearable) {
+            if (isWearable && hasAddRemove) {
                 gearBtn.onclick = (e) => {
                     e.preventDefault();
                     const advSettings = setItem.querySelector('.advanced-settings');
@@ -1980,7 +2135,7 @@ function renderToyLibrary() {
             diffRow.appendChild(diffControls);
             setItem.appendChild(diffRow);
             
-            if (isWearable) {
+            if (isWearable && hasAddRemove) {
                 const advSettings = document.createElement('div');
                 advSettings.className = 'advanced-settings';
                 
@@ -1996,7 +2151,7 @@ function renderToyLibrary() {
                 addInput.oninput = (e) => {
                     const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
                     e.target.value = val;
-                    if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 25, removeChance: 15};
+                    if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 10, removeChance: 20};
                     toyModifiers[toyKey].addChance = val;
                     saveGameState();
                 };
@@ -2017,7 +2172,7 @@ function renderToyLibrary() {
                 removeInput.oninput = (e) => {
                     const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
                     e.target.value = val;
-                    if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 25, removeChance: 15};
+                    if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 10, removeChance: 20};
                     toyModifiers[toyKey].removeChance = val;
                     saveGameState();
                 };
@@ -2041,9 +2196,9 @@ function renderToyLibrary() {
 
 function applyPreset(toyKey, difficulty) {
     const presets = {
-        easy: {addChance: 10, removeChance: 30},
-        medium: {addChance: 25, removeChance: 15},
-        hard: {addChance: 50, removeChance: 5}
+        easy: {addChance: 5, removeChance: 25},
+        medium: {addChance: 10, removeChance: 20},
+        hard: {addChance: 15, removeChance: 15}
     };
     
     if (presets[difficulty]) {
