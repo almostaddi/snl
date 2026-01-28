@@ -770,7 +770,10 @@ input[type="range"]::-moz-range-thumb {
         <div id="controls">
             <button id="startButton">🎮 Start Game</button>
             <button id="rollDice" style="display: none;">🎲 Roll Dice</button>
-            <div id="diceResult" style="display: none;">Dice: -</div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div id="diceResult" style="display: none;">Dice: -</div>
+                <div id="turnCounter" style="display: none; font-size: 20px; font-weight: bold; padding: 12px 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; box-shadow: 0 4px 15px rgba(102,126,234,0.3);">Turn: 0</div>
+            </div>
         </div>
         <div id="instructions"></div>
         <div id="buttoncontainer">
@@ -836,6 +839,7 @@ input[type="range"]::-moz-range-thumb {
 // DOM Elements
 const board = document.getElementById('board');
 const diceResult = document.getElementById('diceResult');
+const turnCounter = document.getElementById('turnCounter');
 const instructions = document.getElementById('instructions');
 const startButton = document.getElementById('startButton');
 const rollDiceButton = document.getElementById('rollDice');
@@ -858,6 +862,10 @@ let currentMetronomeTask = null;
 let toyDifficulties = {};
 let gameStarted = false;
 let playerPosition = 0;
+let turnCount = 0;
+let turnCountBySet = {}; // Track turns per set (e.g., {dressup: 5, tnd: 3})
+let turnCountByToy = {}; // Track turns per set-toy combo (e.g., {dressup_stickers: 3, tnd_prison: 2})
+let lastSelectedSet = {}; // Track which set each toy was last selected from (e.g., {stickers: 'dressup', prison: 'tnd'})
 let selectedSets = [];
 let prizeSettings = {major: 20, minor: 30, noPrize: 50};
 let toyQuantities = {};
@@ -868,6 +876,7 @@ let toyChecked = {};
 
 // Prison-specific state (always available, not tied to TnD selection)
 let prisonLocked = false;
+let prisonWorn = false;
 
 // Body part capacity system
 const bodyParts = {
@@ -927,6 +936,12 @@ function getTaskConditions() {
         // Player info
         name: playerName || 'Player',
         playerPosition: playerPosition,
+        turnCount: turnCount,
+        
+        // Turn count tracking
+        getTurnCountForSet: (setId) => turnCountBySet[setId] || 0,
+        getTurnCountForToy: (toyKey) => turnCountByToy[toyKey] || 0,
+        getLastSelectedSet: (toyId) => lastSelectedSet[toyId] || null,
         
         // Prison state
         prisonLocked: prisonLocked,
@@ -1350,6 +1365,29 @@ const instructionSets = {
             ],
             prison: [
                 {
+                    // SPECIAL ALWAYS TASK: Put on prison after 2 TnD hand tasks
+                    // CONDITIONS: TnD selected, Prison can be worn on Pe, Rolled 2+ TnD hand tasks
+                    // This task is "always" selected when conditions are met (overrides normal task selection)
+                    alwaysSelect: (c) => {
+                        // Check if we've rolled at least 2 TnD hand tasks
+                        if (c.getTurnCountForToy('tnd_hand') < 2) return false;
+                        // Check TnD is selected
+                        if (!c.hasSet('tnd')) return false;
+                        // Check if prison toy is checked
+                        if (!c.toyChecked('prison')) return false;
+                        // Check if Pe can hold prison
+                        return c.canBodyPartHold('Pe', 'prison');
+                    },
+                    getDifficulty: (d, c, diffMap) => {
+                        const handCount = c.getTurnCountForToy('tnd_hand');
+                        return `<strong>🔒 Special Prison Task!</strong><p>You've completed ${handCount} hand tasks from TnD. Time to put on the prison!</p><p>Place the prison on your Pe.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: ALWAYS task - only triggers after rolling 2+ TnD hand tasks if TnD selected, prison checked, and Pe can hold prison. This overrides normal task selection.</em></p><img src="https://picsum.photos/seed/prisonhand/800/600"/>`;
+                    },
+                    execute: function() {
+                        // Add prison to Pe
+                        return addToyToBodyPart('Pe', 'prison');
+                    }
+                },
+                {
                     // TASK: Control prison settings
                     // DIFFICULTY: Easy=10sec, Medium=15sec, Hard=20sec
                     // CONDITIONS: None (always available)
@@ -1367,71 +1405,75 @@ const instructionSets = {
                     type: 'remove', 
                     bodyPart: 'Pe'
                 }
-            ],
-            _snakeTasks: [
-                {
-                    // SNAKE TASK: Conditional vibranium task
-                    // CONDITIONS: TnD selected AND vibranium available AND Pe available
-                    // DIFFICULTY: Easy=5sec, Medium=10sec, Hard=15sec
-                    canSelect: (c) => {
-                        // Check TnD is selected
-                        if (!c.hasSet('tnd')) return false;
-                        // Check if vibranium toy is checked/enabled
-                        if (!c.toyChecked('vibranium')) return false;
-                        // Check if any vibranium toy key is enabled (could be from TnD or other sets)
-                        const tndVibKey = 'tnd_vibranium';
-                        const hasVibranium = c.toySetEnabled(tndVibKey) && (c.toyQuantity(tndVibKey) > 0);
-                        if (!hasVibranium) return false;
-                        // Check if Pe can hold vibranium
-                        return c.canBodyPartHold('Pe', 'vibranium');
-                    },
-                    getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
-                        const vibDiff = diffMap['vibranium'] || 'medium';
-                        const seconds = getDifficultyValue(vibDiff, 5, 10, 15);
-                        return `<strong>Snake Slide! 🐍</strong><p>You fell ${Math.abs(snakeLadderInfo.distance)} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Hold the vibranium steady for ${seconds} seconds to steady yourself.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Conditional snake task with vibranium. Only appears if TnD selected, vibranium checked, tnd_vibranium enabled with quantity > 0, and Pe can hold it. Difficulty: Easy=5s, Medium=10s, Hard=15s. Fall distance: ${Math.abs(snakeLadderInfo.distance)} spaces.</em></p><img src="https://picsum.photos/seed/snakevib/800/600"/>`;
-                    }
-                },
-                {
-                    // SNAKE TASK: Fallback task (always available)
-                    // CONDITIONS: None
-                    getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
-                        return `<strong>Snake Slide! 🐍</strong><p>You slid down ${Math.abs(snakeLadderInfo.distance)} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}.</p><p>Take a moment to recover from the fall.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Fallback snake task (no toys, no conditions). Always available. Shows fall distance: ${Math.abs(snakeLadderInfo.distance)} spaces.</em></p><img src="https://picsum.photos/seed/snakefallback/800/600"/>`;
-                    }
-                }
-            ],
-            _ladderTasks: [
-                {
-                    // LADDER TASK: Conditional hand task
-                    // CONDITIONS: TnD selected AND hand available AND Ha available
-                    // DIFFICULTY: Easy=8, Medium=12, Hard=16 gestures
-                    canSelect: (c) => {
-                        // Check TnD is selected
-                        if (!c.hasSet('tnd')) return false;
-                        // Check if hand toy is checked/enabled
-                        if (!c.toyChecked('hand')) return false;
-                        // Check if TnD hand is enabled with quantity > 0
-                        const tndHandKey = 'tnd_hand';
-                        const hasHand = c.toySetEnabled(tndHandKey) && (c.toyQuantity(tndHandKey) > 0);
-                        if (!hasHand) return false;
-                        // Check if Ha can hold hand
-                        return c.canBodyPartHold('Ha', 'hand');
-                    },
-                    getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
-                        const handDiff = diffMap['hand'] || 'medium';
-                        const gestures = getDifficultyValue(handDiff, 8, 12, 16);
-                        return `<strong>Ladder Climb! 🪜</strong><p>You climbed ${snakeLadderInfo.distance} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Make ${gestures} celebratory hand gestures for your climb.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Conditional ladder task with hand. Only appears if TnD selected, hand checked, tnd_hand enabled with quantity > 0, and Ha can hold it. Difficulty: Easy=8, Medium=12, Hard=16 gestures. Climb distance: ${snakeLadderInfo.distance} spaces.</em></p><img src="https://picsum.photos/seed/ladderhand/800/600"/>`;
-                    }
-                },
-                {
-                    // LADDER TASK: Fallback task (always available)
-                    // CONDITIONS: None
-                    getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
-                        return `<strong>Ladder Climb! 🪜</strong><p>You climbed ${snakeLadderInfo.distance} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Celebrate your good fortune!</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Fallback ladder task (no toys, no conditions). Always available. Shows climb distance: ${snakeLadderInfo.distance} spaces.</em></p><img src="https://picsum.photos/seed/ladderfallback/800/600"/>`;
-                    }
-                }
             ]
         }
     }
+};
+
+// Snake and Ladder special tasks (at root level, not tied to a specific set)
+const snakeLadderTasks = {
+    snakeTasks: [
+        {
+            // SNAKE TASK: Conditional vibranium task
+            // CONDITIONS: TnD selected AND vibranium available AND vibranium not currently held
+            // DIFFICULTY: Easy=5sec, Medium=10sec, Hard=15sec
+            canSelect: (c) => {
+                // Check TnD is selected
+                if (!c.hasSet('tnd')) return false;
+                // Check if vibranium toy is checked/enabled
+                if (!c.toyChecked('vibranium')) return false;
+                // Check if any vibranium toy key is enabled (could be from TnD or other sets)
+                const tndVibKey = 'tnd_vibranium';
+                const hasVibranium = c.toySetEnabled(tndVibKey) && (c.toyQuantity(tndVibKey) > 0);
+                if (!hasVibranium) return false;
+                // Check if vibranium is free (not currently held on any body part)
+                return !c.isHolding('vibranium');
+            },
+            getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
+                const vibDiff = diffMap['vibranium'] || 'medium';
+                const seconds = getDifficultyValue(vibDiff, 5, 10, 15);
+                return `<strong>Snake Slide! 🐍</strong><p>You fell ${Math.abs(snakeLadderInfo.distance)} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Hold the vibranium steady for ${seconds} seconds to steady yourself.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Conditional snake task with vibranium. Only appears if TnD selected, vibranium checked, tnd_vibranium enabled with quantity > 0, and vibranium is NOT currently being held. Difficulty: Easy=5s, Medium=10s, Hard=15s. Fall distance: ${Math.abs(snakeLadderInfo.distance)} spaces.</em></p><img src="https://picsum.photos/seed/snakevib/800/600"/>`;
+            }
+        },
+        {
+            // SNAKE TASK: Fallback task (always available)
+            // CONDITIONS: None
+            getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
+                return `<strong>Snake Slide! 🐍</strong><p>You slid down ${Math.abs(snakeLadderInfo.distance)} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}.</p><p>Take a moment to recover from the fall.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: FALLBACK snake task (no toys, no conditions). Always available when conditional tasks don't pass. Fall distance: ${Math.abs(snakeLadderInfo.distance)} spaces.</em></p><img src="https://picsum.photos/seed/snakefallback/800/600"/>`;
+            }
+        }
+    ],
+    ladderTasks: [
+        {
+            // LADDER TASK: Conditional hand task
+            // CONDITIONS: TnD selected AND hand available AND Ha available
+            // DIFFICULTY: Easy=8, Medium=12, Hard=16 gestures
+            canSelect: (c) => {
+                // Check TnD is selected
+                if (!c.hasSet('tnd')) return false;
+                // Check if hand toy is checked/enabled
+                if (!c.toyChecked('hand')) return false;
+                // Check if TnD hand is enabled with quantity > 0
+                const tndHandKey = 'tnd_hand';
+                const hasHand = c.toySetEnabled(tndHandKey) && (c.toyQuantity(tndHandKey) > 0);
+                if (!hasHand) return false;
+                // Check if Ha can hold hand
+                return c.canBodyPartHold('Ha', 'hand');
+            },
+            getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
+                const handDiff = diffMap['hand'] || 'medium';
+                const gestures = getDifficultyValue(handDiff, 8, 12, 16);
+                return `<strong>Ladder Climb! 🪜</strong><p>You climbed ${snakeLadderInfo.distance} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Make ${gestures} celebratory hand gestures for your climb.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: CONDITIONAL ladder task with hand. Only appears if TnD selected, hand checked, tnd_hand enabled with quantity > 0, and Ha can hold it. Difficulty: Easy=8, Medium=12, Hard=16 gestures. Climb distance: ${snakeLadderInfo.distance} spaces.</em></p><img src="https://picsum.photos/seed/ladderhand/800/600"/>`;
+            }
+        },
+        {
+            // LADDER TASK: Fallback task (always available)
+            // CONDITIONS: None
+            getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
+                return `<strong>Ladder Climb! 🪜</strong><p>You climbed ${snakeLadderInfo.distance} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Celebrate your good fortune!</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: FALLBACK ladder task (no toys, no conditions). Always available when conditional tasks don't pass. Climb distance: ${snakeLadderInfo.distance} spaces.</em></p><img src="https://picsum.photos/seed/ladderfallback/800/600"/>`;
+            }
+        }
+    ]
 };
 
 // Storage Functions
@@ -1439,6 +1481,10 @@ function saveGameState() {
     localStorage.setItem('snakesLaddersGameState', JSON.stringify({
         gameStarted,
         playerPosition,
+        turnCount,
+        turnCountBySet,
+        turnCountByToy,
+        lastSelectedSet,
         selectedSets,
         toyDifficulties,
         prizeSettings,
@@ -1449,6 +1495,7 @@ function saveGameState() {
         toySetEnabled,
         toyChecked,
         prisonLocked,
+        prisonWorn,
         diceResultText: diceResult.textContent,
         currentInstruction: instructions.innerHTML,
         instructionsActive: instructions.classList.contains('active'),
@@ -1464,6 +1511,10 @@ function loadGameState() {
         const gs = JSON.parse(saved);
         gameStarted = gs.gameStarted;
         playerPosition = gs.playerPosition;
+        turnCount = gs.turnCount || 0;
+        turnCountBySet = gs.turnCountBySet || {};
+        turnCountByToy = gs.turnCountByToy || {};
+        lastSelectedSet = gs.lastSelectedSet || {};
         selectedSets = gs.selectedSets || [];
         toyDifficulties = gs.toyDifficulties || {};
         toyQuantities = gs.toyQuantities || {};
@@ -1472,6 +1523,7 @@ function loadGameState() {
         toySetEnabled = gs.toySetEnabled || {};
         toyChecked = gs.toyChecked || {};
         prisonLocked = gs.prisonLocked || false;
+        prisonWorn = gs.prisonWorn || false;
         
         if (gs.bodyPartState) {
             bodyPartState = gs.bodyPartState;
@@ -1490,7 +1542,9 @@ function loadGameState() {
             startButton.style.display = 'none';
             rollDiceButton.style.display = 'block';
             diceResult.style.display = 'block';
+            turnCounter.style.display = 'block';
             diceResult.textContent = gs.diceResultText || 'Dice: -';
+            turnCounter.textContent = `Turn: ${turnCount}`;
             
             const leftCol = document.querySelector('.settings-column-left');
             const rightCol = document.querySelector('.settings-column-right');
@@ -1831,6 +1885,11 @@ function rollForAddRemoveTasks() {
         if (quantity > 0) {
             const [setId, ...toyIdParts] = toyKey.split('_');
             const toyId = toyIdParts.join('_');
+            
+            // Only roll for toys whose set is selected, toy is checked, and set-toy combo is enabled
+            if (!selectedSets.includes(setId)) continue;
+            if (!toyChecked[toyId]) continue;
+            if (!toySetEnabled[toyKey]) continue;
             
             if (!isToyWearable(toyId)) continue;
             
@@ -2182,6 +2241,25 @@ function animatePlayer(start, end, callback, instant = false) {
     }, 200);
 }
 
+// Check if any toys have "always" tasks that meet their conditions
+function checkForAlwaysTasks(toys, conditions) {
+    const alwaysTasks = [];
+    for (const toyObj of toys) {
+        const tasks = instructionSets[toyObj.setId].tasks[toyObj.toyId];
+        if (!tasks) continue;
+        
+        for (const task of tasks) {
+            // Skip add/remove tasks
+            if (task.type === 'add' || task.type === 'remove') continue;
+            // Check if this is an "always" task and its condition is met
+            if (task.alwaysSelect && task.alwaysSelect(conditions)) {
+                alwaysTasks.push({task, toyObj});
+            }
+        }
+    }
+    return alwaysTasks;
+}
+
 // Toy Selection Functions
 function getSelectedToys() {
     const allToys = [];
@@ -2190,7 +2268,8 @@ function getSelectedToys() {
             const [setId, ...toyIdParts] = toyKey.split('_');
             const toyId = toyIdParts.join('_');
             
-            if (toyChecked[toyId] && toySetEnabled[toyKey]) {
+            // Only include toy if: toy is checked, set-toy combo is enabled, AND the set is selected
+            if (toyChecked[toyId] && toySetEnabled[toyKey] && selectedSets.includes(setId)) {
                 allToys.push({
                     toyId,
                     setId,
@@ -2217,17 +2296,77 @@ function displayRandomInstruction() {
         return;
     }
     
-    const randomToyObj = toys[Math.floor(Math.random() * toys.length)];
-    const tasks = instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];
+    const conditions = getTaskConditions();
     
-    if (!tasks || tasks.length === 0) {
+    // First, check if any toys have "always" tasks
+    const alwaysTasks = checkForAlwaysTasks(toys, conditions);
+    
+    if (alwaysTasks.length > 0) {
+        const selectedAlways = alwaysTasks[Math.floor(Math.random() * alwaysTasks.length)];
+        const {task, toyObj} = selectedAlways;
+        
+        // Increment turn counts
+        const selectedToyKey = `${toyObj.setId}_${toyObj.toyId}`;
+        turnCountBySet[toyObj.setId] = (turnCountBySet[toyObj.setId] || 0) + 1;
+        turnCountByToy[selectedToyKey] = (turnCountByToy[selectedToyKey] || 0) + 1;
+        lastSelectedSet[toyObj.toyId] = toyObj.setId;
+        
+        // Execute the task if it has an execute function
+        if (task.execute) {
+            task.execute();
+        }
+        
+        window.lastTaskInfo = {
+            toyId: toyObj.toyId,
+            setId: toyObj.setId,
+            difficulty: toyObj.difficulty,
+            taskType: 'always'
+        };
+        
         instructions.classList.add('active');
-        instructions.innerHTML = "<div>No tasks available for this toy!</div>";
+        
+        // Create difficulty map
+        const difficultyMap = {};
+        for (const [toyKey, diff] of Object.entries(toyDifficulties)) {
+            const [setId, ...toyIdParts] = toyKey.split('_');
+            const toyId = toyIdParts.join('_');
+            if (!difficultyMap[toyId]) {
+                difficultyMap[toyId] = diff;
+            }
+        }
+        
+        const content = task.getDifficulty(toyObj.difficulty, conditions, difficultyMap);
+        instructions.innerHTML = content;
+        saveGameState();
+        return;
+    }
+    
+    // No "always" tasks - proceed with normal task selection
+    // Filter toys to only those with available tasks
+    const toysWithAvailableTasks = toys.filter(toyObj => {
+        const tasks = instructionSets[toyObj.setId].tasks[toyObj.toyId];
+        if (!tasks || tasks.length === 0) return false;
+        
+        const availableTasks = tasks.filter(task => {
+            // Filter out add/remove tasks - they're handled separately
+            if (task.type === 'add' || task.type === 'remove') return false;
+            // Check canSelect condition if it exists
+            return !task.canSelect || task.canSelect(conditions);
+        });
+        
+        return availableTasks.length > 0;
+    });
+    
+    if (toysWithAvailableTasks.length === 0) {
+        instructions.classList.add('active');
+        instructions.innerHTML = "<div>No available tasks for current conditions!</div>";
         window.lastTaskInfo = null;
         return;
     }
     
-    const conditions = getTaskConditions();
+    const randomToyObj = toysWithAvailableTasks[Math.floor(Math.random() * toysWithAvailableTasks.length)];
+    const tasks = instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];
+    
     const availableTasks = tasks.filter(task => {
         // Filter out add/remove tasks - they're handled separately
         if (task.type === 'add' || task.type === 'remove') return false;
@@ -2235,14 +2374,14 @@ function displayRandomInstruction() {
         return !task.canSelect || task.canSelect(conditions);
     });
     
-    if (availableTasks.length === 0) {
-        instructions.classList.add('active');
-        instructions.innerHTML = "<div>No available tasks for current conditions!</div>";
-        window.lastTaskInfo = null;
-        return;
-    }
-    
     const randomTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
+    
+    // Increment turn counts for this set and toy
+    const selectedToyKey = `${randomToyObj.setId}_${randomToyObj.toyId}`;
+    turnCountBySet[randomToyObj.setId] = (turnCountBySet[randomToyObj.setId] || 0) + 1;
+    turnCountByToy[selectedToyKey] = (turnCountByToy[selectedToyKey] || 0) + 1;
+    lastSelectedSet[randomToyObj.toyId] = randomToyObj.setId;
+    
     window.lastTaskInfo = {
         toyId: randomToyObj.toyId,
         setId: randomToyObj.setId,
@@ -2294,31 +2433,67 @@ function displaySnakeLadderTask(type, fromPos, toPos) {
     };
     
     // Get the appropriate task list
-    const taskListKey = type === 'snake' ? '_snakeTasks' : '_ladderTasks';
-    const taskList = instructionSets.tnd && instructionSets.tnd[taskListKey];
+    const taskListKey = type === 'snake' ? 'snakeTasks' : 'ladderTasks';
+    const taskList = snakeLadderTasks && snakeLadderTasks[taskListKey];
+    
+    // Build debug info
+    let debugInfo = '<div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 0.85em;">';
+    debugInfo += '<strong>🔍 DEBUG INFO:</strong><br>';
+    debugInfo += `Type: ${type}<br>`;
+    debugInfo += `snakeLadderTasks exists: ${typeof snakeLadderTasks !== 'undefined'}<br>`;
+    debugInfo += `taskListKey: ${taskListKey}<br>`;
+    debugInfo += `taskList exists: ${!!taskList}<br>`;
+    debugInfo += `taskList length: ${taskList ? taskList.length : 'N/A'}<br>`;
     
     if (!taskList || taskList.length === 0) {
-        // Fallback if no snake/ladder tasks defined
+        debugInfo += '<strong style="color: red;">ERROR: No task list found!</strong><br>';
+        debugInfo += 'This means snakeTasks or ladderTasks is missing from snakeLadderTasks object';
+        debugInfo += '</div>';
+        
         instructions.classList.add('active');
         instructions.innerHTML = type === 'snake' ? 
-            `<div><strong>Snake Slide! 🐍</strong><p>You slid down ${Math.abs(distance)} spaces from ${fromPos} to ${toPos}.</p></div>` :
-            `<div><strong>Ladder Climb! 🪜</strong><p>You climbed ${distance} spaces from ${fromPos} to ${toPos}!</p></div>`;
+            `<div><strong>Snake Slide! 🐍</strong><p>You slid down ${Math.abs(distance)} spaces from ${fromPos} to ${toPos}.</p>${debugInfo}</div>` :
+            `<div><strong>Ladder Climb! 🪜</strong><p>You climbed ${distance} spaces from ${fromPos} to ${toPos}!</p>${debugInfo}</div>`;
         return;
+    }
+    
+    // Check conditions for first task if it has canSelect
+    if (taskList[0].canSelect) {
+        debugInfo += '<br><strong>Condition Checks:</strong><br>';
+        debugInfo += `- hasSet(tnd): ${conditions.hasSet('tnd')}<br>`;
+        debugInfo += `- toyChecked(hand): ${conditions.toyChecked('hand')}<br>`;
+        debugInfo += `- toyChecked(vibranium): ${conditions.toyChecked('vibranium')}<br>`;
+        debugInfo += `- toySetEnabled(tnd_hand): ${conditions.toySetEnabled('tnd_hand')}<br>`;
+        debugInfo += `- toySetEnabled(tnd_vibranium): ${conditions.toySetEnabled('tnd_vibranium')}<br>`;
+        debugInfo += `- toyQuantity(tnd_hand): ${conditions.toyQuantity('tnd_hand')}<br>`;
+        debugInfo += `- toyQuantity(tnd_vibranium): ${conditions.toyQuantity('tnd_vibranium')}<br>`;
+        debugInfo += `- canBodyPartHold(Ha, hand): ${conditions.canBodyPartHold('Ha', 'hand')}<br>`;
+        debugInfo += `- isHolding(vibranium): ${conditions.isHolding('vibranium')}<br>`;
     }
     
     // Filter available tasks
     const availableTasks = taskList.filter(task => {
-        return !task.canSelect || task.canSelect(conditions);
+        const canSelect = !task.canSelect || task.canSelect(conditions);
+        return canSelect;
     });
+    
+    debugInfo += `<br><strong>Available tasks: ${availableTasks.length} / ${taskList.length}</strong><br>`;
     
     if (availableTasks.length === 0) {
         instructions.classList.add('active');
-        instructions.innerHTML = "<div>No snake/ladder tasks available!</div>";
+        instructions.innerHTML = `<div>No snake/ladder tasks available!${debugInfo}</div>`;
         return;
     }
     
-    // Select a random available task
-    const selectedTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
+    // Prioritize conditional tasks (those with canSelect) over fallback tasks
+    const conditionalTasks = availableTasks.filter(t => t.canSelect);
+    const selectedTask = conditionalTasks.length > 0 ? 
+        conditionalTasks[Math.floor(Math.random() * conditionalTasks.length)] :
+        availableTasks[Math.floor(Math.random() * availableTasks.length)];
+    
+    debugInfo += `Conditional tasks available: ${conditionalTasks.length}<br>`;
+    debugInfo += `Task selected: ${selectedTask.canSelect ? 'CONDITIONAL' : 'FALLBACK'}`;
+    debugInfo += '</div>';
     
     // Create difficulty map
     const difficultyMap = {};
@@ -2336,7 +2511,7 @@ function displaySnakeLadderTask(type, fromPos, toPos) {
     // Display the task
     instructions.classList.add('active');
     const content = selectedTask.getDifficulty(primaryDifficulty, conditions, difficultyMap, snakeLadderInfo);
-    instructions.innerHTML = content;
+    instructions.innerHTML = content + debugInfo;
     
     saveGameState();
 }
@@ -2356,17 +2531,77 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
         return;
     }
     
-    const randomToyObj = toys[Math.floor(Math.random() * toys.length)];
-    const tasks = instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];
+    const conditions = getTaskConditions();
     
-    if (!tasks || tasks.length === 0) {
+    // First, check if any toys have "always" tasks
+    const alwaysTasks = checkForAlwaysTasks(toys, conditions);
+    
+    if (alwaysTasks.length > 0) {
+        const selectedAlways = alwaysTasks[Math.floor(Math.random() * alwaysTasks.length)];
+        const {task, toyObj} = selectedAlways;
+        
+        // Increment turn counts
+        const selectedToyKey = `${toyObj.setId}_${toyObj.toyId}`;
+        turnCountBySet[toyObj.setId] = (turnCountBySet[toyObj.setId] || 0) + 1;
+        turnCountByToy[selectedToyKey] = (turnCountByToy[selectedToyKey] || 0) + 1;
+        lastSelectedSet[toyObj.toyId] = toyObj.setId;
+        
+        // Execute the task if it has an execute function
+        if (task.execute) {
+            task.execute();
+        }
+        
+        window.lastTaskInfo = {
+            toyId: toyObj.toyId,
+            setId: toyObj.setId,
+            difficulty: toyObj.difficulty,
+            taskType: 'always'
+        };
+        
         instructions.classList.add('active');
-        instructions.innerHTML = "<div>No tasks available for this toy!</div>";
+        
+        // Create difficulty map
+        const difficultyMap = {};
+        for (const [toyKey, diff] of Object.entries(toyDifficulties)) {
+            const [setId, ...toyIdParts] = toyKey.split('_');
+            const toyId = toyIdParts.join('_');
+            if (!difficultyMap[toyId]) {
+                difficultyMap[toyId] = diff;
+            }
+        }
+        
+        const content = task.getDifficulty(toyObj.difficulty, conditions, difficultyMap);
+        instructions.innerHTML = content;
+        saveGameState();
+        return;
+    }
+    
+    // No "always" tasks - proceed with normal task selection
+    // Filter toys to only those with available tasks
+    const toysWithAvailableTasks = toys.filter(toyObj => {
+        const tasks = instructionSets[toyObj.setId].tasks[toyObj.toyId];
+        if (!tasks || tasks.length === 0) return false;
+        
+        const availableTasks = tasks.filter(task => {
+            // Filter out add/remove tasks - they're handled separately
+            if (task.type === 'add' || task.type === 'remove') return false;
+            // Check canSelect condition if it exists
+            return !task.canSelect || task.canSelect(conditions);
+        });
+        
+        return availableTasks.length > 0;
+    });
+    
+    if (toysWithAvailableTasks.length === 0) {
+        instructions.classList.add('active');
+        instructions.innerHTML = "<div>No available tasks for current conditions!</div>";
         window.lastTaskInfo = null;
         return;
     }
     
-    const conditions = getTaskConditions();
+    const randomToyObj = toysWithAvailableTasks[Math.floor(Math.random() * toysWithAvailableTasks.length)];
+    const tasks = instructionSets[randomToyObj.setId].tasks[randomToyObj.toyId];
+    
     const availableTasks = tasks.filter(task => {
         // Filter out add/remove tasks - they're handled separately
         if (task.type === 'add' || task.type === 'remove') return false;
@@ -2374,14 +2609,14 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
         return !task.canSelect || task.canSelect(conditions);
     });
     
-    if (availableTasks.length === 0) {
-        instructions.classList.add('active');
-        instructions.innerHTML = "<div>No available tasks for current conditions!</div>";
-        window.lastTaskInfo = null;
-        return;
-    }
-    
     const randomTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
+    
+    // Increment turn counts for this set and toy
+    const selectedToyKey = `${randomToyObj.setId}_${randomToyObj.toyId}`;
+    turnCountBySet[randomToyObj.setId] = (turnCountBySet[randomToyObj.setId] || 0) + 1;
+    turnCountByToy[selectedToyKey] = (turnCountByToy[selectedToyKey] || 0) + 1;
+    lastSelectedSet[randomToyObj.toyId] = randomToyObj.setId;
+    
     window.lastTaskInfo = {
         toyId: randomToyObj.toyId,
         setId: randomToyObj.setId,
@@ -2526,7 +2761,7 @@ function renderToyLibrary() {
         if (toyId === 'prison') {
             const prisonControls = document.createElement('div');
             prisonControls.className = 'toy-controls';
-            prisonControls.style.cssText = 'margin-left: 28px; margin-top: 10px;';
+            prisonControls.style.cssText = 'margin-left: 28px; margin-top: 10px; display: flex; flex-direction: row; gap: 16px; align-items: center;';
             
             const lockedLabel = document.createElement('label');
             lockedLabel.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer;';
@@ -2583,6 +2818,28 @@ function renderToyLibrary() {
             lockedLabel.appendChild(lockedCheckbox);
             lockedLabel.appendChild(lockedText);
             prisonControls.appendChild(lockedLabel);
+            
+            // Worn checkbox
+            const wornLabel = document.createElement('label');
+            wornLabel.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer;';
+            
+            const wornCheckbox = document.createElement('input');
+            wornCheckbox.type = 'checkbox';
+            wornCheckbox.checked = prisonWorn;
+            wornCheckbox.disabled = !toyChecked[toyId];
+            wornCheckbox.style.cssText = 'width: 18px; height: 18px; cursor: pointer; accent-color: #51cf66;';
+            wornCheckbox.onchange = () => {
+                prisonWorn = wornCheckbox.checked;
+                saveGameState();
+            };
+            
+            const wornText = document.createElement('span');
+            wornText.textContent = '👕 Start Worn';
+            wornText.style.cssText = 'font-weight: 600; color: #333;';
+            
+            wornLabel.appendChild(wornCheckbox);
+            wornLabel.appendChild(wornText);
+            prisonControls.appendChild(wornLabel);
             
             toyItem.appendChild(prisonControls);
             
@@ -2957,6 +3214,11 @@ function startGame() {
         return;
     }
     
+    // Add prison to Pe if "Start Worn" is checked
+    if (prisonWorn && toyChecked['prison']) {
+        addToyToBodyPart('Pe', 'prison');
+    }
+    
     gameStarted = true;
     saveGameState();
     
@@ -2978,12 +3240,17 @@ function startGame() {
     
     rollDiceButton.style.display = 'block';
     diceResult.style.display = 'block';
+    turnCounter.style.display = 'block';
+    turnCounter.textContent = 'Turn: 0';
 }
 
 function rollDice() {
     rollDiceButton.disabled = true;
+    turnCount++; // Increment turn counter
     const diceRoll = Math.floor(Math.random() * 6) + 1;
     diceResult.textContent = `Dice: ${diceRoll} 🎲`;
+    turnCounter.textContent = `Turn: ${turnCount}`;
+
     
     let nextPosition = playerPosition + diceRoll;
     if (nextPosition > totalSquares) nextPosition = totalSquares;
@@ -3081,10 +3348,15 @@ confirmResetBtn.addEventListener('click', function() {
     
     gameStarted = false;
     playerPosition = 0;
+    turnCount = 0;
+    turnCountBySet = {};
+    turnCountByToy = {};
+    lastSelectedSet = {};
     playerName = '';
     player.remove();
     bodyPartState = JSON.parse(JSON.stringify(bodyParts));
     prisonLocked = false;
+    prisonWorn = false;
     
     startButton.style.display = 'block';
     rollDiceButton.style.display = 'none';
@@ -3094,6 +3366,8 @@ confirmResetBtn.addEventListener('click', function() {
     instructions.innerHTML = '';
     diceResult.textContent = 'Dice: -';
     diceResult.style.display = 'none';
+    turnCounter.textContent = 'Turn: 0';
+    turnCounter.style.display = 'none';
     
     document.getElementById('playerNameInput').value = '';
     
