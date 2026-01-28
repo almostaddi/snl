@@ -867,6 +867,9 @@ let playerName = '';
 let toySetEnabled = {};
 let toyChecked = {};
 
+// Prison-specific state (always available, not tied to TnD selection)
+let prisonLocked = false;
+
 // Body part capacity system
 const bodyParts = {
     Mo: { name: "Mo", items: [] },
@@ -875,7 +878,8 @@ const bodyParts = {
     As: { name: "As", items: [] },
     Ni: { name: "Ni", items: [] },
     Ha: { name: "Ha", items: [] },
-    Bo: { name: "Bo", items: [] }
+    Bo: { name: "Bo", items: [] },
+    Pe: { name: "Pe", items: [] }
 };
 
 // Clothestickers max count per body part
@@ -886,7 +890,8 @@ const clothestickersMaxCount = {
     'Bu': 1,
     'As': 1,
     'Ha': 1,
-    'Bo': 1
+    'Bo': 1,
+    'Pe': 1
 };
 
 const toyCapacity = {
@@ -902,7 +907,8 @@ const toyCapacity = {
     stick_m: 1,
     metal_stick: 1,
     tail: 1,
-    vibranium: 1
+    vibranium: 1,
+    prison: 1
 };
 
 function isToyWearable(toyId) {
@@ -933,13 +939,26 @@ let bodyPartState = JSON.parse(JSON.stringify(bodyParts));
 
 function getTaskConditions() {
     return {
+        // Player info
         name: playerName || 'Player',
+        playerPosition: playerPosition,
+        
+        // Prison state
+        prisonLocked: prisonLocked,
+        
+        // Selected sets
+        selectedSets: selectedSets,
+        hasSet: (setId) => selectedSets.includes(setId),
+        
+        // Toy holding checks
         isHolding: (toyId) => {
             for (const part of Object.values(bodyPartState)) {
                 if (part.items.includes(toyId)) return true;
             }
             return false;
         },
+        
+        // Get all body parts holding a specific toy
         getBodyPartsHolding: (toyId) => {
             const parts = [];
             for (const [partKey, part] of Object.entries(bodyPartState)) {
@@ -949,12 +968,69 @@ function getTaskConditions() {
             }
             return parts;
         },
+        
+        // Count toys
+        countToy: (toyId) => {
+            let count = 0;
+            for (const part of Object.values(bodyPartState)) {
+                count += part.items.filter(item => item === toyId).length;
+            }
+            return count;
+        },
+        
+        countToyInBodyPart: (toyId, bodyPart) => {
+            return bodyPartState[bodyPart].items.filter(item => item === toyId).length;
+        },
+        
+        // Body part checks
+        getBodyPart: (bodyPartKey) => {
+            return bodyPartState[bodyPartKey];
+        },
+        
+        bodyPartEmpty: (bodyPartKey) => {
+            return isBodyPartEmpty(bodyPartKey);
+        },
+        
+        bodyPartHas: (bodyPartKey, toyId) => {
+            return bodyPartState[bodyPartKey].items.includes(toyId);
+        },
+        
+        bodyPartHasRegularToys: (bodyPartKey) => {
+            return hasRegularToys(bodyPartKey);
+        },
+        
+        bodyPartHasClothestickers: (bodyPartKey) => {
+            return hasClothestickers(bodyPartKey);
+        },
+        
         isBodyPartOccupied: (bodyPartKey) => {
             return bodyPartState[bodyPartKey] && !isBodyPartEmpty(bodyPartKey);
         },
+        
         canBodyPartHold: (bodyPartKey, toyId) => {
             return canAddToyToBodyPart(bodyPartKey, toyId);
         },
+        
+        // Multiple toy checks
+        hasMultiple: (toyIds) => {
+            return toyIds.every(toyId => {
+                for (const part of Object.values(bodyPartState)) {
+                    if (part.items.includes(toyId)) return true;
+                }
+                return false;
+            });
+        },
+        
+        hasAny: (toyIds) => {
+            return toyIds.some(toyId => {
+                for (const part of Object.values(bodyPartState)) {
+                    if (part.items.includes(toyId)) return true;
+                }
+                return false;
+            });
+        },
+        
+        // Get all held items
         getAllHeldItems: () => {
             const items = [];
             for (const part of Object.values(bodyPartState)) {
@@ -962,8 +1038,23 @@ function getTaskConditions() {
             }
             return items;
         },
-        getBodyPartState: () => bodyPartState
+        
+        // Get full body part state
+        getBodyPartState: () => bodyPartState,
+        
+        // Utility
+        randomChance: (percent) => {
+            return Math.random() * 100 < percent;
+        }
     };
+}
+
+// Helper function to get difficulty value based on difficulty setting
+function getDifficultyValue(difficulty, easyVal, mediumVal, hardVal) {
+    if (difficulty === 'easy') return easyVal;
+    if (difficulty === 'medium') return mediumVal;
+    if (difficulty === 'hard') return hardVal;
+    return mediumVal; // default
 }
 
 // Instruction Sets
@@ -979,24 +1070,130 @@ const instructionSets = {
         ],
         tasks: {
             stickers: [
-                {getDifficulty: d => `<strong>Clothesticker Challenge</strong><p>Apply ${d=='easy'?3:d=='medium'?5:8} clothestickers to yourself.</p><img src="https://picsum.photos/seed/sticker1/800/600"/>`},
-                {type: 'add', bodyPart: 'Ba', quantity: d => d=='easy'?3:d=='medium'?5:8},
-                {type: 'remove', bodyPart: 'Ba', quantity: d => d=='easy'?3:d=='medium'?5:8}
+                {
+                    // STANDARD TASK: Apply clothestickers
+                    // Difficulty: Easy=3, Medium=5, Hard=8 clothestickers
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Clothesticker Challenge</strong><p>Apply ${d=='easy'?3:d=='medium'?5:8} clothestickers to yourself.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard clothesticker task. Difficulty: Easy=3, Medium=5, Hard=8 stickers.</em></p><img src="https://picsum.photos/seed/sticker1/800/600"/>`
+                },
+                {
+                    // ADD TASK: Add clothestickers to Ba
+                    // Difficulty: Easy=3, Medium=5, Hard=8 clothestickers
+                    type: 'add', 
+                    bodyPart: 'Ba', 
+                    quantity: d => d=='easy'?3:d=='medium'?5:8
+                },
+                {
+                    // REMOVE TASK: Remove clothestickers from Ba
+                    // Difficulty: Easy=3, Medium=5, Hard=8 clothestickers
+                    type: 'remove', 
+                    bodyPart: 'Ba', 
+                    quantity: d => d=='easy'?3:d=='medium'?5:8
+                }
             ],
             silly_shirt: [
-                {getDifficulty: d => `<strong>Wear the Clampshirt</strong><p>Put on the clampshirt and pose for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><img src="https://picsum.photos/seed/shirt1/800/600"/>`},
-                {type: 'add', bodyPart: 'Ni'},
-                {type: 'remove', bodyPart: 'Ni'}
+                {
+                    // DYNAMIC TASK: Multi-toy task with conditions
+                    // CONDITIONS:
+                    //   - Only available if: Analyse set is selected OR Ba has clothestickers
+                    // DYNAMIC BEHAVIOR:
+                    //   - If wearing clampshirt: asks to spin (uses clampshirt difficulty: Easy=5s, Medium=10s, Hard=15s)
+                    //   - If not wearing: asks to put it on
+                    //   - Adds special comment if Analyse set is active
+                    //   - If Ba can hold more stickers: adds requirement to add clothestickers (uses sticker difficulty: Easy=3, Medium=5, Hard=8)
+                    //   - Comments on existing clothesticker count in Ba (0, <5, <15, 15+)
+                    canSelect: (c) => {
+                        return c.hasSet('apple') || c.countToyInBodyPart('stickers', 'Ba') > 0;
+                    },
+                    getDifficulty: (primaryDifficulty, c, diffMap) => {
+                        let html = '<strong>Clampshirt Task</strong><p>';
+                        
+                        const shirtDiff = diffMap['silly_shirt'] || 'medium';
+                        const stickerDiff = diffMap['stickers'] || 'medium';
+                        
+                        if (c.bodyPartHas('Ni', 'silly_shirt')) {
+                            const spinTime = getDifficultyValue(shirtDiff, 5, 10, 15);
+                            html += `Spin around with the clampshirt on for ${spinTime} seconds!`;
+                        } else {
+                            html += 'Put on the clampshirt';
+                            if (c.hasSet('apple')) {
+                                html += ' (the Analyse set appreciates fashion)';
+                            }
+                            html += '.';
+                        }
+                        
+                        const baStickers = c.countToyInBodyPart('stickers', 'Ba');
+                        const stickerCount = getDifficultyValue(stickerDiff, 3, 5, 8);
+                        
+                        if (c.canBodyPartHold('Ba', 'stickers')) {
+                            html += `<br><br>Also add ${stickerCount} clothestickers to Ba.`;
+                        }
+                        
+                        if (baStickers > 0) {
+                            html += '<br><br><em>';
+                            if (baStickers < 5) {
+                                html += "Just a few clothestickers... not bad.";
+                            } else if (baStickers < 15) {
+                                html += "That's quite a few clothestickers!";
+                            } else {
+                                html += "Wow! So many clothestickers!";
+                            }
+                            html += '</em>';
+                        }
+                        
+                        html += '</p>';
+                        html += '<p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Dynamic multi-toy task. ';
+                        html += 'Condition: Only appears if Analyse set selected OR Ba has clothestickers. ';
+                        html += 'Clampshirt difficulty (Easy=5s, Med=10s, Hard=15s). ';
+                        html += 'Clothesticker difficulty (Easy=3, Med=5, Hard=8). ';
+                        html += 'Changes based on: wearing shirt, Analyse set active, Ba sticker count, if Ba can hold more.</em></p>';
+                        html += '<img src="https://picsum.photos/seed/shirt1/800/600"/>';
+                        return html;
+                    }
+                },
+                {
+                    // ADD TASK: Put on clampshirt to Ni
+                    // No difficulty variation - always 1 item
+                    type: 'add', 
+                    bodyPart: 'Ni'
+                },
+                {
+                    // REMOVE TASK: Take off clampshirt from Ni
+                    // No difficulty variation - always 1 item
+                    type: 'remove', 
+                    bodyPart: 'Ni'
+                }
             ],
             wristband: [
-                {getDifficulty: d => `<strong>Spikeyband Spin</strong><p>Spin the spikeyband around your wrist ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/wrist1/800/600"/>`}
+                {
+                    // STANDARD TASK: Spin spikeyband
+                    // Difficulty: Easy=5, Medium=10, Hard=15 spins
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Spikeyband Spin</strong><p>Spin the spikeyband around your wrist ${d=='easy'?5:d=='medium'?10:15} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard spikeyband task. Difficulty: Easy=5, Medium=10, Hard=15 spins.</em></p><img src="https://picsum.photos/seed/wrist1/800/600"/>`
+                }
             ],
             hand: [
-                {getDifficulty: d => `<strong>Hand Wave</strong><p>Wave your hand ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/hand1/800/600"/>`},
-                {type: 'redlight', getDifficulty: d => d=='easy'?15000:d=='medium'?20000:25000}
+                {
+                    // STANDARD TASK: Wave hand
+                    // Difficulty: Easy=10, Medium=15, Hard=20 waves
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Hand Wave</strong><p>Wave your hand ${d=='easy'?10:d=='medium'?15:20} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard hand wave task. Difficulty: Easy=10, Medium=15, Hard=20 waves.</em></p><img src="https://picsum.photos/seed/hand1/800/600"/>`
+                },
+                {
+                    // RED LIGHT GREEN LIGHT TASK: Jump on green, stop on red
+                    // Difficulty: Easy=15s, Medium=20s, Hard=25s duration
+                    // No conditions - always available
+                    type: 'redlight', 
+                    getDifficulty: d => d=='easy'?15000:d=='medium'?20000:25000
+                }
             ],
             vibranium: [
-                {getDifficulty: d => `<strong>Vibranium Hold</strong><p>Hold the vibranium steady for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><img src="https://picsum.photos/seed/vibranium1/800/600"/>`}
+                {
+                    // STANDARD TASK: Hold vibranium steady
+                    // Difficulty: Easy=5, Medium=10, Hard=15 seconds
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Vibranium Hold</strong><p>Hold the vibranium steady for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium task. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/vibranium1/800/600"/>`
+                }
             ]
         }
     },
@@ -1010,22 +1207,72 @@ const instructionSets = {
         ],
         tasks: {
             stick_a: [
-                {getDifficulty: d => `<strong>Dillstick A Balance</strong><p>Balance the dillstick A on your hand for ${d=='easy'?3:d=='medium'?5:8} seconds.</p><img src="https://picsum.photos/seed/stick1/800/600"/>`},
-                {type: 'add', bodyPart: 'Bu'},
-                {type: 'remove', bodyPart: 'Bu'}
+                {
+                    // STANDARD TASK: Balance dillstick A
+                    // Difficulty: Easy=3, Medium=5, Hard=8 seconds
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Dillstick A Balance</strong><p>Balance the dillstick A on your hand for ${d=='easy'?3:d=='medium'?5:8} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard dillstick A task. Difficulty: Easy=3s, Medium=5s, Hard=8s.</em></p><img src="https://picsum.photos/seed/stick1/800/600"/>`
+                },
+                {
+                    // ADD TASK: Add dillstick A to Bu
+                    // No difficulty variation - always 1 item
+                    type: 'add', 
+                    bodyPart: 'Bu'
+                },
+                {
+                    // REMOVE TASK: Remove dillstick A from Bu
+                    // No difficulty variation - always 1 item
+                    type: 'remove', 
+                    bodyPart: 'Bu'
+                }
             ],
             metal_stick: [
-                {getDifficulty: d => `<strong>Metal Dillstick Tap</strong><p>Tap the metal dillstick on the ground ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/metal1/800/600"/>`},
-                {type: 'add', bodyPart: 'Bu'},
-                {type: 'remove', bodyPart: 'Bu'}
+                {
+                    // STANDARD TASK: Tap metal dillstick
+                    // Difficulty: Easy=10, Medium=15, Hard=20 taps
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Metal Dillstick Tap</strong><p>Tap the metal dillstick on the ground ${d=='easy'?10:d=='medium'?15:20} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard metal dillstick task. Difficulty: Easy=10, Medium=15, Hard=20 taps.</em></p><img src="https://picsum.photos/seed/metal1/800/600"/>`
+                },
+                {
+                    // ADD TASK: Add metal dillstick to Bu
+                    // No difficulty variation - always 1 item
+                    type: 'add', 
+                    bodyPart: 'Bu'
+                },
+                {
+                    // REMOVE TASK: Remove metal dillstick from Bu
+                    // No difficulty variation - always 1 item
+                    type: 'remove', 
+                    bodyPart: 'Bu'
+                }
             ],
             tail: [
-                {getDifficulty: d => `<strong>Plugtail Wag</strong><p>Wag your plugtail ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/tail1/800/600"/>`},
-                {type: 'add', bodyPart: 'Bu'},
-                {type: 'remove', bodyPart: 'Bu'}
+                {
+                    // STANDARD TASK: Wag plugtail
+                    // Difficulty: Easy=5, Medium=10, Hard=15 wags
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Plugtail Wag</strong><p>Wag your plugtail ${d=='easy'?5:d=='medium'?10:15} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard plugtail task. Difficulty: Easy=5, Medium=10, Hard=15 wags.</em></p><img src="https://picsum.photos/seed/tail1/800/600"/>`
+                },
+                {
+                    // ADD TASK: Add plugtail to Bu
+                    // No difficulty variation - always 1 item
+                    type: 'add', 
+                    bodyPart: 'Bu'
+                },
+                {
+                    // REMOVE TASK: Remove plugtail from Bu
+                    // No difficulty variation - always 1 item
+                    type: 'remove', 
+                    bodyPart: 'Bu'
+                }
             ],
             vibranium: [
-                {getDifficulty: d => `<strong>Vibranium Shake</strong><p>Shake the vibranium ${d=='easy'?5:d=='medium'?10:15} times.</p><img src="https://picsum.photos/seed/vibranium2/800/600"/>`}
+                {
+                    // STANDARD TASK: Shake vibranium
+                    // Difficulty: Easy=5, Medium=10, Hard=15 shakes
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Vibranium Shake</strong><p>Shake the vibranium ${d=='easy'?5:d=='medium'?10:15} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium shake task. Difficulty: Easy=5, Medium=10, Hard=15 shakes.</em></p><img src="https://picsum.photos/seed/vibranium2/800/600"/>`
+                }
             ]
         }
     },
@@ -1037,12 +1284,32 @@ const instructionSets = {
         ],
         tasks: {
             stick_m: [
-                {getDifficulty: d => `<strong>Dig with Dillstick M</strong><p>Use the dillstick M to make ${d=='easy'?3:d=='medium'?5:8} digging motions.</p><img src="https://picsum.photos/seed/dig1/800/600"/>`},
-                {type: 'add', bodyPart: 'Mo'},
-                {type: 'remove', bodyPart: 'Mo'}
+                {
+                    // STANDARD TASK: Dig with dillstick M
+                    // Difficulty: Easy=3, Medium=5, Hard=8 digging motions
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Dig with Dillstick M</strong><p>Use the dillstick M to make ${d=='easy'?3:d=='medium'?5:8} digging motions.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard dillstick M task. Difficulty: Easy=3, Medium=5, Hard=8 motions.</em></p><img src="https://picsum.photos/seed/dig1/800/600"/>`
+                },
+                {
+                    // ADD TASK: Add dillstick M to Mo
+                    // No difficulty variation - always 1 item
+                    type: 'add', 
+                    bodyPart: 'Mo'
+                },
+                {
+                    // REMOVE TASK: Remove dillstick M from Mo
+                    // No difficulty variation - always 1 item
+                    type: 'remove', 
+                    bodyPart: 'Mo'
+                }
             ],
             hand: [
-                {getDifficulty: d => `<strong>Hand Digging</strong><p>Make digging motions with your hands ${d=='easy'?10:d=='medium'?15:20} times.</p><img src="https://picsum.photos/seed/dighand1/800/600"/>`}
+                {
+                    // STANDARD TASK: Hand digging motions
+                    // Difficulty: Easy=10, Medium=15, Hard=20 motions
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Hand Digging</strong><p>Make digging motions with your hands ${d=='easy'?10:d=='medium'?15:20} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard hand digging task. Difficulty: Easy=10, Medium=15, Hard=20 motions.</em></p><img src="https://picsum.photos/seed/dighand1/800/600"/>`
+                }
             ]
         }
     },
@@ -1050,14 +1317,25 @@ const instructionSets = {
         name: "TnD",
         toys: [
             {id: "vibranium", name: "Vibranium 💎"},
-            {id: "hand", name: "Hand ✋"}
+            {id: "hand", name: "Hand ✋"},
+            {id: "prison", name: "Prison 🔒"}
         ],
         tasks: {
             vibranium: [
-                {getDifficulty: d => `<strong>Vibranium Control</strong><p>Control the vibranium settings for ${d=='easy'?10:d=='medium'?20:30} seconds.</p><img src="https://picsum.photos/seed/vibranium3/800/600"/>`}
+                {
+                    // STANDARD TASK: Control vibranium settings
+                    // Difficulty: Easy=10, Medium=20, Hard=30 seconds
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Vibranium Control</strong><p>Control the vibranium settings for ${d=='easy'?10:d=='medium'?20:30} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium control task. Difficulty: Easy=10s, Medium=20s, Hard=30s.</em></p><img src="https://picsum.photos/seed/vibranium3/800/600"/>`
+                }
             ],
             hand: [
-                {getDifficulty: d => `<strong>Hand Gesture</strong><p>Make hand gestures ${d=='easy'?8:d=='medium'?12:16} times.</p><img src="https://picsum.photos/seed/handtnd1/800/600"/>`}
+                {
+                    // STANDARD TASK: Hand gestures
+                    // Difficulty: Easy=8, Medium=12, Hard=16 gestures
+                    // No conditions - always available
+                    getDifficulty: d => `<strong>Hand Gesture</strong><p>Make hand gestures ${d=='easy'?8:d=='medium'?12:16} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard hand gesture task. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/handtnd1/800/600"/>`
+                }
             ]
         }
     }
@@ -1079,6 +1357,7 @@ function saveGameState() {
         playerName,
         toySetEnabled,
         toyChecked,
+        prisonLocked,
         diceResultText: diceResult.textContent,
         currentInstruction: instructions.innerHTML,
         instructionsActive: instructions.classList.contains('active'),
@@ -1103,6 +1382,7 @@ function loadGameState() {
         playerName = gs.playerName || '';
         toySetEnabled = gs.toySetEnabled || {};
         toyChecked = gs.toyChecked || {};
+        prisonLocked = gs.prisonLocked || false;
         
         if (gs.bodyPartState) {
             bodyPartState = gs.bodyPartState;
@@ -1949,20 +2229,30 @@ function displayRandomInstruction() {
     
     instructions.classList.add('active');
     
+    // Create difficulty map for all toys
+    const difficultyMap = {};
+    for (const [toyKey, diff] of Object.entries(toyDifficulties)) {
+        const [setId, ...toyIdParts] = toyKey.split('_');
+        const toyId = toyIdParts.join('_');
+        if (!difficultyMap[toyId]) {
+            difficultyMap[toyId] = diff;
+        }
+    }
+    
     if (randomTask.type === 'metronome') {
-        const beatCount = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        const beatCount = randomTask.getDifficulty(randomToyObj.difficulty, conditions, difficultyMap);
         window.lastTaskInfo.beatCount = beatCount;
         currentMetronomeTask = createMetronomeTask(beatCount);
         instructions.innerHTML = '';
         instructions.appendChild(currentMetronomeTask.element);
     } else if (randomTask.type === 'redlight') {
-        const duration = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        const duration = randomTask.getDifficulty(randomToyObj.difficulty, conditions, difficultyMap);
         window.lastTaskInfo.duration = duration;
         currentMetronomeTask = createRedLightGreenLightTask(duration);
         instructions.innerHTML = '';
         instructions.appendChild(currentMetronomeTask.element);
     } else {
-        const content = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        const content = randomTask.getDifficulty(randomToyObj.difficulty, conditions, difficultyMap);
         instructions.innerHTML = content;
     }
 }
@@ -2030,20 +2320,30 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
         addRemoveHTML = text;
     }
     
+    // Create difficulty map for all toys
+    const difficultyMap = {};
+    for (const [toyKey, diff] of Object.entries(toyDifficulties)) {
+        const [setId, ...toyIdParts] = toyKey.split('_');
+        const toyId = toyIdParts.join('_');
+        if (!difficultyMap[toyId]) {
+            difficultyMap[toyId] = diff;
+        }
+    }
+    
     if (randomTask.type === 'metronome') {
-        const beatCount = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        const beatCount = randomTask.getDifficulty(randomToyObj.difficulty, conditions, difficultyMap);
         window.lastTaskInfo.beatCount = beatCount;
         currentMetronomeTask = createMetronomeTask(beatCount);
         instructions.innerHTML = addRemoveHTML;
         instructions.appendChild(currentMetronomeTask.element);
     } else if (randomTask.type === 'redlight') {
-        const duration = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        const duration = randomTask.getDifficulty(randomToyObj.difficulty, conditions, difficultyMap);
         window.lastTaskInfo.duration = duration;
         currentMetronomeTask = createRedLightGreenLightTask(duration);
         instructions.innerHTML = addRemoveHTML;
         instructions.appendChild(currentMetronomeTask.element);
     } else {
-        const content = randomTask.getDifficulty(randomToyObj.difficulty, conditions);
+        const content = randomTask.getDifficulty(randomToyObj.difficulty, conditions, difficultyMap);
         instructions.innerHTML = addRemoveHTML + content;
     }
 }
@@ -2058,17 +2358,27 @@ function renderToyLibrary() {
     
     container.innerHTML = '';
     
-    if (selectedSets.length === 0) {
-        container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px; background: white; border-radius: 10px; border: 2px solid #667eea;">Select instruction sets above to see available toys</p>';
-        return;
-    }
-    
     const setEmojis = {dressup: '🎨', apple: '🍎', digging: '⛏️', tnd: '🎯'};
     const allToys = {};
+    
+    // Always add prison toy, even if TnD is not selected
+    allToys['prison'] = {
+        id: 'prison',
+        name: 'Prison 🔒',
+        sets: [{
+            setId: 'tnd',
+            setName: 'TnD',
+            emoji: '🎯'
+        }],
+        alwaysVisible: true
+    };
     
     selectedSets.forEach(setId => {
         if (instructionSets[setId]) {
             instructionSets[setId].toys.forEach(toy => {
+                // Skip prison since we already added it
+                if (toy.id === 'prison') return;
+                
                 if (!allToys[toy.id]) {
                     allToys[toy.id] = {id: toy.id, name: toy.name, sets: []};
                 }
@@ -2080,6 +2390,11 @@ function renderToyLibrary() {
             });
         }
     });
+    
+    if (Object.keys(allToys).length === 1 && allToys['prison']) {
+        // Only prison is available, show message
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px; background: white; border-radius: 10px; border: 2px solid #667eea;">Select instruction sets above to see available toys</p>';
+    }
     
     for (const [toyId, toyData] of Object.entries(allToys)) {
         const toyItem = document.createElement('div');
@@ -2124,6 +2439,38 @@ function renderToyLibrary() {
         header.appendChild(checkboxWrapper);
         header.appendChild(nameSpan);
         toyItem.appendChild(header);
+        
+        // Special handling for prison toy
+        if (toyId === 'prison') {
+            const prisonControls = document.createElement('div');
+            prisonControls.className = 'toy-controls';
+            prisonControls.style.cssText = 'margin-left: 28px; margin-top: 10px;';
+            
+            const lockedLabel = document.createElement('label');
+            lockedLabel.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer;';
+            
+            const lockedCheckbox = document.createElement('input');
+            lockedCheckbox.type = 'checkbox';
+            lockedCheckbox.checked = prisonLocked;
+            lockedCheckbox.disabled = !toyChecked[toyId];
+            lockedCheckbox.style.cssText = 'width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;';
+            lockedCheckbox.onchange = () => {
+                prisonLocked = lockedCheckbox.checked;
+                saveGameState();
+            };
+            
+            const lockedText = document.createElement('span');
+            lockedText.textContent = '🔒 Locked';
+            lockedText.style.cssText = 'font-weight: 600; color: #333;';
+            
+            lockedLabel.appendChild(lockedCheckbox);
+            lockedLabel.appendChild(lockedText);
+            prisonControls.appendChild(lockedLabel);
+            
+            toyItem.appendChild(prisonControls);
+            container.appendChild(toyItem);
+            continue; // Skip normal rendering for prison
+        }
         
         const controls = document.createElement('div');
         controls.className = 'toy-controls';
@@ -2457,6 +2804,7 @@ confirmResetBtn.addEventListener('click', function() {
     playerName = '';
     player.remove();
     bodyPartState = JSON.parse(JSON.stringify(bodyParts));
+    prisonLocked = false;
     
     startButton.style.display = 'block';
     rollDiceButton.style.display = 'none';
