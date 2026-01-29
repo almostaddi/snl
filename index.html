@@ -782,6 +782,14 @@ input[type="range"]::-moz-range-thumb {
         <div id="controls">
             <button id="startButton">🎮 Start Game</button>
             <button id="rollDice" style="display: none;">🎲 Roll Dice</button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <label style="font-size: 14px; color: #333;">Test Jump:</label>
+                <input type="number" id="testJumpInput" min="1" max="100" placeholder="Square" 
+                       style="width: 80px; padding: 8px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;">
+                <button id="testJumpButton" style="padding: 8px 15px; background: #f39c12; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    Jump
+                </button>
+            </div>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <div id="diceResult" style="display: none;">Dice: -</div>
                 <div id="turnCounter" style="display: none; font-size: 20px; font-weight: bold; padding: 12px 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; box-shadow: 0 4px 15px rgba(102,126,234,0.3);">Turn: 0</div>
@@ -831,7 +839,17 @@ input[type="range"]::-moz-range-thumb {
                         
                         <!-- Gestures -->
                         <div style="margin-bottom: 20px;">
-                            <div style="font-weight: 600; color: #5c7cfa; margin-bottom: 8px;">🤲 Gestures:</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div style="font-weight: 600; color: #5c7cfa;">🤲 Gestures:</div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 12px; color: #666;">Difficulty:</span>
+                                    <select id="gesturesDifficulty" style="padding: 4px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; background: white;">
+                                        <option value="easy">Easy</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="hard">Hard</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="gestures_ihot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
@@ -858,7 +876,17 @@ input[type="range"]::-moz-range-thumb {
                         
                         <!-- Vibranium -->
                         <div style="margin-bottom: 20px;">
-                            <div style="font-weight: 600; color: #8b5cf6; margin-bottom: 8px;">💎 Vibranium:</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div style="font-weight: 600; color: #8b5cf6;">💎 Vibranium:</div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 12px; color: #666;">Difficulty:</span>
+                                    <select id="vibraniumDifficulty" style="padding: 4px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; background: white;">
+                                        <option value="easy">Easy</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="hard">Hard</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="vibranium_ihot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
@@ -873,7 +901,17 @@ input[type="range"]::-moz-range-thumb {
                         
                         <!-- Analyse -->
                         <div style="margin-bottom: 20px;">
-                            <div style="font-weight: 600; color: #d97706; margin-bottom: 8px;">🔍 Analyse:</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div style="font-weight: 600; color: #d97706;">🔍 Analyse:</div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 12px; color: #666;">Difficulty:</span>
+                                    <select id="analyseDifficulty" style="padding: 4px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; background: white;">
+                                        <option value="easy">Easy</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="hard">Hard</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="analyse_vibranium" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;">
@@ -988,6 +1026,31 @@ let finalChallengeSettings = {
     gestures: 33,
     vibranium: 33,
     analyse: 34
+};
+
+// Final challenge types enabled
+let finalChallengeTypes = {
+    gestures_ihot: false,
+    gestures_icewater: false,
+    gestures_spikeyband: false,
+    gestures_squeezing: false,
+    gestures_2finger: false,
+    vibranium_ihot: false,
+    vibranium_icewater: false,
+    analyse_vibranium: false
+};
+
+// Final challenge difficulties
+let finalChallengeDifficulties = {
+    gestures: 'medium',
+    vibranium: 'medium',
+    analyse: 'medium'
+};
+
+// Final challenge modifiers
+let finalChallengeModifiers = {
+    ce: false,
+    pf: false
 };
 
 // Body part capacity system
@@ -1588,6 +1651,188 @@ const snakeLadderTasks = {
     ]
 };
 
+// Final Challenge Tasks
+const finalChallengeTasks = [
+    {
+        // GESTURES TASK: Only if gestures challenges enabled
+        canSelect: (c) => {
+            return finalChallengeTypes.gestures_ihot || 
+                   finalChallengeTypes.gestures_icewater || 
+                   finalChallengeTypes.gestures_spikeyband || 
+                   finalChallengeTypes.gestures_squeezing || 
+                   finalChallengeTypes.gestures_2finger;
+        },
+        getDifficulty: (d, c, diffMap, prizeType) => {
+            // Pick from enabled gestures challenges
+            const enabledGestures = [];
+            if (finalChallengeTypes.gestures_ihot) enabledGestures.push('I-Hot');
+            if (finalChallengeTypes.gestures_icewater) enabledGestures.push('Ice Water');
+            if (finalChallengeTypes.gestures_spikeyband) enabledGestures.push('Spikeyband');
+            if (finalChallengeTypes.gestures_squeezing) enabledGestures.push('Squeezing');
+            if (finalChallengeTypes.gestures_2finger) enabledGestures.push('2 Finger');
+            
+            const subtype = enabledGestures[Math.floor(Math.random() * enabledGestures.length)];
+            const difficulty = finalChallengeDifficulties.gestures;
+            const count = difficulty === 'easy' ? 8 : difficulty === 'hard' ? 16 : 12;
+            
+            return `
+                <strong>🏆 Final Challenge! 🏆</strong>
+                <p>Complete ${count} hand gestures with ${subtype} at ${difficulty} difficulty.</p>
+                <button onclick="revealFinalPrize('gestures', '${prizeType}')" 
+                        style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    I Completed the Challenge
+                </button>
+                <div id="prizeReveal_gestures" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <!-- Prize will be revealed here -->
+                </div>
+                <img src="https://picsum.photos/seed/finalgestures/800/600"/>
+            `;
+        }
+    },
+    {
+        // VIBRANIUM TASK: Only if vibranium challenges enabled
+        canSelect: (c) => {
+            return finalChallengeTypes.vibranium_ihot || finalChallengeTypes.vibranium_icewater;
+        },
+        getDifficulty: (d, c, diffMap, prizeType) => {
+            // Pick from enabled vibranium challenges
+            const enabledVibranium = [];
+            if (finalChallengeTypes.vibranium_ihot) enabledVibranium.push('I-Hot');
+            if (finalChallengeTypes.vibranium_icewater) enabledVibranium.push('Ice Water');
+            
+            const subtype = enabledVibranium[Math.floor(Math.random() * enabledVibranium.length)];
+            const difficulty = finalChallengeDifficulties.vibranium;
+            const seconds = difficulty === 'easy' ? 30 : difficulty === 'hard' ? 60 : 45;
+            
+            return `
+                <strong>🏆 Final Challenge! 🏆</strong>
+                <p>Hold vibranium with ${subtype} for ${seconds} seconds at ${difficulty} difficulty.</p>
+                <button onclick="revealFinalPrize('vibranium', '${prizeType}')" 
+                        style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    I Completed the Challenge
+                </button>
+                <div id="prizeReveal_vibranium" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <!-- Prize will be revealed here -->
+                </div>
+                <img src="https://picsum.photos/seed/finalvibranium/800/600"/>
+            `;
+        }
+    },
+    {
+        // ANALYSE TASK: Only if analyse challenges enabled
+        canSelect: (c) => {
+            return finalChallengeTypes.analyse_vibranium;
+        },
+        getDifficulty: (d, c, diffMap, prizeType) => {
+            const difficulty = finalChallengeDifficulties.analyse;
+            const count = difficulty === 'easy' ? 3 : difficulty === 'hard' ? 7 : 5;
+            
+            return `
+                <strong>🏆 Final Challenge! 🏆</strong>
+                <p>Analyse ${count} dillsticks with Vibranium at ${difficulty} difficulty.</p>
+                <button onclick="revealFinalPrize('analyse', '${prizeType}')" 
+                        style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    I Completed the Challenge
+                </button>
+                <div id="prizeReveal_analyse" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <!-- Prize will be revealed here -->
+                </div>
+                <img src="https://picsum.photos/seed/finalanalyse/800/600"/>
+            `;
+        }
+    },
+    {
+        // EXAMPLE: ALWAYS task - only triggers if specific condition met
+        // This demonstrates how to add conditional "always" tasks
+        alwaysSelect: (c) => {
+            // Example: Only show this task if player completed 10+ turns
+            // return c.turnCount >= 10;
+            return false; // Disabled by default - set to true or add condition to enable
+        },
+        getDifficulty: (d, c, diffMap, prizeType) => {
+            return `
+                <strong>🏆 Special Final Challenge! 🏆</strong>
+                <p>You've been selected for a special challenge based on your game progress!</p>
+                <p>This is an example of an "always" task that only appears when specific conditions are met.</p>
+                <button onclick="revealFinalPrize('special', '${prizeType}')" 
+                        style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    I Completed the Challenge
+                </button>
+                <div id="prizeReveal_special" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <!-- Prize will be revealed here -->
+                </div>
+                <img src="https://picsum.photos/seed/finalspecial/800/600"/>
+            `;
+        }
+    },
+    {
+        // FALLBACK TASK: Always available, no challenge
+        getDifficulty: (d, c, diffMap, prizeType) => {
+            // Immediately show prize with modifiers
+            const prizeHTML = generatePrizeHTML(prizeType);
+            
+            return `
+                <strong>🏆 Final Challenge! 🏆</strong>
+                <p>Let's see what your prize is...</p>
+                <div style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    ${prizeHTML}
+                </div>
+                <img src="https://picsum.photos/seed/finalfallback/800/600"/>
+            `;
+        }
+    }
+];
+
+// Generate prize HTML with modifiers
+function generatePrizeHTML(prizeType) {
+    let html = '<div style="text-align: center;">';
+    html += '<div style="font-size: 24px; margin-bottom: 10px;">━━━━━━━━━━━━━━━━━━━━</div>';
+    html += '<div style="font-size: 20px; font-weight: 600; margin-bottom: 15px;">🎉 Prize Result 🎉</div>';
+    
+    if (prizeType === 'major') {
+        html += '<div style="font-size: 28px; font-weight: bold; color: #ffd93d; margin-bottom: 10px;">🏆 MAJOR PRIZE! 🏆</div>';
+        html += '<p style="font-size: 16px; margin-bottom: 15px;">Congratulations! You won big!</p>';
+        
+        // Add modifiers for Major (CE + PF if enabled)
+        if (finalChallengeModifiers.ce) {
+            html += '<div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-bottom: 10px; text-align: left;">';
+            html += '<strong>🥛 CE (Cum Eating):</strong> Complete the CE requirement.';
+            html += '</div>';
+        }
+        if (finalChallengeModifiers.pf) {
+            html += '<div style="background: #cfe2ff; padding: 10px; border-radius: 6px; margin-bottom: 10px; text-align: left;">';
+            html += '<strong>⏱️ PF (Post Finish):</strong> Complete the PF requirement.';
+            html += '</div>';
+        }
+    } else if (prizeType === 'minor') {
+        html += '<div style="font-size: 28px; font-weight: bold; color: #51cf66; margin-bottom: 10px;">🎉 Minor Prize 🎉</div>';
+        html += '<p style="font-size: 16px; margin-bottom: 15px;">Not bad! You got a small reward.</p>';
+        
+        // Add modifiers for Minor (CE only if enabled)
+        if (finalChallengeModifiers.ce) {
+            html += '<div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-bottom: 10px; text-align: left;">';
+            html += '<strong>🥛 CE (Cum Eating):</strong> Complete the CE requirement.';
+            html += '</div>';
+        }
+    } else {
+        html += '<div style="font-size: 28px; font-weight: bold; color: #adb5bd; margin-bottom: 10px;">❌ No Prize ❌</div>';
+        html += '<p style="font-size: 16px; margin-bottom: 15px;">Better luck next time!</p>';
+        // No modifiers for None
+    }
+    
+    html += '</div>';
+    return html;
+}
+
+// Reveal prize after button click
+function revealFinalPrize(taskId, prizeType) {
+    const revealDiv = document.getElementById(`prizeReveal_${taskId}`);
+    if (revealDiv) {
+        revealDiv.innerHTML = generatePrizeHTML(prizeType);
+        revealDiv.style.display = 'block';
+    }
+}
+
 // Storage Functions
 function saveGameState() {
     localStorage.setItem('snakesLaddersGameState', JSON.stringify({
@@ -1609,6 +1854,9 @@ function saveGameState() {
         prisonLocked,
         prisonWorn,
         finalChallengeSettings,
+        finalChallengeTypes,
+        finalChallengeDifficulties,
+        finalChallengeModifiers,
         diceResultText: diceResult.textContent,
         currentInstruction: instructions.innerHTML,
         instructionsActive: instructions.classList.contains('active'),
@@ -1638,6 +1886,13 @@ function loadGameState() {
         prisonLocked = gs.prisonLocked || false;
         prisonWorn = gs.prisonWorn || false;
         finalChallengeSettings = gs.finalChallengeSettings || {gestures: 33, vibranium: 33, analyse: 34};
+        finalChallengeTypes = gs.finalChallengeTypes || {
+            gestures_ihot: false, gestures_icewater: false, gestures_spikeyband: false,
+            gestures_squeezing: false, gestures_2finger: false, vibranium_ihot: false,
+            vibranium_icewater: false, analyse_vibranium: false
+        };
+        finalChallengeDifficulties = gs.finalChallengeDifficulties || {gestures: 'medium', vibranium: 'medium', analyse: 'medium'};
+        finalChallengeModifiers = gs.finalChallengeModifiers || {ce: false, pf: false};
         
         if (gs.bodyPartState) {
             bodyPartState = gs.bodyPartState;
@@ -1659,6 +1914,24 @@ function loadGameState() {
         document.getElementById('gesturesPercent').textContent = finalChallengeSettings.gestures + '%';
         document.getElementById('vibraniumPercent').textContent = finalChallengeSettings.vibranium + '%';
         document.getElementById('analysePercent').textContent = finalChallengeSettings.analyse + '%';
+        
+        // Restore final challenge type checkboxes
+        Object.keys(finalChallengeTypes).forEach(key => {
+            const checkbox = document.getElementById(key);
+            if (checkbox) checkbox.checked = finalChallengeTypes[key];
+        });
+        
+        // Restore final challenge difficulty dropdowns
+        Object.keys(finalChallengeDifficulties).forEach(type => {
+            const dropdown = document.getElementById(`${type}Difficulty`);
+            if (dropdown) dropdown.value = finalChallengeDifficulties[type];
+        });
+        
+        // Restore final challenge modifier checkboxes
+        Object.keys(finalChallengeModifiers).forEach(mod => {
+            const checkbox = document.getElementById(`modifier_${mod}`);
+            if (checkbox) checkbox.checked = finalChallengeModifiers[mod];
+        });
         
         if (gameStarted) {
             startButton.style.display = 'none';
@@ -3397,6 +3670,31 @@ analyseSlider.addEventListener('input', function() {
     updateFinalChallengeDisplays();
 });
 
+// Final challenge type checkboxes
+['gestures_ihot', 'gestures_icewater', 'gestures_spikeyband', 'gestures_squeezing', 'gestures_2finger',
+ 'vibranium_ihot', 'vibranium_icewater', 'analyse_vibranium'].forEach(id => {
+    document.getElementById(id).addEventListener('change', function() {
+        finalChallengeTypes[id] = this.checked;
+        saveGameState();
+    });
+});
+
+// Final challenge difficulty dropdowns
+['gestures', 'vibranium', 'analyse'].forEach(type => {
+    document.getElementById(`${type}Difficulty`).addEventListener('change', function() {
+        finalChallengeDifficulties[type] = this.value;
+        saveGameState();
+    });
+});
+
+// Final challenge modifier checkboxes
+['ce', 'pf'].forEach(mod => {
+    document.getElementById(`modifier_${mod}`).addEventListener('change', function() {
+        finalChallengeModifiers[mod] = this.checked;
+        saveGameState();
+    });
+});
+
 document.getElementById('playerNameInput').addEventListener('input', function() {
     playerName = this.value;
     saveGameState();
@@ -3445,6 +3743,60 @@ function startGame() {
     turnCounter.textContent = 'Turn: 0';
 }
 
+// Display final challenge task
+function displayFinalChallenge() {
+    // Roll prize type first (secretly)
+    const prizeType = determinePrize();
+    
+    // Get condition helpers
+    const conditionHelpers = getTaskConditions();
+    
+    // FIRST: Check for "always" tasks (priority tasks with specific conditions)
+    const alwaysTasks = [];
+    finalChallengeTasks.forEach((task, index) => {
+        if (task.alwaysSelect && task.alwaysSelect(conditionHelpers)) {
+            alwaysTasks.push({task, index});
+        }
+    });
+    
+    // If there are "always" tasks, randomly pick one
+    if (alwaysTasks.length > 0) {
+        const randomIndex = Math.floor(Math.random() * alwaysTasks.length);
+        const selectedTask = alwaysTasks[randomIndex].task;
+        const taskHTML = selectedTask.getDifficulty(null, conditionHelpers, toyDifficulties, prizeType);
+        instructions.innerHTML = taskHTML;
+        instructions.classList.add('active');
+        return;
+    }
+    
+    // SECOND: Get available regular tasks (check canSelect conditions)
+    const availableTasks = [];
+    finalChallengeTasks.forEach((task, index) => {
+        // Skip if it's an "always" task (already checked above)
+        if (task.alwaysSelect) return;
+        
+        if (!task.canSelect || task.canSelect(conditionHelpers)) {
+            availableTasks.push({task, index});
+        }
+    });
+    
+    // Select random task from available
+    let selectedTask;
+    if (availableTasks.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableTasks.length);
+        selectedTask = availableTasks[randomIndex].task;
+    } else {
+        // Should never happen since fallback has no conditions, but safety fallback
+        selectedTask = finalChallengeTasks[finalChallengeTasks.length - 1];
+    }
+    
+    // Display the task with secret prize type
+    const taskHTML = selectedTask.getDifficulty(null, conditionHelpers, toyDifficulties, prizeType);
+    
+    instructions.innerHTML = taskHTML;
+    instructions.classList.add('active');
+}
+
 function rollDice() {
     rollDiceButton.disabled = true;
     turnCount++; // Increment turn counter
@@ -3486,8 +3838,7 @@ function rollDice() {
         
         if (playerPosition === totalSquares) {
             rollDiceButton.disabled = true;
-            const prize = determinePrize();
-            instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>` + displayPrizeResult(prize);
+            displayFinalChallenge();
             return;
         }
         
@@ -3502,8 +3853,7 @@ function rollDice() {
                     playerPosition = finalPosition;
                     if (playerPosition === totalSquares) {
                         rollDiceButton.disabled = true;
-                        const prize = determinePrize();
-                        instructions.innerHTML = `<div><strong>🎉 Congratulations, you've won! 🎉</strong></div>` + displayPrizeResult(prize);
+                        displayFinalChallenge();
                         saveGameState();
                     } else {
                         rollDiceButton.disabled = false;
@@ -3589,6 +3939,31 @@ confirmResetBtn.addEventListener('click', function() {
     
     updateSliderDisplays();
     renderToyLibrary();
+});
+
+// Test jump button for debugging
+document.getElementById('testJumpButton').addEventListener('click', function() {
+    if (!gameStarted) return;
+    
+    const targetSquare = parseInt(document.getElementById('testJumpInput').value);
+    if (isNaN(targetSquare) || targetSquare < 1 || targetSquare > 100) {
+        alert('Please enter a number between 1 and 100');
+        return;
+    }
+    
+    // Instant jump (no animation)
+    playerPosition = targetSquare;
+    const square = document.getElementById(`square-${targetSquare}`);
+    if (square) square.appendChild(player);
+    
+    if (playerPosition === totalSquares) {
+        rollDiceButton.disabled = true;
+        displayFinalChallenge();
+        saveGameState();
+    } else {
+        displayRandomInstruction();
+        saveGameState();
+    }
 });
 
 // Initialize
