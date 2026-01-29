@@ -364,6 +364,18 @@ input[type="range"]::-moz-range-thumb {
     background: linear-gradient(to right, #adb5bd, #868e96); 
 }
 
+#gesturesSlider {
+    background: linear-gradient(to right, #748ffc, #5c7cfa);
+}
+
+#vibraniumSlider {
+    background: linear-gradient(to right, #a78bfa, #8b5cf6);
+}
+
+#analyseSlider {
+    background: linear-gradient(to right, #f59f0b, #d97706);
+}
+
 .toy-library-item { 
     border: 2px solid #e9ecef; 
     border-radius: 10px; 
@@ -794,20 +806,40 @@ input[type="range"]::-moz-range-thumb {
             </div>
             
             <div class="settings-column-right">
-                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px;">🎁 Prize Probabilities:</label>
+                <!-- Final Challenges Section -->
+                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px;">🏆 Final Challenges:</label>
+                <div class="prize-settings">
+                    <h3>🏆 Final Challenges</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Set probabilities for each final challenge type. These are separate from the main game toys.</p>
+                    
+                    <div class="slider-container">
+                        <div class="slider-label"><span>🤲 Gestures:</span><span class="percentage" id="gesturesPercent">33%</span></div>
+                        <input type="range" id="gesturesSlider" min="0" max="100" value="33">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label"><span>💎 Vibranium:</span><span class="percentage" id="vibraniumPercent">33%</span></div>
+                        <input type="range" id="vibraniumSlider" min="0" max="100" value="33">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label"><span>🔍 Analyse:</span><span class="percentage" id="analysePercent">34%</span></div>
+                        <input type="range" id="analyseSlider" min="0" max="100" value="34">
+                    </div>
+                </div>
+                
+                <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px; margin-top: 20px;">🎁 Prize Probabilities:</label>
                 <div class="prize-settings">
                     <h3>🎁 Prize Probabilities</h3>
                     <div class="slider-container">
-                        <div class="slider-label"><span>🏆 Major:</span><span class="percentage" id="majorPercent">10%</span></div>
-                        <input type="range" id="majorSlider" min="0" max="100" value="10">
+                        <div class="slider-label"><span>🏆 Major:</span><span class="percentage" id="majorPercent">33%</span></div>
+                        <input type="range" id="majorSlider" min="0" max="100" value="33">
                     </div>
                     <div class="slider-container">
-                        <div class="slider-label"><span>🎉 Minor:</span><span class="percentage" id="minorPercent">25%</span></div>
-                        <input type="range" id="minorSlider" min="0" max="100" value="25">
+                        <div class="slider-label"><span>🎉 Minor:</span><span class="percentage" id="minorPercent">33%</span></div>
+                        <input type="range" id="minorSlider" min="0" max="100" value="33">
                     </div>
                     <div class="slider-container">
-                        <div class="slider-label"><span>❌ None:</span><span class="percentage" id="noPrizePercent">65%</span></div>
-                        <input type="range" id="noPrizeSlider" min="0" max="100" value="65">
+                        <div class="slider-label"><span>❌ None:</span><span class="percentage" id="noPrizePercent">34%</span></div>
+                        <input type="range" id="noPrizeSlider" min="0" max="100" value="34">
                     </div>
                 </div>
             </div>
@@ -867,7 +899,7 @@ let turnCountBySet = {}; // Track turns per set (e.g., {dressup: 5, tnd: 3})
 let turnCountByToy = {}; // Track turns per set-toy combo (e.g., {dressup_stickers: 3, tnd_prison: 2})
 let lastSelectedSet = {}; // Track which set each toy was last selected from (e.g., {stickers: 'dressup', prison: 'tnd'})
 let selectedSets = [];
-let prizeSettings = {major: 20, minor: 30, noPrize: 50};
+let prizeSettings = {major: 33, minor: 33, noPrize: 34};
 let toyQuantities = {};
 let toyModifiers = {};
 let playerName = '';
@@ -877,6 +909,13 @@ let toyChecked = {};
 // Prison-specific state (always available, not tied to TnD selection)
 let prisonLocked = false;
 let prisonWorn = false;
+
+// Final challenge state
+let finalChallengeSettings = {
+    gestures: 33,
+    vibranium: 33,
+    analyse: 34
+};
 
 // Body part capacity system
 const bodyParts = {
@@ -1496,6 +1535,7 @@ function saveGameState() {
         toyChecked,
         prisonLocked,
         prisonWorn,
+        finalChallengeSettings,
         diceResultText: diceResult.textContent,
         currentInstruction: instructions.innerHTML,
         instructionsActive: instructions.classList.contains('active'),
@@ -1524,6 +1564,7 @@ function loadGameState() {
         toyChecked = gs.toyChecked || {};
         prisonLocked = gs.prisonLocked || false;
         prisonWorn = gs.prisonWorn || false;
+        finalChallengeSettings = gs.finalChallengeSettings || {gestures: 33, vibranium: 33, analyse: 34};
         
         if (gs.bodyPartState) {
             bodyPartState = gs.bodyPartState;
@@ -1537,6 +1578,14 @@ function loadGameState() {
         document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => {
             cb.checked = selectedSets.includes(cb.value);
         });
+        
+        // Restore final challenge sliders
+        document.getElementById('gesturesSlider').value = finalChallengeSettings.gestures;
+        document.getElementById('vibraniumSlider').value = finalChallengeSettings.vibranium;
+        document.getElementById('analyseSlider').value = finalChallengeSettings.analyse;
+        document.getElementById('gesturesPercent').textContent = finalChallengeSettings.gestures + '%';
+        document.getElementById('vibraniumPercent').textContent = finalChallengeSettings.vibranium + '%';
+        document.getElementById('analysePercent').textContent = finalChallengeSettings.analyse + '%';
         
         if (gameStarted) {
             startButton.style.display = 'none';
@@ -1627,20 +1676,20 @@ document.getElementById('noPrizeSlider').addEventListener('input', function() {
     const available = 100 - newNoPrize;
     const currentTotal = Math.round(prizeSettings.minor) + Math.round(prizeSettings.major);
     
-    if (available < currentTotal && currentTotal > 0) {
-        const reduction = currentTotal - available;
-        const minorProp = prizeSettings.minor / currentTotal;
-        const majorProp = prizeSettings.major / currentTotal;
-        prizeSettings.minor = Math.max(0, Math.round(prizeSettings.minor - reduction * minorProp));
-        prizeSettings.major = Math.max(0, Math.round(prizeSettings.major - reduction * majorProp));
-    } else if (available > currentTotal) {
-        const increase = available - currentTotal;
-        const half = increase / 2;
-        prizeSettings.minor = Math.round(prizeSettings.minor + half);
-        prizeSettings.major = Math.round(prizeSettings.major + half);
+    // Changed: use equal split for BOTH directions (not just when increasing)
+    if (available !== currentTotal) {
+        const change = available - currentTotal;
+        const half = change / 2;
+        prizeSettings.minor = Math.max(0, Math.round(prizeSettings.minor + half));
+        prizeSettings.major = Math.max(0, Math.round(prizeSettings.major + half));
+        
+        // Ensure total is exactly 100 by adjusting noPrize if values were clamped
+        const actualTotal = prizeSettings.minor + prizeSettings.major;
+        prizeSettings.noPrize = Math.max(0, 100 - actualTotal);
+    } else {
+        prizeSettings.noPrize = Math.max(0, newNoPrize);
     }
     
-    prizeSettings.noPrize = newNoPrize;
     updateSliderDisplays();
 });
 
@@ -3194,6 +3243,61 @@ document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => {
         renderToyLibrary();
         saveGameState();
     });
+});
+
+// Final Challenge probability sliders
+const gesturesSlider = document.getElementById('gesturesSlider');
+const vibraniumSlider = document.getElementById('vibraniumSlider');
+const analyseSlider = document.getElementById('analyseSlider');
+
+function updateFinalChallengeDisplays() {
+    document.getElementById('gesturesPercent').textContent = finalChallengeSettings.gestures + '%';
+    document.getElementById('vibraniumPercent').textContent = finalChallengeSettings.vibranium + '%';
+    document.getElementById('analysePercent').textContent = finalChallengeSettings.analyse + '%';
+    
+    gesturesSlider.value = finalChallengeSettings.gestures;
+    vibraniumSlider.value = finalChallengeSettings.vibranium;
+    analyseSlider.value = finalChallengeSettings.analyse;
+    
+    saveGameState();
+}
+
+gesturesSlider.addEventListener('input', function() {
+    const newGestures = Math.round(parseFloat(this.value));
+    const maxAllowed = 100 - Math.round(finalChallengeSettings.vibranium);
+    finalChallengeSettings.gestures = newGestures > maxAllowed ? maxAllowed : newGestures;
+    finalChallengeSettings.analyse = 100 - finalChallengeSettings.gestures - finalChallengeSettings.vibranium;
+    updateFinalChallengeDisplays();
+});
+
+vibraniumSlider.addEventListener('input', function() {
+    const newVibranium = Math.round(parseFloat(this.value));
+    const maxAllowed = 100 - Math.round(finalChallengeSettings.gestures);
+    finalChallengeSettings.vibranium = newVibranium > maxAllowed ? maxAllowed : newVibranium;
+    finalChallengeSettings.analyse = 100 - finalChallengeSettings.gestures - finalChallengeSettings.vibranium;
+    updateFinalChallengeDisplays();
+});
+
+analyseSlider.addEventListener('input', function() {
+    const newAnalyse = Math.round(parseFloat(this.value));
+    const available = 100 - newAnalyse;
+    const currentTotal = Math.round(finalChallengeSettings.gestures) + Math.round(finalChallengeSettings.vibranium);
+    
+    // Changed: use equal split for BOTH directions (not just when increasing)
+    if (available !== currentTotal) {
+        const change = available - currentTotal;
+        const half = change / 2;
+        finalChallengeSettings.gestures = Math.max(0, Math.round(finalChallengeSettings.gestures + half));
+        finalChallengeSettings.vibranium = Math.max(0, Math.round(finalChallengeSettings.vibranium + half));
+        
+        // Ensure total is exactly 100 by adjusting analyse if values were clamped
+        const actualTotal = finalChallengeSettings.gestures + finalChallengeSettings.vibranium;
+        finalChallengeSettings.analyse = Math.max(0, 100 - actualTotal);
+    } else {
+        finalChallengeSettings.analyse = Math.max(0, newAnalyse);
+    }
+    
+    updateFinalChallengeDisplays();
 });
 
 document.getElementById('playerNameInput').addEventListener('input', function() {
