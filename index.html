@@ -824,6 +824,79 @@ input[type="range"]::-moz-range-thumb {
                         <div class="slider-label"><span>🔍 Analyse:</span><span class="percentage" id="analysePercent">34%</span></div>
                         <input type="range" id="analyseSlider" min="0" max="100" value="34">
                     </div>
+                    
+                    <!-- Challenge Types -->
+                    <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #e9ecef;">
+                        <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">Challenge Types & Difficulty:</h4>
+                        
+                        <!-- Gestures -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-weight: 600; color: #5c7cfa; margin-bottom: 8px;">🤲 Gestures:</div>
+                            <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="gestures_ihot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <span style="color: #495057; font-size: 14px;">I-Hot</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="gestures_icewater" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <span style="color: #495057; font-size: 14px;">Ice Water</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="gestures_spikeyband" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <span style="color: #495057; font-size: 14px;">Spikeyband</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="gestures_squeezing" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <span style="color: #495057; font-size: 14px;">Squeezing</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="gestures_2finger" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <span style="color: #495057; font-size: 14px;">2 Finger</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Vibranium -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-weight: 600; color: #8b5cf6; margin-bottom: 8px;">💎 Vibranium:</div>
+                            <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="vibranium_ihot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
+                                    <span style="color: #495057; font-size: 14px;">I-Hot</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="vibranium_icewater" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
+                                    <span style="color: #495057; font-size: 14px;">Ice Water</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Analyse -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-weight: 600; color: #d97706; margin-bottom: 8px;">🔍 Analyse:</div>
+                            <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="analyse_vibranium" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;">
+                                    <span style="color: #495057; font-size: 14px;">Vibranium</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Modifiers -->
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e9ecef;">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 8px;">🎲 Modifiers (chance-based):</div>
+                            <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="modifier_ce" style="width: 16px; height: 16px; cursor: pointer; accent-color: #667eea;">
+                                    <span style="color: #495057; font-size: 14px;">CE (Cum Eating)</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="modifier_pf" style="width: 16px; height: 16px; cursor: pointer; accent-color: #667eea;">
+                                    <span style="color: #495057; font-size: 14px;">PF (Post Finish)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px; margin-top: 20px;">🎁 Prize Probabilities:</label>
@@ -1657,17 +1730,17 @@ function updateSliderDisplays(skipSave = false) {
 
 document.getElementById('minorSlider').addEventListener('input', function() {
     const newMinor = Math.round(parseFloat(this.value));
-    const maxAllowed = 100 - Math.round(prizeSettings.major);
+    const maxAllowed = 100 - Math.round(prizeSettings.noPrize);
     prizeSettings.minor = newMinor > maxAllowed ? maxAllowed : newMinor;
-    prizeSettings.noPrize = 100 - prizeSettings.minor - prizeSettings.major;
+    prizeSettings.major = 100 - prizeSettings.noPrize - prizeSettings.minor;
     updateSliderDisplays();
 });
 
 document.getElementById('majorSlider').addEventListener('input', function() {
     const newMajor = Math.round(parseFloat(this.value));
-    const maxAllowed = 100 - Math.round(prizeSettings.minor);
+    const maxAllowed = 100 - Math.round(prizeSettings.noPrize);
     prizeSettings.major = newMajor > maxAllowed ? maxAllowed : newMajor;
-    prizeSettings.noPrize = 100 - prizeSettings.minor - prizeSettings.major;
+    prizeSettings.minor = 100 - prizeSettings.noPrize - prizeSettings.major;
     updateSliderDisplays();
 });
 
@@ -2812,6 +2885,25 @@ function renderToyLibrary() {
             prisonControls.className = 'toy-controls';
             prisonControls.style.cssText = 'margin-left: 28px; margin-top: 10px; display: flex; flex-direction: row; gap: 16px; align-items: center;';
             
+            // Worn checkbox (now first)
+            const wornLabel = document.createElement('label');
+            wornLabel.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer;';
+            
+            const wornCheckbox = document.createElement('input');
+            wornCheckbox.type = 'checkbox';
+            wornCheckbox.checked = prisonWorn;
+            wornCheckbox.disabled = !toyChecked[toyId];
+            wornCheckbox.style.cssText = 'width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;';
+            
+            const wornText = document.createElement('span');
+            wornText.textContent = '👕 Start Worn';
+            wornText.style.cssText = 'font-weight: 600; color: #333;';
+            
+            wornLabel.appendChild(wornCheckbox);
+            wornLabel.appendChild(wornText);
+            prisonControls.appendChild(wornLabel);
+            
+            // Locked checkbox (now second)
             const lockedLabel = document.createElement('label');
             lockedLabel.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer;';
             
@@ -2868,27 +2960,32 @@ function renderToyLibrary() {
             lockedLabel.appendChild(lockedText);
             prisonControls.appendChild(lockedLabel);
             
-            // Worn checkbox
-            const wornLabel = document.createElement('label');
-            wornLabel.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer;';
-            
-            const wornCheckbox = document.createElement('input');
-            wornCheckbox.type = 'checkbox';
-            wornCheckbox.checked = prisonWorn;
-            wornCheckbox.disabled = !toyChecked[toyId];
-            wornCheckbox.style.cssText = 'width: 18px; height: 18px; cursor: pointer; accent-color: #51cf66;';
+            // Worn checkbox change handler
             wornCheckbox.onchange = () => {
                 prisonWorn = wornCheckbox.checked;
+                
+                // If unchecking worn, also uncheck and disable locked
+                if (!prisonWorn) {
+                    prisonLocked = false;
+                    lockedCheckbox.checked = false;
+                    lockedCheckbox.disabled = true;
+                    lockedCheckbox.style.opacity = '0.5';
+                    lockedText.style.color = '#999';
+                } else {
+                    lockedCheckbox.disabled = false;
+                    lockedCheckbox.style.opacity = '1';
+                    lockedText.style.color = '#333';
+                }
+                
                 saveGameState();
             };
             
-            const wornText = document.createElement('span');
-            wornText.textContent = '👕 Start Worn';
-            wornText.style.cssText = 'font-weight: 600; color: #333;';
-            
-            wornLabel.appendChild(wornCheckbox);
-            wornLabel.appendChild(wornText);
-            prisonControls.appendChild(wornLabel);
+            // Set initial locked state based on worn
+            if (!prisonWorn) {
+                lockedCheckbox.disabled = true;
+                lockedCheckbox.style.opacity = '0.5';
+                lockedText.style.color = '#999';
+            }
             
             toyItem.appendChild(prisonControls);
             
@@ -3264,17 +3361,17 @@ function updateFinalChallengeDisplays() {
 
 gesturesSlider.addEventListener('input', function() {
     const newGestures = Math.round(parseFloat(this.value));
-    const maxAllowed = 100 - Math.round(finalChallengeSettings.vibranium);
+    const maxAllowed = 100 - Math.round(finalChallengeSettings.analyse);
     finalChallengeSettings.gestures = newGestures > maxAllowed ? maxAllowed : newGestures;
-    finalChallengeSettings.analyse = 100 - finalChallengeSettings.gestures - finalChallengeSettings.vibranium;
+    finalChallengeSettings.vibranium = 100 - finalChallengeSettings.analyse - finalChallengeSettings.gestures;
     updateFinalChallengeDisplays();
 });
 
 vibraniumSlider.addEventListener('input', function() {
     const newVibranium = Math.round(parseFloat(this.value));
-    const maxAllowed = 100 - Math.round(finalChallengeSettings.gestures);
+    const maxAllowed = 100 - Math.round(finalChallengeSettings.analyse);
     finalChallengeSettings.vibranium = newVibranium > maxAllowed ? maxAllowed : newVibranium;
-    finalChallengeSettings.analyse = 100 - finalChallengeSettings.gestures - finalChallengeSettings.vibranium;
+    finalChallengeSettings.gestures = 100 - finalChallengeSettings.analyse - finalChallengeSettings.vibranium;
     updateFinalChallengeDisplays();
 });
 
