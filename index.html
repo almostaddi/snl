@@ -854,22 +854,32 @@ input[type="range"]::-moz-range-thumb {
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="gestures_ihot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">I-Hot</span>
+                                    <input type="number" id="gestures_ihot_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="gestures_icewater" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">Ice Water</span>
+                                    <input type="number" id="gestures_icewater_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="gestures_spikeyband" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">Spikeyband</span>
+                                    <input type="number" id="gestures_spikeyband_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="gestures_squeezing" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">Squeezing</span>
+                                    <input type="number" id="gestures_squeezing_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="gestures_2finger" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">2 Finger</span>
+                                    <input type="number" id="gestures_2finger_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                             </div>
                         </div>
@@ -891,10 +901,14 @@ input[type="range"]::-moz-range-thumb {
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="vibranium_ihot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
                                     <span style="color: #495057; font-size: 14px;">I-Hot</span>
+                                    <input type="number" id="vibranium_ihot_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="vibranium_icewater" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
                                     <span style="color: #495057; font-size: 14px;">Ice Water</span>
+                                    <input type="number" id="vibranium_icewater_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                             </div>
                         </div>
@@ -916,6 +930,8 @@ input[type="range"]::-moz-range-thumb {
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="analyse_vibranium" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;">
                                     <span style="color: #495057; font-size: 14px;">Vibranium</span>
+                                    <input type="number" id="analyse_vibranium_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                             </div>
                         </div>
@@ -1039,6 +1055,18 @@ let finalChallengeTypes = {
     vibranium_ihot: false,
     vibranium_icewater: false,
     analyse_vibranium: false
+};
+
+// Final challenge modifier percentages (chance to be applied)
+let finalChallengeModifierChances = {
+    gestures_ihot: 0,
+    gestures_icewater: 0,
+    gestures_spikeyband: 0,
+    gestures_squeezing: 0,
+    gestures_2finger: 0,
+    vibranium_ihot: 0,
+    vibranium_icewater: 0,
+    analyse_vibranium: 0
 };
 
 // Final challenge difficulties
@@ -1373,7 +1401,16 @@ const instructionSets = {
                     // STANDARD TASK: Hold vibranium steady
                     // Difficulty: Easy=5, Medium=10, Hard=15 seconds
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Vibranium Hold</strong><p>Hold the vibranium steady for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium task. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/vibranium1/800/600"/>`
+                    getDifficulty: (d, c, diffMap) => {
+                        const seconds = d === 'easy' ? 5 : d === 'hard' ? 15 : 10;
+                        const isPrisonWorn = c.isHolding('prison');
+                        
+                        if (isPrisonWorn) {
+                            return `<strong>Vibranium Hold</strong><p>Hold the vibranium steady for ${seconds} seconds while wearing the prison.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Vibranium task with prison worn. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/vibraniumprision/800/600"/>`;
+                        } else {
+                            return `<strong>Vibranium Hold</strong><p>Hold the vibranium steady for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium task. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/vibranium1/800/600"/>`;
+                        }
+                    }
                 }
             ]
         }
@@ -1453,7 +1490,16 @@ const instructionSets = {
                     // STANDARD TASK: Shake vibranium
                     // Difficulty: Easy=5, Medium=10, Hard=15 shakes
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Vibranium Shake</strong><p>Shake the vibranium ${d=='easy'?5:d=='medium'?10:15} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium shake task. Difficulty: Easy=5, Medium=10, Hard=15 shakes.</em></p><img src="https://picsum.photos/seed/vibranium2/800/600"/>`
+                    getDifficulty: (d, c, diffMap) => {
+                        const count = d === 'easy' ? 5 : d === 'hard' ? 15 : 10;
+                        const isPrisonWorn = c.isHolding('prison');
+                        
+                        if (isPrisonWorn) {
+                            return `<strong>Vibranium Shake</strong><p>Shake the vibranium ${count} times while wearing the prison.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Vibranium shake task with prison worn. Difficulty: Easy=5, Medium=10, Hard=15 shakes.</em></p><img src="https://picsum.photos/seed/vibraniumshakeprison/800/600"/>`;
+                        } else {
+                            return `<strong>Vibranium Shake</strong><p>Shake the vibranium ${count} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium shake task. Difficulty: Easy=5, Medium=10, Hard=15 shakes.</em></p><img src="https://picsum.photos/seed/vibranium2/800/600"/>`;
+                        }
+                    }
                 }
             ],
             prison: [
@@ -1528,7 +1574,16 @@ const instructionSets = {
                     // STANDARD TASK: Control vibranium settings
                     // Difficulty: Easy=10, Medium=20, Hard=30 seconds
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Vibranium Control</strong><p>Control the vibranium settings for ${d=='easy'?10:d=='medium'?20:30} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium control task. Difficulty: Easy=10s, Medium=20s, Hard=30s.</em></p><img src="https://picsum.photos/seed/vibranium3/800/600"/>`
+                    getDifficulty: (d, c, diffMap) => {
+                        const seconds = d === 'easy' ? 10 : d === 'hard' ? 30 : 20;
+                        const isPrisonWorn = c.isHolding('prison');
+                        
+                        if (isPrisonWorn) {
+                            return `<strong>Vibranium Control</strong><p>Control the vibranium settings for ${seconds} seconds while wearing the prison.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Vibranium control task with prison worn. Difficulty: Easy=10s, Medium=20s, Hard=30s.</em></p><img src="https://picsum.photos/seed/vibraniumcontrolprison/800/600"/>`;
+                        } else {
+                            return `<strong>Vibranium Control</strong><p>Control the vibranium settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium control task. Difficulty: Easy=10s, Medium=20s, Hard=30s.</em></p><img src="https://picsum.photos/seed/vibranium3/800/600"/>`;
+                        }
+                    }
                 }
             ],
             hand: [
@@ -1594,7 +1649,14 @@ const instructionSets = {
                     },
                     getDifficulty: (d, c, diffMap) => {
                         const count = d === 'easy' ? 8 : d === 'hard' ? 16 : 12;
-                        return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD prison off + hand available - hand gesture task. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/prisonhand/800/600"/>`;
+                        // Check if prison is worn anywhere (not necessarily on Pe)
+                        const isPrisonWorn = c.isHolding('prison');
+                        
+                        if (isPrisonWorn) {
+                            return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures while wearing the prison.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD hand task with prison worn. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/prisonhandworn/800/600"/>`;
+                        } else {
+                            return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD hand task without prison. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/prisonhand/800/600"/>`;
+                        }
                     }
                 },
                 {
@@ -1716,19 +1778,28 @@ const finalChallengeTasks = [
             return finalChallengeSettings.gestures > 0;
         },
         getDifficulty: (d, c, diffMap, prizeType) => {
-            // Pick from enabled gestures modifiers (if any checked)
-            const enabledGestures = [];
-            if (finalChallengeTypes.gestures_ihot) enabledGestures.push('with I-Hot');
-            if (finalChallengeTypes.gestures_icewater) enabledGestures.push('with Ice Water');
-            if (finalChallengeTypes.gestures_spikeyband) enabledGestures.push('with Spikeyband');
-            if (finalChallengeTypes.gestures_squeezing) enabledGestures.push('with Squeezing');
-            if (finalChallengeTypes.gestures_2finger) enabledGestures.push('with 2 Finger');
+            // Roll for each modifier based on percentage chance
+            const appliedModifiers = [];
+            if (finalChallengeTypes.gestures_ihot && Math.random() * 100 < finalChallengeModifierChances.gestures_ihot) {
+                appliedModifiers.push('I-Hot');
+            }
+            if (finalChallengeTypes.gestures_icewater && Math.random() * 100 < finalChallengeModifierChances.gestures_icewater) {
+                appliedModifiers.push('Ice Water');
+            }
+            if (finalChallengeTypes.gestures_spikeyband && Math.random() * 100 < finalChallengeModifierChances.gestures_spikeyband) {
+                appliedModifiers.push('Spikeyband');
+            }
+            if (finalChallengeTypes.gestures_squeezing && Math.random() * 100 < finalChallengeModifierChances.gestures_squeezing) {
+                appliedModifiers.push('Squeezing');
+            }
+            if (finalChallengeTypes.gestures_2finger && Math.random() * 100 < finalChallengeModifierChances.gestures_2finger) {
+                appliedModifiers.push('2 Finger');
+            }
             
             // Build modifier text
             let modifierText = '';
-            if (enabledGestures.length > 0) {
-                const modifier = enabledGestures[Math.floor(Math.random() * enabledGestures.length)];
-                modifierText = ' ' + modifier;
+            if (appliedModifiers.length > 0) {
+                modifierText = ' with ' + appliedModifiers.join(', ');
             }
             
             const difficulty = finalChallengeDifficulties.gestures;
@@ -1755,16 +1826,19 @@ const finalChallengeTasks = [
             return finalChallengeSettings.vibranium > 0;
         },
         getDifficulty: (d, c, diffMap, prizeType) => {
-            // Pick from enabled vibranium modifiers (if any checked)
-            const enabledVibranium = [];
-            if (finalChallengeTypes.vibranium_ihot) enabledVibranium.push('with I-Hot');
-            if (finalChallengeTypes.vibranium_icewater) enabledVibranium.push('with Ice Water');
+            // Roll for each modifier based on percentage chance
+            const appliedModifiers = [];
+            if (finalChallengeTypes.vibranium_ihot && Math.random() * 100 < finalChallengeModifierChances.vibranium_ihot) {
+                appliedModifiers.push('I-Hot');
+            }
+            if (finalChallengeTypes.vibranium_icewater && Math.random() * 100 < finalChallengeModifierChances.vibranium_icewater) {
+                appliedModifiers.push('Ice Water');
+            }
             
             // Build modifier text
             let modifierText = '';
-            if (enabledVibranium.length > 0) {
-                const modifier = enabledVibranium[Math.floor(Math.random() * enabledVibranium.length)];
-                modifierText = ' ' + modifier;
+            if (appliedModifiers.length > 0) {
+                modifierText = ' with ' + appliedModifiers.join(', ');
             }
             
             const difficulty = finalChallengeDifficulties.vibranium;
@@ -1791,9 +1865,9 @@ const finalChallengeTasks = [
             return finalChallengeSettings.analyse > 0;
         },
         getDifficulty: (d, c, diffMap, prizeType) => {
-            // Modifier text (if vibranium checkbox enabled)
+            // Roll for modifier based on percentage chance
             let modifierText = '';
-            if (finalChallengeTypes.analyse_vibranium) {
+            if (finalChallengeTypes.analyse_vibranium && Math.random() * 100 < finalChallengeModifierChances.analyse_vibranium) {
                 modifierText = ' with Vibranium';
             }
             
@@ -1931,6 +2005,7 @@ function saveGameState() {
         prisonWorn,
         finalChallengeSettings,
         finalChallengeTypes,
+        finalChallengeModifierChances,
         finalChallengeDifficulties,
         finalChallengeModifiers,
         diceResultText: diceResult.textContent,
@@ -1968,6 +2043,11 @@ function loadGameState() {
             gestures_squeezing: false, gestures_2finger: false, vibranium_ihot: false,
             vibranium_icewater: false, analyse_vibranium: false
         };
+        finalChallengeModifierChances = gs.finalChallengeModifierChances || {
+            gestures_ihot: 0, gestures_icewater: 0, gestures_spikeyband: 0,
+            gestures_squeezing: 0, gestures_2finger: 0, vibranium_ihot: 0,
+            vibranium_icewater: 0, analyse_vibranium: 0
+        };
         finalChallengeDifficulties = gs.finalChallengeDifficulties || {gestures: 'medium', vibranium: 'medium', analyse: 'medium'};
         finalChallengeModifiers = gs.finalChallengeModifiers || {ce: false, pf: false};
         
@@ -2002,6 +2082,12 @@ function loadGameState() {
         Object.keys(finalChallengeDifficulties).forEach(type => {
             const dropdown = document.getElementById(`${type}Difficulty`);
             if (dropdown) dropdown.value = finalChallengeDifficulties[type];
+        });
+        
+        // Restore final challenge modifier chance inputs
+        Object.keys(finalChallengeModifierChances).forEach(key => {
+            const input = document.getElementById(`${key}_chance`);
+            if (input) input.value = finalChallengeModifierChances[key];
         });
         
         // Restore final challenge modifier checkboxes
@@ -3796,6 +3882,18 @@ analyseSlider.addEventListener('input', function() {
 ['gestures', 'vibranium', 'analyse'].forEach(type => {
     document.getElementById(`${type}Difficulty`).addEventListener('change', function() {
         finalChallengeDifficulties[type] = this.value;
+        saveGameState();
+    });
+});
+
+// Final challenge modifier percentage inputs
+['gestures_ihot', 'gestures_icewater', 'gestures_spikeyband', 'gestures_squeezing', 'gestures_2finger',
+ 'vibranium_ihot', 'vibranium_icewater', 'analyse_vibranium'].forEach(id => {
+    document.getElementById(`${id}_chance`).addEventListener('input', function() {
+        let value = parseInt(this.value) || 0;
+        value = Math.max(0, Math.min(100, value)); // Clamp between 0-100
+        this.value = value;
+        finalChallengeModifierChances[id] = value;
         saveGameState();
     });
 });
