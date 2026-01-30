@@ -1009,6 +1009,7 @@ let turnCount = 0;
 let turnCountBySet = {}; // Track turns per set (e.g., {dressup: 5, tnd: 3})
 let turnCountByToy = {}; // Track turns per set-toy combo (e.g., {dressup_stickers: 3, tnd_prison: 2})
 let lastSelectedSet = {}; // Track which set each toy was last selected from (e.g., {stickers: 'dressup', prison: 'tnd'})
+let completedOnlyOnceTasks = {}; // Track which onlyOnce tasks have been completed (e.g., {tnd_prison_always: true})
 let selectedSets = [];
 let prizeSettings = {major: 33, minor: 33, noPrize: 34};
 let toyQuantities = {};
@@ -1545,14 +1546,34 @@ const instructionSets = {
                     // This task is "always" selected when conditions are met (overrides normal task selection)
                     alwaysSelect: (c) => {
                         // Check if we've rolled at least 2 TnD hand tasks
-                        if (c.getTurnCountForToy('tnd_hand') < 2) return false;
+                        const handCount = c.getTurnCountForToy('tnd_hand');
+                        console.log('Prison alwaysSelect check - handCount:', handCount);
+                        if (handCount < 2) {
+                            console.log('Prison task rejected: handCount < 2');
+                            return false;
+                        }
                         // Check TnD is selected
-                        if (!c.hasSet('tnd')) return false;
+                        if (!c.hasSet('tnd')) {
+                            console.log('Prison task rejected: TnD not selected');
+                            return false;
+                        }
                         // Check if prison toy is checked
-                        if (!c.toyChecked('prison')) return false;
+                        if (!c.toyChecked('prison')) {
+                            console.log('Prison task rejected: prison not checked');
+                            return false;
+                        }
                         // Check if Pe can hold prison
-                        return c.canBodyPartHold('Pe', 'prison');
+                        const canHold = c.canBodyPartHold('Pe', 'prison');
+                        console.log('Prison task canHold:', canHold);
+                        if (!canHold) {
+                            console.log('Prison task rejected: Pe cannot hold prison');
+                            return false;
+                        }
+                        console.log('Prison task ACCEPTED - all conditions passed!');
+                        return true;
                     },
+                    excludeFromNormalPool: true,  // Only appears via alwaysSelect, not random selection
+                    onlyOnce: true,  // Only triggers once per game (tracked separately)
                     getDifficulty: (d, c, diffMap) => {
                         const handCount = c.getTurnCountForToy('tnd_hand');
                         return `<strong>🔒 Special Prison Task!</strong><p>You've completed ${handCount} hand tasks from TnD. Time to put on the prison!</p><p>Place the prison on your Pe.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: ALWAYS task - only triggers after rolling 2+ TnD hand tasks if TnD selected, prison checked, and Pe can hold prison. This overrides normal task selection.</em></p><img src="https://picsum.photos/seed/prisonhand/800/600"/>`;
@@ -1563,10 +1584,45 @@ const instructionSets = {
                     }
                 },
                 {
-                    // TASK: Control prison settings
+                    // TASK: Hand gestures (when prison is NOT on Pe AND hand is available)
+                    // DIFFICULTY: Easy=8, Medium=12, Hard=16 gestures
+                    // CONDITIONS: Prison is NOT on Pe AND hand toy is checked for TnD
+                    canSelect: (c) => {
+                        const isPrisonOnPe = c.isHolding('prison') && c.getBodyPartsHolding('prison').some(part => part.key === 'Pe');
+                        const isHandAvailable = c.toyChecked('hand') && c.toySetEnabled('tnd_hand');
+                        return !isPrisonOnPe && isHandAvailable; // Prison OFF and hand available
+                    },
+                    getDifficulty: (d, c, diffMap) => {
+                        const count = d === 'easy' ? 8 : d === 'hard' ? 16 : 12;
+                        return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD prison off + hand available - hand gesture task. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/prisonhand/800/600"/>`;
+                    }
+                },
+                {
+                    // TASK: Put on prison then do settings (when prison is NOT on Pe AND hand is NOT available)
                     // DIFFICULTY: Easy=10sec, Medium=15sec, Hard=20sec
-                    // CONDITIONS: None (always available)
-                    getDifficulty: d => `<strong>Prison Control</strong><p>Adjust the prison settings for ${d=='easy'?10:d=='medium'?15:20} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD prison task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/prison1/800/600"/>`
+                    // CONDITIONS: Prison is NOT on Pe AND hand toy is NOT available for TnD
+                    canSelect: (c) => {
+                        const isPrisonOnPe = c.isHolding('prison') && c.getBodyPartsHolding('prison').some(part => part.key === 'Pe');
+                        const isHandAvailable = c.toyChecked('hand') && c.toySetEnabled('tnd_hand');
+                        return !isPrisonOnPe && !isHandAvailable; // Prison OFF and hand NOT available
+                    },
+                    getDifficulty: (d, c, diffMap) => {
+                        const seconds = d === 'easy' ? 10 : d === 'hard' ? 20 : 15;
+                        return `<strong>Prison Task</strong><p>Put the prison on your Pe.</p><p>Then adjust the prison settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD prison off + hand NOT available - put on prison task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/prisonputon/800/600"/>`;
+                    }
+                },
+                {
+                    // TASK: Control prison settings (when prison IS on Pe)
+                    // DIFFICULTY: Easy=10sec, Medium=15sec, Hard=20sec
+                    // CONDITIONS: Prison is currently on Pe
+                    canSelect: (c) => {
+                        const isPrisonOnPe = c.isHolding('prison') && c.getBodyPartsHolding('prison').some(part => part.key === 'Pe');
+                        return isPrisonOnPe; // Only if prison is ON
+                    },
+                    getDifficulty: (d, c, diffMap) => {
+                        const seconds = d === 'easy' ? 10 : d === 'hard' ? 20 : 15;
+                        return `<strong>Prison Control</strong><p>Adjust the prison settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD prison on - settings task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/prisonsettings/800/600"/>`;
+                    }
                 },
                 {
                     // ADD TASK: Add prison to Pe
@@ -1654,30 +1710,33 @@ const snakeLadderTasks = {
 // Final Challenge Tasks
 const finalChallengeTasks = [
     {
-        // GESTURES TASK: Only if gestures challenges enabled
+        id: 'gestures',
+        // GESTURES TASK: Only if gestures probability > 0%
         canSelect: (c) => {
-            return finalChallengeTypes.gestures_ihot || 
-                   finalChallengeTypes.gestures_icewater || 
-                   finalChallengeTypes.gestures_spikeyband || 
-                   finalChallengeTypes.gestures_squeezing || 
-                   finalChallengeTypes.gestures_2finger;
+            return finalChallengeSettings.gestures > 0;
         },
         getDifficulty: (d, c, diffMap, prizeType) => {
-            // Pick from enabled gestures challenges
+            // Pick from enabled gestures modifiers (if any checked)
             const enabledGestures = [];
-            if (finalChallengeTypes.gestures_ihot) enabledGestures.push('I-Hot');
-            if (finalChallengeTypes.gestures_icewater) enabledGestures.push('Ice Water');
-            if (finalChallengeTypes.gestures_spikeyband) enabledGestures.push('Spikeyband');
-            if (finalChallengeTypes.gestures_squeezing) enabledGestures.push('Squeezing');
-            if (finalChallengeTypes.gestures_2finger) enabledGestures.push('2 Finger');
+            if (finalChallengeTypes.gestures_ihot) enabledGestures.push('with I-Hot');
+            if (finalChallengeTypes.gestures_icewater) enabledGestures.push('with Ice Water');
+            if (finalChallengeTypes.gestures_spikeyband) enabledGestures.push('with Spikeyband');
+            if (finalChallengeTypes.gestures_squeezing) enabledGestures.push('with Squeezing');
+            if (finalChallengeTypes.gestures_2finger) enabledGestures.push('with 2 Finger');
             
-            const subtype = enabledGestures[Math.floor(Math.random() * enabledGestures.length)];
+            // Build modifier text
+            let modifierText = '';
+            if (enabledGestures.length > 0) {
+                const modifier = enabledGestures[Math.floor(Math.random() * enabledGestures.length)];
+                modifierText = ' ' + modifier;
+            }
+            
             const difficulty = finalChallengeDifficulties.gestures;
             const count = difficulty === 'easy' ? 8 : difficulty === 'hard' ? 16 : 12;
             
             return `
                 <strong>🏆 Final Challenge! 🏆</strong>
-                <p>Complete ${count} hand gestures with ${subtype} at ${difficulty} difficulty.</p>
+                <p>Complete ${count} hand gestures${modifierText} at ${difficulty} difficulty.</p>
                 <button onclick="revealFinalPrize('gestures', '${prizeType}')" 
                         style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                     I Completed the Challenge
@@ -1690,23 +1749,30 @@ const finalChallengeTasks = [
         }
     },
     {
-        // VIBRANIUM TASK: Only if vibranium challenges enabled
+        id: 'vibranium',
+        // VIBRANIUM TASK: Only if vibranium probability > 0%
         canSelect: (c) => {
-            return finalChallengeTypes.vibranium_ihot || finalChallengeTypes.vibranium_icewater;
+            return finalChallengeSettings.vibranium > 0;
         },
         getDifficulty: (d, c, diffMap, prizeType) => {
-            // Pick from enabled vibranium challenges
+            // Pick from enabled vibranium modifiers (if any checked)
             const enabledVibranium = [];
-            if (finalChallengeTypes.vibranium_ihot) enabledVibranium.push('I-Hot');
-            if (finalChallengeTypes.vibranium_icewater) enabledVibranium.push('Ice Water');
+            if (finalChallengeTypes.vibranium_ihot) enabledVibranium.push('with I-Hot');
+            if (finalChallengeTypes.vibranium_icewater) enabledVibranium.push('with Ice Water');
             
-            const subtype = enabledVibranium[Math.floor(Math.random() * enabledVibranium.length)];
+            // Build modifier text
+            let modifierText = '';
+            if (enabledVibranium.length > 0) {
+                const modifier = enabledVibranium[Math.floor(Math.random() * enabledVibranium.length)];
+                modifierText = ' ' + modifier;
+            }
+            
             const difficulty = finalChallengeDifficulties.vibranium;
             const seconds = difficulty === 'easy' ? 30 : difficulty === 'hard' ? 60 : 45;
             
             return `
                 <strong>🏆 Final Challenge! 🏆</strong>
-                <p>Hold vibranium with ${subtype} for ${seconds} seconds at ${difficulty} difficulty.</p>
+                <p>Hold vibranium${modifierText} for ${seconds} seconds at ${difficulty} difficulty.</p>
                 <button onclick="revealFinalPrize('vibranium', '${prizeType}')" 
                         style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                     I Completed the Challenge
@@ -1719,17 +1785,24 @@ const finalChallengeTasks = [
         }
     },
     {
-        // ANALYSE TASK: Only if analyse challenges enabled
+        id: 'analyse',
+        // ANALYSE TASK: Only if analyse probability > 0%
         canSelect: (c) => {
-            return finalChallengeTypes.analyse_vibranium;
+            return finalChallengeSettings.analyse > 0;
         },
         getDifficulty: (d, c, diffMap, prizeType) => {
+            // Modifier text (if vibranium checkbox enabled)
+            let modifierText = '';
+            if (finalChallengeTypes.analyse_vibranium) {
+                modifierText = ' with Vibranium';
+            }
+            
             const difficulty = finalChallengeDifficulties.analyse;
             const count = difficulty === 'easy' ? 3 : difficulty === 'hard' ? 7 : 5;
             
             return `
                 <strong>🏆 Final Challenge! 🏆</strong>
-                <p>Analyse ${count} dillsticks with Vibranium at ${difficulty} difficulty.</p>
+                <p>Analyse ${count} dillsticks${modifierText} at ${difficulty} difficulty.</p>
                 <button onclick="revealFinalPrize('analyse', '${prizeType}')" 
                         style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                     I Completed the Challenge
@@ -1742,6 +1815,7 @@ const finalChallengeTasks = [
         }
     },
     {
+        id: 'special',
         // EXAMPLE: ALWAYS task - only triggers if specific condition met
         // This demonstrates how to add conditional "always" tasks
         alwaysSelect: (c) => {
@@ -1766,6 +1840,7 @@ const finalChallengeTasks = [
         }
     },
     {
+        id: 'fallback',
         // FALLBACK TASK: Always available, no challenge
         getDifficulty: (d, c, diffMap, prizeType) => {
             // Immediately show prize with modifiers
@@ -1842,6 +1917,7 @@ function saveGameState() {
         turnCountBySet,
         turnCountByToy,
         lastSelectedSet,
+        completedOnlyOnceTasks,
         selectedSets,
         toyDifficulties,
         prizeSettings,
@@ -1876,6 +1952,7 @@ function loadGameState() {
         turnCountBySet = gs.turnCountBySet || {};
         turnCountByToy = gs.turnCountByToy || {};
         lastSelectedSet = gs.lastSelectedSet || {};
+        completedOnlyOnceTasks = gs.completedOnlyOnceTasks || {};
         selectedSets = gs.selectedSets || [];
         toyDifficulties = gs.toyDifficulties || {};
         toyQuantities = gs.toyQuantities || {};
@@ -2646,12 +2723,26 @@ function checkForAlwaysTasks(toys, conditions) {
         for (const task of tasks) {
             // Skip add/remove tasks
             if (task.type === 'add' || task.type === 'remove') continue;
-            // Check if this is an "always" task and its condition is met
-            if (task.alwaysSelect && task.alwaysSelect(conditions)) {
-                alwaysTasks.push({task, toyObj});
+            // Check if this is an "always" task
+            if (task.alwaysSelect) {
+                // Create unique task ID for onlyOnce tracking
+                const taskId = `${toyObj.setId}_${toyObj.toyId}_always`;
+                
+                // Skip if this is a onlyOnce task that's already been completed
+                if (task.onlyOnce && completedOnlyOnceTasks[taskId]) {
+                    console.log(`Skipping onlyOnce task ${taskId} - already completed`);
+                    continue;
+                }
+                
+                const result = task.alwaysSelect(conditions);
+                console.log(`Always task check for ${toyObj.setId}_${toyObj.toyId}:`, result);
+                if (result) {
+                    alwaysTasks.push({task, toyObj, taskId});
+                }
             }
         }
     }
+    console.log('Total always tasks found:', alwaysTasks.length);
     return alwaysTasks;
 }
 
@@ -2697,8 +2788,10 @@ function displayRandomInstruction() {
     const alwaysTasks = checkForAlwaysTasks(toys, conditions);
     
     if (alwaysTasks.length > 0) {
+        console.log('[displayRandomInstruction] DISPLAYING ALWAYS TASK, count:', alwaysTasks.length);
         const selectedAlways = alwaysTasks[Math.floor(Math.random() * alwaysTasks.length)];
-        const {task, toyObj} = selectedAlways;
+        const {task, toyObj, taskId} = selectedAlways;
+        console.log('[displayRandomInstruction] Selected:', toyObj.setId, toyObj.toyId);
         
         // Increment turn counts
         const selectedToyKey = `${toyObj.setId}_${toyObj.toyId}`;
@@ -2709,6 +2802,12 @@ function displayRandomInstruction() {
         // Execute the task if it has an execute function
         if (task.execute) {
             task.execute();
+        }
+        
+        // Mark onlyOnce task as completed
+        if (task.onlyOnce && taskId) {
+            completedOnlyOnceTasks[taskId] = true;
+            console.log(`Marked onlyOnce task ${taskId} as completed`);
         }
         
         window.lastTaskInfo = {
@@ -2745,6 +2844,8 @@ function displayRandomInstruction() {
         const availableTasks = tasks.filter(task => {
             // Filter out add/remove tasks - they're handled separately
             if (task.type === 'add' || task.type === 'remove') return false;
+            // Filter out tasks excluded from normal pool
+            if (task.excludeFromNormalPool) return false;
             // Check canSelect condition if it exists
             return !task.canSelect || task.canSelect(conditions);
         });
@@ -2765,6 +2866,8 @@ function displayRandomInstruction() {
     const availableTasks = tasks.filter(task => {
         // Filter out add/remove tasks - they're handled separately
         if (task.type === 'add' || task.type === 'remove') return false;
+        // Filter out tasks excluded from normal pool
+        if (task.excludeFromNormalPool) return false;
         // Check canSelect condition if it exists
         return !task.canSelect || task.canSelect(conditions);
     });
@@ -2933,7 +3036,7 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
     
     if (alwaysTasks.length > 0) {
         const selectedAlways = alwaysTasks[Math.floor(Math.random() * alwaysTasks.length)];
-        const {task, toyObj} = selectedAlways;
+        const {task, toyObj, taskId} = selectedAlways;
         
         // Increment turn counts
         const selectedToyKey = `${toyObj.setId}_${toyObj.toyId}`;
@@ -2944,6 +3047,12 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
         // Execute the task if it has an execute function
         if (task.execute) {
             task.execute();
+        }
+        
+        // Mark onlyOnce task as completed
+        if (task.onlyOnce && taskId) {
+            completedOnlyOnceTasks[taskId] = true;
+            console.log(`Marked onlyOnce task ${taskId} as completed`);
         }
         
         window.lastTaskInfo = {
@@ -2980,6 +3089,8 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
         const availableTasks = tasks.filter(task => {
             // Filter out add/remove tasks - they're handled separately
             if (task.type === 'add' || task.type === 'remove') return false;
+            // Filter out tasks excluded from normal pool
+            if (task.excludeFromNormalPool) return false;
             // Check canSelect condition if it exists
             return !task.canSelect || task.canSelect(conditions);
         });
@@ -3000,6 +3111,8 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
     const availableTasks = tasks.filter(task => {
         // Filter out add/remove tasks - they're handled separately
         if (task.type === 'add' || task.type === 'remove') return false;
+        // Filter out tasks excluded from normal pool
+        if (task.excludeFromNormalPool) return false;
         // Check canSelect condition if it exists
         return !task.canSelect || task.canSelect(conditions);
     });
@@ -3769,25 +3882,25 @@ function displayFinalChallenge() {
         return;
     }
     
-    // SECOND: Get available regular tasks (check canSelect conditions)
-    const availableTasks = [];
-    finalChallengeTasks.forEach((task, index) => {
-        // Skip if it's an "always" task (already checked above)
-        if (task.alwaysSelect) return;
-        
-        if (!task.canSelect || task.canSelect(conditionHelpers)) {
-            availableTasks.push({task, index});
-        }
-    });
+    // SECOND: Use weighted probability to select task type
+    const roll = Math.random() * 100;
+    let targetTaskId = null;
     
-    // Select random task from available
-    let selectedTask;
-    if (availableTasks.length > 0) {
-        const randomIndex = Math.floor(Math.random() * availableTasks.length);
-        selectedTask = availableTasks[randomIndex].task;
+    // Determine which task type based on weighted probability
+    if (roll < finalChallengeSettings.gestures) {
+        targetTaskId = 'gestures';
+    } else if (roll < finalChallengeSettings.gestures + finalChallengeSettings.vibranium) {
+        targetTaskId = 'vibranium';
     } else {
-        // Should never happen since fallback has no conditions, but safety fallback
-        selectedTask = finalChallengeTasks[finalChallengeTasks.length - 1];
+        targetTaskId = 'analyse';
+    }
+    
+    // Find the task with matching ID
+    let selectedTask = finalChallengeTasks.find(task => task.id === targetTaskId);
+    
+    // If task not found or doesn't pass canSelect, use fallback
+    if (!selectedTask || (selectedTask.canSelect && !selectedTask.canSelect(conditionHelpers))) {
+        selectedTask = finalChallengeTasks.find(task => task.id === 'fallback');
     }
     
     // Display the task with secret prize type
@@ -3951,6 +4064,10 @@ document.getElementById('testJumpButton').addEventListener('click', function() {
         return;
     }
     
+    // Increment turn counter (simulating a dice roll)
+    turnCount++;
+    turnCounter.textContent = `Turn: ${turnCount}`;
+    
     // Instant jump (no animation)
     playerPosition = targetSquare;
     const square = document.getElementById(`square-${targetSquare}`);
@@ -3959,11 +4076,16 @@ document.getElementById('testJumpButton').addEventListener('click', function() {
     if (playerPosition === totalSquares) {
         rollDiceButton.disabled = true;
         displayFinalChallenge();
-        saveGameState();
     } else {
         displayRandomInstruction();
-        saveGameState();
+        instructions.appendChild(continueButton);
+        continueButton.style.display = "block";
+        continueButton.onclick = () => {
+            continueButton.style.display = "none";
+            rollDiceButton.disabled = false;
+        };
     }
+    saveGameState();
 });
 
 // Initialize
