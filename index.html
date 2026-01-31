@@ -352,15 +352,15 @@ input[type="range"]::-moz-range-thumb {
     cursor: pointer; 
 }
 
-#minorSlider { 
+#ruinSlider { 
     background: linear-gradient(to right, #51cf66, #37b24d); 
 }
 
-#majorSlider { 
+#fullSlider { 
     background: linear-gradient(to right, #ffd93d, #ffbc00); 
 }
 
-#noPrizeSlider { 
+#deniedSlider { 
     background: linear-gradient(to right, #adb5bd, #868e96); 
 }
 
@@ -368,7 +368,7 @@ input[type="range"]::-moz-range-thumb {
     background: linear-gradient(to right, #748ffc, #5c7cfa);
 }
 
-#vibraniumSlider {
+#vibeSlider {
     background: linear-gradient(to right, #a78bfa, #8b5cf6);
 }
 
@@ -721,17 +721,17 @@ input[type="range"]::-moz-range-thumb {
     100% { transform: scale(1); opacity: 1; } 
 }
 
-.prize-minor { 
+.prize-ruin { 
     background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); 
     color: white; 
 }
 
-.prize-major { 
+.prize-full { 
     background: linear-gradient(135deg, #ffd93d 0%, #ffbc00 100%); 
     color: #333; 
 }
 
-.prize-none { 
+.prize-denied { 
     background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%); 
     color: white; 
 }
@@ -825,8 +825,8 @@ input[type="range"]::-moz-range-thumb {
                         <input type="range" id="gesturesSlider" min="0" max="100" value="33">
                     </div>
                     <div class="slider-container">
-                        <div class="slider-label"><span>💎 Vibranium:</span><span class="percentage" id="vibraniumPercent">33%</span></div>
-                        <input type="range" id="vibraniumSlider" min="0" max="100" value="33">
+                        <div class="slider-label"><span>💎 Vibe:</span><span class="percentage" id="vibePercent">33%</span></div>
+                        <input type="range" id="vibeSlider" min="0" max="100" value="33">
                     </div>
                     <div class="slider-container">
                         <div class="slider-label"><span>🔍 Analyse:</span><span class="percentage" id="analysePercent">34%</span></div>
@@ -852,45 +852,45 @@ input[type="range"]::-moz-range-thumb {
                             </div>
                             <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="gestures_ihot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
-                                    <span style="color: #495057; font-size: 14px;">I-Hot</span>
-                                    <input type="number" id="gestures_ihot_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="checkbox" id="gestures_icyhot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <span style="color: #495057; font-size: 14px;">Icy Hot</span>
+                                    <input type="number" id="gestures_icyhot_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="gestures_icewater" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">Ice Water</span>
-                                    <input type="number" id="gestures_icewater_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="number" id="gestures_icewater_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="gestures_spikeyband" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
-                                    <span style="color: #495057; font-size: 14px;">Spikeyband</span>
-                                    <input type="number" id="gestures_spikeyband_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="checkbox" id="gestures_ktb" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <span style="color: #495057; font-size: 14px;">KTB</span>
+                                    <input type="number" id="gestures_ktb_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="gestures_squeezing" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
-                                    <span style="color: #495057; font-size: 14px;">Squeezing</span>
-                                    <input type="number" id="gestures_squeezing_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="checkbox" id="gestures_ballsqueeze" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <span style="color: #495057; font-size: 14px;">Ball Squeeze</span>
+                                    <input type="number" id="gestures_ballsqueeze_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                     <input type="checkbox" id="gestures_2finger" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">2 Finger</span>
-                                    <input type="number" id="gestures_2finger_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="number" id="gestures_2finger_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                             </div>
                         </div>
                         
-                        <!-- Vibranium -->
+                        <!-- Vibe -->
                         <div style="margin-bottom: 20px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <div style="font-weight: 600; color: #8b5cf6;">💎 Vibranium:</div>
+                                <div style="font-weight: 600; color: #8b5cf6;">💎 Vibe:</div>
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span style="font-size: 12px; color: #666;">Difficulty:</span>
-                                    <select id="vibraniumDifficulty" style="padding: 4px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; background: white;">
+                                    <select id="vibeDifficulty" style="padding: 4px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; background: white;">
                                         <option value="easy">Easy</option>
                                         <option value="medium" selected>Medium</option>
                                         <option value="hard">Hard</option>
@@ -899,15 +899,15 @@ input[type="range"]::-moz-range-thumb {
                             </div>
                             <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="vibranium_ihot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
-                                    <span style="color: #495057; font-size: 14px;">I-Hot</span>
-                                    <input type="number" id="vibranium_ihot_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="checkbox" id="vibe_icyhot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
+                                    <span style="color: #495057; font-size: 14px;">Icy Hot</span>
+                                    <input type="number" id="vibe_icyhot_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="vibranium_icewater" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
+                                    <input type="checkbox" id="vibe_icewater" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
                                     <span style="color: #495057; font-size: 14px;">Ice Water</span>
-                                    <input type="number" id="vibranium_icewater_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="number" id="vibe_icewater_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                             </div>
@@ -928,9 +928,9 @@ input[type="range"]::-moz-range-thumb {
                             </div>
                             <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="analyse_vibranium" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;">
-                                    <span style="color: #495057; font-size: 14px;">Vibranium</span>
-                                    <input type="number" id="analyse_vibranium_chance" min="0" max="100" value="0" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="checkbox" id="analyse_vibe" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;">
+                                    <span style="color: #495057; font-size: 14px;">Vibe</span>
+                                    <input type="number" id="analyse_vibe_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                             </div>
@@ -957,16 +957,16 @@ input[type="range"]::-moz-range-thumb {
                 <div class="prize-settings">
                     <h3>🎁 Prize Probabilities</h3>
                     <div class="slider-container">
-                        <div class="slider-label"><span>🏆 Major:</span><span class="percentage" id="majorPercent">33%</span></div>
-                        <input type="range" id="majorSlider" min="0" max="100" value="33">
+                        <div class="slider-label"><span>🏆 Full:</span><span class="percentage" id="fullPercent">33%</span></div>
+                        <input type="range" id="fullSlider" min="0" max="100" value="33">
                     </div>
                     <div class="slider-container">
-                        <div class="slider-label"><span>🎉 Minor:</span><span class="percentage" id="minorPercent">33%</span></div>
-                        <input type="range" id="minorSlider" min="0" max="100" value="33">
+                        <div class="slider-label"><span>🎉 Ruin:</span><span class="percentage" id="ruinPercent">33%</span></div>
+                        <input type="range" id="ruinSlider" min="0" max="100" value="33">
                     </div>
                     <div class="slider-container">
-                        <div class="slider-label"><span>❌ None:</span><span class="percentage" id="noPrizePercent">34%</span></div>
-                        <input type="range" id="noPrizeSlider" min="0" max="100" value="34">
+                        <div class="slider-label"><span>❌ Denial:</span><span class="percentage" id="deniedPercent">34%</span></div>
+                        <input type="range" id="deniedSlider" min="0" max="100" value="34">
                     </div>
                 </div>
             </div>
@@ -1023,56 +1023,56 @@ let gameStarted = false;
 let playerPosition = 0;
 let turnCount = 0;
 let turnCountBySet = {}; // Track turns per set (e.g., {dressup: 5, tnd: 3})
-let turnCountByToy = {}; // Track turns per set-toy combo (e.g., {dressup_stickers: 3, tnd_prison: 2})
-let lastSelectedSet = {}; // Track which set each toy was last selected from (e.g., {stickers: 'dressup', prison: 'tnd'})
-let completedOnlyOnceTasks = {}; // Track which onlyOnce tasks have been completed (e.g., {tnd_prison_always: true})
+let turnCountByToy = {}; // Track turns per set-toy combo (e.g., {dressup_stickers: 3, tnd_cage: 2})
+let lastSelectedSet = {}; // Track which set each toy was last selected from (e.g., {stickers: 'dressup', cage: 'tnd'})
+let completedOnlyOnceTasks = {}; // Track which onlyOnce tasks have been completed (e.g., {tnd_cage_always: true})
 let selectedSets = [];
-let prizeSettings = {major: 33, minor: 33, noPrize: 34};
+let prizeSettings = {full: 33, ruin: 33, denied: 34};
 let toyQuantities = {};
 let toyModifiers = {};
 let playerName = '';
 let toySetEnabled = {};
 let toyChecked = {};
 
-// Prison-specific state (always available, not tied to TnD selection)
-let prisonLocked = false;
-let prisonWorn = false;
+// Cage-specific state (always available, not tied to TnD selection)
+let cageLocked = false;
+let cageWorn = false;
 
 // Final challenge state
 let finalChallengeSettings = {
     gestures: 33,
-    vibranium: 33,
+    vibe: 33,
     analyse: 34
 };
 
 // Final challenge types enabled
 let finalChallengeTypes = {
-    gestures_ihot: false,
+    gestures_icyhot: false,
     gestures_icewater: false,
-    gestures_spikeyband: false,
-    gestures_squeezing: false,
+    gestures_ktb: false,
+    gestures_ballsqueeze: false,
     gestures_2finger: false,
-    vibranium_ihot: false,
-    vibranium_icewater: false,
-    analyse_vibranium: false
+    vibe_icyhot: false,
+    vibe_icewater: false,
+    analyse_vibe: false
 };
 
 // Final challenge modifier percentages (chance to be applied)
 let finalChallengeModifierChances = {
-    gestures_ihot: 0,
-    gestures_icewater: 0,
-    gestures_spikeyband: 0,
-    gestures_squeezing: 0,
-    gestures_2finger: 0,
-    vibranium_ihot: 0,
-    vibranium_icewater: 0,
-    analyse_vibranium: 0
+    gestures_icyhot: 10,
+    gestures_icewater: 10,
+    gestures_ktb: 10,
+    gestures_ballsqueeze: 10,
+    gestures_2finger: 10,
+    vibe_icyhot: 10,
+    vibe_icewater: 10,
+    analyse_vibe: 10
 };
 
 // Final challenge difficulties
 let finalChallengeDifficulties = {
     gestures: 'medium',
-    vibranium: 'medium',
+    vibe: 'medium',
     analyse: 'medium'
 };
 
@@ -1107,7 +1107,7 @@ const clothestickersMaxCount = {
 };
 
 // List of toys that can be worn/held on body parts
-const wearableToys = new Set(['stickers', 'silly_shirt', 'stick_a', 'stick_m', 'metal_stick', 'tail', 'prison', 'hand', 'vibranium']);
+const wearableToys = new Set(['stickers', 'silly_shirt', 'stick_a', 'stick_m', 'metal_stick', 'tail', 'cage', 'hand', 'vibe']);
 
 function isToyWearable(toyId) {
     return wearableToys.has(toyId);
@@ -1147,8 +1147,8 @@ function getTaskConditions() {
         getTurnCountForToy: (toyKey) => turnCountByToy[toyKey] || 0,
         getLastSelectedSet: (toyId) => lastSelectedSet[toyId] || null,
         
-        // Prison state
-        prisonLocked: prisonLocked,
+        // Cage state
+        cageLocked: cageLocked,
         
         // Selected sets
         selectedSets: selectedSets,
@@ -1272,10 +1272,10 @@ const instructionSets = {
         name: "Pinplay Set",
         toys: [
             {id: "stickers", name: "Clothestickers 🎨"},
-            {id: "silly_shirt", name: "Clampshirt 👕"},
-            {id: "wristband", name: "Spikeyband ⌚"},
+            {id: "silly_shirt", name: "Clamps 👕"},
+            {id: "wristband", name: "KTB ⌚"},
             {id: "hand", name: "Hand ✋"},
-            {id: "vibranium", name: "Vibranium 💎"}
+            {id: "vibe", name: "Vibe 💎"}
         ],
         tasks: {
             stickers: [
@@ -1306,7 +1306,7 @@ const instructionSets = {
                     // CONDITIONS:
                     //   - Only available if: Analyse set is selected OR Ba has clothestickers
                     // DYNAMIC BEHAVIOR:
-                    //   - If wearing clampshirt: asks to spin (uses clampshirt difficulty: Easy=5s, Medium=10s, Hard=15s)
+                    //   - If wearing clamps: asks to spin (uses clamps difficulty: Easy=5s, Medium=10s, Hard=15s)
                     //   - If not wearing: asks to put it on
                     //   - Adds special comment if Analyse set is active
                     //   - If Ba can hold more stickers: adds requirement to add clothestickers (uses sticker difficulty: Easy=3, Medium=5, Hard=8)
@@ -1315,16 +1315,16 @@ const instructionSets = {
                         return c.hasSet('apple') || c.countToyInBodyPart('stickers', 'Ba') > 0;
                     },
                     getDifficulty: (primaryDifficulty, c, diffMap) => {
-                        let html = '<strong>Clampshirt Task</strong><p>';
+                        let html = '<strong>Clamps Task</strong><p>';
                         
                         const shirtDiff = diffMap['silly_shirt'] || 'medium';
                         const stickerDiff = diffMap['stickers'] || 'medium';
                         
                         if (c.bodyPartHas('Ni', 'silly_shirt')) {
                             const spinTime = getDifficultyValue(shirtDiff, 5, 10, 15);
-                            html += `Spin around with the clampshirt on for ${spinTime} seconds!`;
+                            html += `Spin around with the clamps on for ${spinTime} seconds!`;
                         } else {
-                            html += 'Put on the clampshirt';
+                            html += 'Put on the clamps';
                             if (c.hasSet('apple')) {
                                 html += ' (the Analyse set appreciates fashion)';
                             }
@@ -1353,7 +1353,7 @@ const instructionSets = {
                         html += '</p>';
                         html += '<p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Dynamic multi-toy task. ';
                         html += 'Condition: Only appears if Analyse set selected OR Ba has clothestickers. ';
-                        html += 'Clampshirt difficulty (Easy=5s, Med=10s, Hard=15s). ';
+                        html += 'Clamps difficulty (Easy=5s, Med=10s, Hard=15s). ';
                         html += 'Clothesticker difficulty (Easy=3, Med=5, Hard=8). ';
                         html += 'Changes based on: wearing shirt, Analyse set active, Ba sticker count, if Ba can hold more.</em></p>';
                         html += '<img src="https://picsum.photos/seed/shirt1/800/600"/>';
@@ -1361,13 +1361,13 @@ const instructionSets = {
                     }
                 },
                 {
-                    // ADD TASK: Put on clampshirt to Ni
+                    // ADD TASK: Put on clamps to Ni
                     // No difficulty variation - always 1 item
                     type: 'add', 
                     bodyPart: 'Ni'
                 },
                 {
-                    // REMOVE TASK: Take off clampshirt from Ni
+                    // REMOVE TASK: Take off clamps from Ni
                     // No difficulty variation - always 1 item
                     type: 'remove', 
                     bodyPart: 'Ni'
@@ -1375,10 +1375,10 @@ const instructionSets = {
             ],
             wristband: [
                 {
-                    // STANDARD TASK: Spin spikeyband
+                    // STANDARD TASK: Spin ktb
                     // Difficulty: Easy=5, Medium=10, Hard=15 spins
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Spikeyband Spin</strong><p>Spin the spikeyband around your wrist ${d=='easy'?5:d=='medium'?10:15} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard spikeyband task. Difficulty: Easy=5, Medium=10, Hard=15 spins.</em></p><img src="https://picsum.photos/seed/wrist1/800/600"/>`
+                    getDifficulty: d => `<strong>KTB Spin</strong><p>Spin the ktb around your wrist ${d=='easy'?5:d=='medium'?10:15} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard ktb task. Difficulty: Easy=5, Medium=10, Hard=15 spins.</em></p><img src="https://picsum.photos/seed/wrist1/800/600"/>`
                 }
             ],
             hand: [
@@ -1396,19 +1396,19 @@ const instructionSets = {
                     getDifficulty: d => d=='easy'?15000:d=='medium'?20000:25000
                 }
             ],
-            vibranium: [
+            vibe: [
                 {
-                    // STANDARD TASK: Hold vibranium steady
+                    // STANDARD TASK: Hold vibe steady
                     // Difficulty: Easy=5, Medium=10, Hard=15 seconds
                     // No conditions - always available
                     getDifficulty: (d, c, diffMap) => {
                         const seconds = d === 'easy' ? 5 : d === 'hard' ? 15 : 10;
-                        const isPrisonWorn = c.isHolding('prison');
+                        const isCageWorn = c.isHolding('cage');
                         
-                        if (isPrisonWorn) {
-                            return `<strong>Vibranium Hold</strong><p>Hold the vibranium steady for ${seconds} seconds while wearing the prison.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Vibranium task with prison worn. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/vibraniumprision/800/600"/>`;
+                        if (isCageWorn) {
+                            return `<strong>Vibe Hold</strong><p>Hold the vibe steady for ${seconds} seconds while wearing the cage.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Vibe task with cage worn. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/vibeprision/800/600"/>`;
                         } else {
-                            return `<strong>Vibranium Hold</strong><p>Hold the vibranium steady for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium task. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/vibranium1/800/600"/>`;
+                            return `<strong>Vibe Hold</strong><p>Hold the vibe steady for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibe task. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/vibe1/800/600"/>`;
                         }
                     }
                 }
@@ -1421,8 +1421,8 @@ const instructionSets = {
             {id: "stick_a", name: "Dillstick A 🪵"},
             {id: "metal_stick", name: "Metal Dillstick 🔩"},
             {id: "tail", name: "Plugtail 🦊"},
-            {id: "vibranium", name: "Vibranium 💎"},
-            {id: "prison", name: "Prison 🔒"}
+            {id: "vibe", name: "Vibe 💎"},
+            {id: "cage", name: "Cage 🔒"}
         ],
         tasks: {
             stick_a: [
@@ -1485,38 +1485,38 @@ const instructionSets = {
                     bodyPart: 'Bu'
                 }
             ],
-            vibranium: [
+            vibe: [
                 {
-                    // STANDARD TASK: Shake vibranium
+                    // STANDARD TASK: Shake vibe
                     // Difficulty: Easy=5, Medium=10, Hard=15 shakes
                     // No conditions - always available
                     getDifficulty: (d, c, diffMap) => {
                         const count = d === 'easy' ? 5 : d === 'hard' ? 15 : 10;
-                        const isPrisonWorn = c.isHolding('prison');
+                        const isCageWorn = c.isHolding('cage');
                         
-                        if (isPrisonWorn) {
-                            return `<strong>Vibranium Shake</strong><p>Shake the vibranium ${count} times while wearing the prison.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Vibranium shake task with prison worn. Difficulty: Easy=5, Medium=10, Hard=15 shakes.</em></p><img src="https://picsum.photos/seed/vibraniumshakeprison/800/600"/>`;
+                        if (isCageWorn) {
+                            return `<strong>Vibe Shake</strong><p>Shake the vibe ${count} times while wearing the cage.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Vibe shake task with cage worn. Difficulty: Easy=5, Medium=10, Hard=15 shakes.</em></p><img src="https://picsum.photos/seed/vibeshakecage/800/600"/>`;
                         } else {
-                            return `<strong>Vibranium Shake</strong><p>Shake the vibranium ${count} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium shake task. Difficulty: Easy=5, Medium=10, Hard=15 shakes.</em></p><img src="https://picsum.photos/seed/vibranium2/800/600"/>`;
+                            return `<strong>Vibe Shake</strong><p>Shake the vibe ${count} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibe shake task. Difficulty: Easy=5, Medium=10, Hard=15 shakes.</em></p><img src="https://picsum.photos/seed/vibe2/800/600"/>`;
                         }
                     }
                 }
             ],
-            prison: [
+            cage: [
                 {
-                    // TASK: Inspect the prison
+                    // TASK: Inspect the cage
                     // DIFFICULTY: Easy=5sec, Medium=10sec, Hard=15sec
                     // CONDITIONS: None (always available)
-                    getDifficulty: d => `<strong>Prison Inspection</strong><p>Carefully inspect the prison for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Analyse prison task. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/prison2/800/600"/>`
+                    getDifficulty: d => `<strong>Cage Inspection</strong><p>Carefully inspect the cage for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Analyse cage task. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/cage2/800/600"/>`
                 },
                 {
-                    // ADD TASK: Add prison to Pe
+                    // ADD TASK: Add cage to Pe
                     // Locked status affects whether this can be rolled
                     type: 'add', 
                     bodyPart: 'Pe'
                 },
                 {
-                    // REMOVE TASK: Remove prison from Pe
+                    // REMOVE TASK: Remove cage from Pe
                     // Locked status affects whether this can be rolled
                     type: 'remove', 
                     bodyPart: 'Pe'
@@ -1564,24 +1564,24 @@ const instructionSets = {
     tnd: {
         name: "TnD",
         toys: [
-            {id: "vibranium", name: "Vibranium 💎"},
+            {id: "vibe", name: "Vibe 💎"},
             {id: "hand", name: "Hand ✋"},
-            {id: "prison", name: "Prison 🔒"}
+            {id: "cage", name: "Cage 🔒"}
         ],
         tasks: {
-            vibranium: [
+            vibe: [
                 {
-                    // STANDARD TASK: Control vibranium settings
+                    // STANDARD TASK: Control vibe settings
                     // Difficulty: Easy=10, Medium=20, Hard=30 seconds
                     // No conditions - always available
                     getDifficulty: (d, c, diffMap) => {
                         const seconds = d === 'easy' ? 10 : d === 'hard' ? 30 : 20;
-                        const isPrisonWorn = c.isHolding('prison');
+                        const isCageWorn = c.isHolding('cage');
                         
-                        if (isPrisonWorn) {
-                            return `<strong>Vibranium Control</strong><p>Control the vibranium settings for ${seconds} seconds while wearing the prison.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Vibranium control task with prison worn. Difficulty: Easy=10s, Medium=20s, Hard=30s.</em></p><img src="https://picsum.photos/seed/vibraniumcontrolprison/800/600"/>`;
+                        if (isCageWorn) {
+                            return `<strong>Vibe Control</strong><p>Control the vibe settings for ${seconds} seconds while wearing the cage.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Vibe control task with cage worn. Difficulty: Easy=10s, Medium=20s, Hard=30s.</em></p><img src="https://picsum.photos/seed/vibecontrolcage/800/600"/>`;
                         } else {
-                            return `<strong>Vibranium Control</strong><p>Control the vibranium settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibranium control task. Difficulty: Easy=10s, Medium=20s, Hard=30s.</em></p><img src="https://picsum.photos/seed/vibranium3/800/600"/>`;
+                            return `<strong>Vibe Control</strong><p>Control the vibe settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard vibe control task. Difficulty: Easy=10s, Medium=20s, Hard=30s.</em></p><img src="https://picsum.photos/seed/vibe3/800/600"/>`;
                         }
                     }
                 }
@@ -1594,106 +1594,99 @@ const instructionSets = {
                     getDifficulty: d => `<strong>Hand Gesture</strong><p>Make hand gestures ${d=='easy'?8:d=='medium'?12:16} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard hand gesture task. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/handtnd1/800/600"/>`
                 }
             ],
-            prison: [
+            cage: [
                 {
-                    // SPECIAL ALWAYS TASK: Put on prison after 2 TnD hand tasks
-                    // CONDITIONS: TnD selected, Prison can be worn on Pe, Rolled 2+ TnD hand tasks
+                    // SPECIAL ALWAYS TASK: Put on cage after 2 TnD hand tasks
+                    // CONDITIONS: TnD selected, Cage can be worn on Pe, Rolled 2+ TnD hand tasks
                     // This task is "always" selected when conditions are met (overrides normal task selection)
                     alwaysSelect: (c) => {
                         // Check if we've rolled at least 2 TnD hand tasks
                         const handCount = c.getTurnCountForToy('tnd_hand');
-                        console.log('Prison alwaysSelect check - handCount:', handCount);
                         if (handCount < 2) {
-                            console.log('Prison task rejected: handCount < 2');
                             return false;
                         }
                         // Check TnD is selected
                         if (!c.hasSet('tnd')) {
-                            console.log('Prison task rejected: TnD not selected');
                             return false;
                         }
-                        // Check if prison toy is checked
-                        if (!c.toyChecked('prison')) {
-                            console.log('Prison task rejected: prison not checked');
+                        // Check if cage toy is checked
+                        if (!c.toyChecked('cage')) {
                             return false;
                         }
-                        // Check if Pe can hold prison
-                        const canHold = c.canBodyPartHold('Pe', 'prison');
-                        console.log('Prison task canHold:', canHold);
+                        // Check if Pe can hold cage
+                        const canHold = c.canBodyPartHold('Pe', 'cage');
                         if (!canHold) {
-                            console.log('Prison task rejected: Pe cannot hold prison');
                             return false;
                         }
-                        console.log('Prison task ACCEPTED - all conditions passed!');
                         return true;
                     },
                     excludeFromNormalPool: true,  // Only appears via alwaysSelect, not random selection
                     onlyOnce: true,  // Only triggers once per game (tracked separately)
                     getDifficulty: (d, c, diffMap) => {
                         const handCount = c.getTurnCountForToy('tnd_hand');
-                        return `<strong>🔒 Special Prison Task!</strong><p>You've completed ${handCount} hand tasks from TnD. Time to put on the prison!</p><p>Place the prison on your Pe.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: ALWAYS task - only triggers after rolling 2+ TnD hand tasks if TnD selected, prison checked, and Pe can hold prison. This overrides normal task selection.</em></p><img src="https://picsum.photos/seed/prisonhand/800/600"/>`;
+                        return `<strong>🔒 Special Cage Task!</strong><p>You've completed ${handCount} hand tasks from TnD. Time to put on the cage!</p><p>Place the cage on your Pe.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: ALWAYS task - only triggers after rolling 2+ TnD hand tasks if TnD selected, cage checked, and Pe can hold cage. This overrides normal task selection.</em></p><img src="https://picsum.photos/seed/cagehand/800/600"/>`;
                     },
                     execute: function() {
-                        // Add prison to Pe
-                        return addToyToBodyPart('Pe', 'prison');
+                        // Add cage to Pe
+                        return addToyToBodyPart('Pe', 'cage');
                     }
                 },
                 {
-                    // TASK: Hand gestures (when prison is NOT on Pe AND hand is available)
+                    // TASK: Hand gestures (when cage is NOT on Pe AND hand is available)
                     // DIFFICULTY: Easy=8, Medium=12, Hard=16 gestures
-                    // CONDITIONS: Prison is NOT on Pe AND hand toy is checked for TnD
+                    // CONDITIONS: Cage is NOT on Pe AND hand toy is checked for TnD
                     canSelect: (c) => {
-                        const isPrisonOnPe = c.isHolding('prison') && c.getBodyPartsHolding('prison').some(part => part.key === 'Pe');
+                        const isCageOnPe = c.isHolding('cage') && c.getBodyPartsHolding('cage').some(part => part.key === 'Pe');
                         const isHandAvailable = c.toyChecked('hand') && c.toySetEnabled('tnd_hand');
-                        return !isPrisonOnPe && isHandAvailable; // Prison OFF and hand available
+                        return !isCageOnPe && isHandAvailable; // Cage OFF and hand available
                     },
                     getDifficulty: (d, c, diffMap) => {
                         const count = d === 'easy' ? 8 : d === 'hard' ? 16 : 12;
-                        // Check if prison is worn anywhere (not necessarily on Pe)
-                        const isPrisonWorn = c.isHolding('prison');
+                        // Check if cage is worn anywhere (not necessarily on Pe)
+                        const isCageWorn = c.isHolding('cage');
                         
-                        if (isPrisonWorn) {
-                            return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures while wearing the prison.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD hand task with prison worn. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/prisonhandworn/800/600"/>`;
+                        if (isCageWorn) {
+                            return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures while wearing the cage.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD hand task with cage worn. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/cagehandworn/800/600"/>`;
                         } else {
-                            return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD hand task without prison. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/prisonhand/800/600"/>`;
+                            return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD hand task without cage. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/cagehand/800/600"/>`;
                         }
                     }
                 },
                 {
-                    // TASK: Put on prison then do settings (when prison is NOT on Pe AND hand is NOT available)
+                    // TASK: Put on cage then do settings (when cage is NOT on Pe AND hand is NOT available)
                     // DIFFICULTY: Easy=10sec, Medium=15sec, Hard=20sec
-                    // CONDITIONS: Prison is NOT on Pe AND hand toy is NOT available for TnD
+                    // CONDITIONS: Cage is NOT on Pe AND hand toy is NOT available for TnD
                     canSelect: (c) => {
-                        const isPrisonOnPe = c.isHolding('prison') && c.getBodyPartsHolding('prison').some(part => part.key === 'Pe');
+                        const isCageOnPe = c.isHolding('cage') && c.getBodyPartsHolding('cage').some(part => part.key === 'Pe');
                         const isHandAvailable = c.toyChecked('hand') && c.toySetEnabled('tnd_hand');
-                        return !isPrisonOnPe && !isHandAvailable; // Prison OFF and hand NOT available
+                        return !isCageOnPe && !isHandAvailable; // Cage OFF and hand NOT available
                     },
                     getDifficulty: (d, c, diffMap) => {
                         const seconds = d === 'easy' ? 10 : d === 'hard' ? 20 : 15;
-                        return `<strong>Prison Task</strong><p>Put the prison on your Pe.</p><p>Then adjust the prison settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD prison off + hand NOT available - put on prison task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/prisonputon/800/600"/>`;
+                        return `<strong>Cage Task</strong><p>Put the cage on your Pe.</p><p>Then adjust the cage settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD cage off + hand NOT available - put on cage task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/cageputon/800/600"/>`;
                     }
                 },
                 {
-                    // TASK: Control prison settings (when prison IS on Pe)
+                    // TASK: Control cage settings (when cage IS on Pe)
                     // DIFFICULTY: Easy=10sec, Medium=15sec, Hard=20sec
-                    // CONDITIONS: Prison is currently on Pe
+                    // CONDITIONS: Cage is currently on Pe
                     canSelect: (c) => {
-                        const isPrisonOnPe = c.isHolding('prison') && c.getBodyPartsHolding('prison').some(part => part.key === 'Pe');
-                        return isPrisonOnPe; // Only if prison is ON
+                        const isCageOnPe = c.isHolding('cage') && c.getBodyPartsHolding('cage').some(part => part.key === 'Pe');
+                        return isCageOnPe; // Only if cage is ON
                     },
                     getDifficulty: (d, c, diffMap) => {
                         const seconds = d === 'easy' ? 10 : d === 'hard' ? 20 : 15;
-                        return `<strong>Prison Control</strong><p>Adjust the prison settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD prison on - settings task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/prisonsettings/800/600"/>`;
+                        return `<strong>Cage Control</strong><p>Adjust the cage settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD cage on - settings task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/cagesettings/800/600"/>`;
                     }
                 },
                 {
-                    // ADD TASK: Add prison to Pe
+                    // ADD TASK: Add cage to Pe
                     // Locked status affects whether this can be rolled
                     type: 'add', 
                     bodyPart: 'Pe'
                 },
                 {
-                    // REMOVE TASK: Remove prison from Pe
+                    // REMOVE TASK: Remove cage from Pe
                     // Locked status affects whether this can be rolled
                     type: 'remove', 
                     bodyPart: 'Pe'
@@ -1707,25 +1700,25 @@ const instructionSets = {
 const snakeLadderTasks = {
     snakeTasks: [
         {
-            // SNAKE TASK: Conditional vibranium task
-            // CONDITIONS: TnD selected AND vibranium available AND vibranium not currently held
+            // SNAKE TASK: Conditional vibe task
+            // CONDITIONS: TnD selected AND vibe available AND vibe not currently held
             // DIFFICULTY: Easy=5sec, Medium=10sec, Hard=15sec
             canSelect: (c) => {
                 // Check TnD is selected
                 if (!c.hasSet('tnd')) return false;
-                // Check if vibranium toy is checked/enabled
-                if (!c.toyChecked('vibranium')) return false;
-                // Check if any vibranium toy key is enabled (could be from TnD or other sets)
-                const tndVibKey = 'tnd_vibranium';
-                const hasVibranium = c.toySetEnabled(tndVibKey) && (c.toyQuantity(tndVibKey) > 0);
-                if (!hasVibranium) return false;
-                // Check if vibranium is free (not currently held on any body part)
-                return !c.isHolding('vibranium');
+                // Check if vibe toy is checked/enabled
+                if (!c.toyChecked('vibe')) return false;
+                // Check if any vibe toy key is enabled (could be from TnD or other sets)
+                const tndVibKey = 'tnd_vibe';
+                const hasVibe = c.toySetEnabled(tndVibKey) && (c.toyQuantity(tndVibKey) > 0);
+                if (!hasVibe) return false;
+                // Check if vibe is free (not currently held on any body part)
+                return !c.isHolding('vibe');
             },
             getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
-                const vibDiff = diffMap['vibranium'] || 'medium';
+                const vibDiff = diffMap['vibe'] || 'medium';
                 const seconds = getDifficultyValue(vibDiff, 5, 10, 15);
-                return `<strong>Snake Slide! 🐍</strong><p>You fell ${Math.abs(snakeLadderInfo.distance)} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Hold the vibranium steady for ${seconds} seconds to steady yourself.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Conditional snake task with vibranium. Only appears if TnD selected, vibranium checked, tnd_vibranium enabled with quantity > 0, and vibranium is NOT currently being held. Difficulty: Easy=5s, Medium=10s, Hard=15s. Fall distance: ${Math.abs(snakeLadderInfo.distance)} spaces.</em></p><img src="https://picsum.photos/seed/snakevib/800/600"/>`;
+                return `<strong>Snake Slide! 🐍</strong><p>You fell ${Math.abs(snakeLadderInfo.distance)} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Hold the vibe steady for ${seconds} seconds to steady yourself.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Conditional snake task with vibe. Only appears if TnD selected, vibe checked, tnd_vibe enabled with quantity > 0, and vibe is NOT currently being held. Difficulty: Easy=5s, Medium=10s, Hard=15s. Fall distance: ${Math.abs(snakeLadderInfo.distance)} spaces.</em></p><img src="https://picsum.photos/seed/snakevib/800/600"/>`;
             }
         },
         {
@@ -1780,17 +1773,17 @@ const finalChallengeTasks = [
         getDifficulty: (d, c, diffMap, prizeType) => {
             // Roll for each modifier based on percentage chance
             const appliedModifiers = [];
-            if (finalChallengeTypes.gestures_ihot && Math.random() * 100 < finalChallengeModifierChances.gestures_ihot) {
-                appliedModifiers.push('I-Hot');
+            if (finalChallengeTypes.gestures_icyhot && Math.random() * 100 < finalChallengeModifierChances.gestures_icyhot) {
+                appliedModifiers.push('Icy Hot');
             }
             if (finalChallengeTypes.gestures_icewater && Math.random() * 100 < finalChallengeModifierChances.gestures_icewater) {
                 appliedModifiers.push('Ice Water');
             }
-            if (finalChallengeTypes.gestures_spikeyband && Math.random() * 100 < finalChallengeModifierChances.gestures_spikeyband) {
-                appliedModifiers.push('Spikeyband');
+            if (finalChallengeTypes.gestures_ktb && Math.random() * 100 < finalChallengeModifierChances.gestures_ktb) {
+                appliedModifiers.push('KTB');
             }
-            if (finalChallengeTypes.gestures_squeezing && Math.random() * 100 < finalChallengeModifierChances.gestures_squeezing) {
-                appliedModifiers.push('Squeezing');
+            if (finalChallengeTypes.gestures_ballsqueeze && Math.random() * 100 < finalChallengeModifierChances.gestures_ballsqueeze) {
+                appliedModifiers.push('Ball Squeeze');
             }
             if (finalChallengeTypes.gestures_2finger && Math.random() * 100 < finalChallengeModifierChances.gestures_2finger) {
                 appliedModifiers.push('2 Finger');
@@ -1820,18 +1813,18 @@ const finalChallengeTasks = [
         }
     },
     {
-        id: 'vibranium',
-        // VIBRANIUM TASK: Only if vibranium probability > 0%
+        id: 'vibe',
+        // VIBRANIUM TASK: Only if vibe probability > 0%
         canSelect: (c) => {
-            return finalChallengeSettings.vibranium > 0;
+            return finalChallengeSettings.vibe > 0;
         },
         getDifficulty: (d, c, diffMap, prizeType) => {
             // Roll for each modifier based on percentage chance
             const appliedModifiers = [];
-            if (finalChallengeTypes.vibranium_ihot && Math.random() * 100 < finalChallengeModifierChances.vibranium_ihot) {
-                appliedModifiers.push('I-Hot');
+            if (finalChallengeTypes.vibe_icyhot && Math.random() * 100 < finalChallengeModifierChances.vibe_icyhot) {
+                appliedModifiers.push('Icy Hot');
             }
-            if (finalChallengeTypes.vibranium_icewater && Math.random() * 100 < finalChallengeModifierChances.vibranium_icewater) {
+            if (finalChallengeTypes.vibe_icewater && Math.random() * 100 < finalChallengeModifierChances.vibe_icewater) {
                 appliedModifiers.push('Ice Water');
             }
             
@@ -1841,20 +1834,20 @@ const finalChallengeTasks = [
                 modifierText = ' with ' + appliedModifiers.join(', ');
             }
             
-            const difficulty = finalChallengeDifficulties.vibranium;
+            const difficulty = finalChallengeDifficulties.vibe;
             const seconds = difficulty === 'easy' ? 30 : difficulty === 'hard' ? 60 : 45;
             
             return `
                 <strong>🏆 Final Challenge! 🏆</strong>
-                <p>Hold vibranium${modifierText} for ${seconds} seconds at ${difficulty} difficulty.</p>
-                <button onclick="revealFinalPrize('vibranium', '${prizeType}')" 
+                <p>Hold vibe${modifierText} for ${seconds} seconds at ${difficulty} difficulty.</p>
+                <button onclick="revealFinalPrize('vibe', '${prizeType}')" 
                         style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                     I Completed the Challenge
                 </button>
-                <div id="prizeReveal_vibranium" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                <div id="prizeReveal_vibe" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
                     <!-- Prize will be revealed here -->
                 </div>
-                <img src="https://picsum.photos/seed/finalvibranium/800/600"/>
+                <img src="https://picsum.photos/seed/finalvibe/800/600"/>
             `;
         }
     },
@@ -1867,8 +1860,8 @@ const finalChallengeTasks = [
         getDifficulty: (d, c, diffMap, prizeType) => {
             // Roll for modifier based on percentage chance
             let modifierText = '';
-            if (finalChallengeTypes.analyse_vibranium && Math.random() * 100 < finalChallengeModifierChances.analyse_vibranium) {
-                modifierText = ' with Vibranium';
+            if (finalChallengeTypes.analyse_vibe && Math.random() * 100 < finalChallengeModifierChances.analyse_vibe) {
+                modifierText = ' with Vibe';
             }
             
             const difficulty = finalChallengeDifficulties.analyse;
@@ -1938,8 +1931,8 @@ function generatePrizeHTML(prizeType) {
     html += '<div style="font-size: 24px; margin-bottom: 10px;">━━━━━━━━━━━━━━━━━━━━</div>';
     html += '<div style="font-size: 20px; font-weight: 600; margin-bottom: 15px;">🎉 Prize Result 🎉</div>';
     
-    if (prizeType === 'major') {
-        html += '<div style="font-size: 28px; font-weight: bold; color: #ffd93d; margin-bottom: 10px;">🏆 MAJOR PRIZE! 🏆</div>';
+    if (prizeType === 'full') {
+        html += '<div style="font-size: 28px; font-weight: bold; color: #ffd93d; margin-bottom: 10px;">🏆 FULL PRIZE! 🏆</div>';
         html += '<p style="font-size: 16px; margin-bottom: 15px;">Congratulations! You won big!</p>';
         
         // Add modifiers for Major (CE + PF if enabled)
@@ -1953,20 +1946,20 @@ function generatePrizeHTML(prizeType) {
             html += '<strong>⏱️ PF (Post Finish):</strong> Complete the PF requirement.';
             html += '</div>';
         }
-    } else if (prizeType === 'minor') {
-        html += '<div style="font-size: 28px; font-weight: bold; color: #51cf66; margin-bottom: 10px;">🎉 Minor Prize 🎉</div>';
-        html += '<p style="font-size: 16px; margin-bottom: 15px;">Not bad! You got a small reward.</p>';
+    } else if (prizeType === 'ruin') {
+        html += '<div style="font-size: 28px; font-weight: bold; color: #51cf66; margin-bottom: 10px;">🎉 Ruin 🎉</div>';
+        html += '<p style="font-size: 16px; margin-bottom: 15px;">You got ruined!</p>';
         
-        // Add modifiers for Minor (CE only if enabled)
+        // Add modifiers for Ruin (CE only if enabled)
         if (finalChallengeModifiers.ce) {
             html += '<div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-bottom: 10px; text-align: left;">';
             html += '<strong>🥛 CE (Cum Eating):</strong> Complete the CE requirement.';
             html += '</div>';
         }
     } else {
-        html += '<div style="font-size: 28px; font-weight: bold; color: #adb5bd; margin-bottom: 10px;">❌ No Prize ❌</div>';
+        html += '<div style="font-size: 28px; font-weight: bold; color: #adb5bd; margin-bottom: 10px;">❌ Denial ❌</div>';
         html += '<p style="font-size: 16px; margin-bottom: 15px;">Better luck next time!</p>';
-        // No modifiers for None
+        // No modifiers for Denial
     }
     
     html += '</div>';
@@ -2001,8 +1994,8 @@ function saveGameState() {
         playerName,
         toySetEnabled,
         toyChecked,
-        prisonLocked,
-        prisonWorn,
+        cageLocked,
+        cageWorn,
         finalChallengeSettings,
         finalChallengeTypes,
         finalChallengeModifierChances,
@@ -2035,20 +2028,20 @@ function loadGameState() {
         playerName = gs.playerName || '';
         toySetEnabled = gs.toySetEnabled || {};
         toyChecked = gs.toyChecked || {};
-        prisonLocked = gs.prisonLocked || false;
-        prisonWorn = gs.prisonWorn || false;
-        finalChallengeSettings = gs.finalChallengeSettings || {gestures: 33, vibranium: 33, analyse: 34};
+        cageLocked = gs.cageLocked || false;
+        cageWorn = gs.cageWorn || false;
+        finalChallengeSettings = gs.finalChallengeSettings || {gestures: 33, vibe: 33, analyse: 34};
         finalChallengeTypes = gs.finalChallengeTypes || {
-            gestures_ihot: false, gestures_icewater: false, gestures_spikeyband: false,
-            gestures_squeezing: false, gestures_2finger: false, vibranium_ihot: false,
-            vibranium_icewater: false, analyse_vibranium: false
+            gestures_icyhot: false, gestures_icewater: false, gestures_ktb: false,
+            gestures_ballsqueeze: false, gestures_2finger: false, vibe_icyhot: false,
+            vibe_icewater: false, analyse_vibe: false
         };
         finalChallengeModifierChances = gs.finalChallengeModifierChances || {
-            gestures_ihot: 0, gestures_icewater: 0, gestures_spikeyband: 0,
-            gestures_squeezing: 0, gestures_2finger: 0, vibranium_ihot: 0,
-            vibranium_icewater: 0, analyse_vibranium: 0
+            gestures_icyhot: 10, gestures_icewater: 10, gestures_ktb: 10,
+            gestures_ballsqueeze: 10, gestures_2finger: 10, vibe_icyhot: 10,
+            vibe_icewater: 10, analyse_vibe: 10
         };
-        finalChallengeDifficulties = gs.finalChallengeDifficulties || {gestures: 'medium', vibranium: 'medium', analyse: 'medium'};
+        finalChallengeDifficulties = gs.finalChallengeDifficulties || {gestures: 'medium', vibe: 'medium', analyse: 'medium'};
         finalChallengeModifiers = gs.finalChallengeModifiers || {ce: false, pf: false};
         
         if (gs.bodyPartState) {
@@ -2066,10 +2059,10 @@ function loadGameState() {
         
         // Restore final challenge sliders
         document.getElementById('gesturesSlider').value = finalChallengeSettings.gestures;
-        document.getElementById('vibraniumSlider').value = finalChallengeSettings.vibranium;
+        document.getElementById('vibeSlider').value = finalChallengeSettings.vibe;
         document.getElementById('analyseSlider').value = finalChallengeSettings.analyse;
         document.getElementById('gesturesPercent').textContent = finalChallengeSettings.gestures + '%';
-        document.getElementById('vibraniumPercent').textContent = finalChallengeSettings.vibranium + '%';
+        document.getElementById('vibePercent').textContent = finalChallengeSettings.vibe + '%';
         document.getElementById('analysePercent').textContent = finalChallengeSettings.analyse + '%';
         
         // Restore final challenge type checkboxes
@@ -2149,54 +2142,62 @@ function loadGameState() {
 
 // Prize Functions
 function updateSliderDisplays(skipSave = false) {
-    prizeSettings.minor = Math.round(prizeSettings.minor * 10) / 10;
-    prizeSettings.major = Math.round(prizeSettings.major * 10) / 10;
-    prizeSettings.noPrize = Math.round(prizeSettings.noPrize * 10) / 10;
+    prizeSettings.ruin = Math.round(prizeSettings.ruin * 10) / 10;
+    prizeSettings.full = Math.round(prizeSettings.full * 10) / 10;
+    prizeSettings.denied = Math.round(prizeSettings.denied * 10) / 10;
     
-    document.getElementById('minorPercent').textContent = prizeSettings.minor.toFixed(1) + '%';
-    document.getElementById('majorPercent').textContent = prizeSettings.major.toFixed(1) + '%';
-    document.getElementById('noPrizePercent').textContent = prizeSettings.noPrize.toFixed(1) + '%';
+    document.getElementById('ruinPercent').textContent = prizeSettings.ruin.toFixed(1) + '%';
+    document.getElementById('fullPercent').textContent = prizeSettings.full.toFixed(1) + '%';
+    document.getElementById('deniedPercent').textContent = prizeSettings.denied.toFixed(1) + '%';
     
-    document.getElementById('minorSlider').value = prizeSettings.minor;
-    document.getElementById('majorSlider').value = prizeSettings.major;
-    document.getElementById('noPrizeSlider').value = prizeSettings.noPrize;
+    document.getElementById('ruinSlider').value = prizeSettings.ruin;
+    document.getElementById('fullSlider').value = prizeSettings.full;
+    document.getElementById('deniedSlider').value = prizeSettings.denied;
     
     if (!skipSave) saveGameState();
 }
 
-document.getElementById('minorSlider').addEventListener('input', function() {
-    const newMinor = Math.round(parseFloat(this.value));
-    const maxAllowed = 100 - Math.round(prizeSettings.noPrize);
-    prizeSettings.minor = newMinor > maxAllowed ? maxAllowed : newMinor;
-    prizeSettings.major = 100 - prizeSettings.noPrize - prizeSettings.minor;
+document.getElementById('ruinSlider').addEventListener('input', function() {
+    const newRuin = Math.round(parseFloat(this.value));
+    const maxAllowed = 100 - Math.round(prizeSettings.denied);
+    prizeSettings.ruin = newRuin > maxAllowed ? maxAllowed : newRuin;
+    prizeSettings.full = 100 - prizeSettings.denied - prizeSettings.ruin;
     updateSliderDisplays();
 });
 
-document.getElementById('majorSlider').addEventListener('input', function() {
-    const newMajor = Math.round(parseFloat(this.value));
-    const maxAllowed = 100 - Math.round(prizeSettings.noPrize);
-    prizeSettings.major = newMajor > maxAllowed ? maxAllowed : newMajor;
-    prizeSettings.minor = 100 - prizeSettings.noPrize - prizeSettings.major;
+document.getElementById('fullSlider').addEventListener('input', function() {
+    const newFull = Math.round(parseFloat(this.value));
+    const maxAllowed = 100 - Math.round(prizeSettings.denied);
+    prizeSettings.full = newFull > maxAllowed ? maxAllowed : newFull;
+    prizeSettings.ruin = 100 - prizeSettings.denied - prizeSettings.full;
     updateSliderDisplays();
 });
 
-document.getElementById('noPrizeSlider').addEventListener('input', function() {
-    const newNoPrize = Math.round(parseFloat(this.value));
-    const available = 100 - newNoPrize;
-    const currentTotal = Math.round(prizeSettings.minor) + Math.round(prizeSettings.major);
+document.getElementById('deniedSlider').addEventListener('input', function() {
+    const newDenied = Math.round(parseFloat(this.value));
     
-    // Changed: use equal split for BOTH directions (not just when increasing)
-    if (available !== currentTotal) {
-        const change = available - currentTotal;
-        const half = change / 2;
-        prizeSettings.minor = Math.max(0, Math.round(prizeSettings.minor + half));
-        prizeSettings.major = Math.max(0, Math.round(prizeSettings.major + half));
-        
-        // Ensure total is exactly 100 by adjusting noPrize if values were clamped
-        const actualTotal = prizeSettings.minor + prizeSettings.major;
-        prizeSettings.noPrize = Math.max(0, 100 - actualTotal);
+    // Special case: if denied is 100%, force the others to 0
+    if (newDenied >= 100) {
+        prizeSettings.ruin = 0;
+        prizeSettings.full = 0;
+        prizeSettings.denied = 100;
     } else {
-        prizeSettings.noPrize = Math.max(0, newNoPrize);
+        const available = 100 - newDenied;
+        const currentTotal = Math.round(prizeSettings.ruin) + Math.round(prizeSettings.full);
+        
+        // Changed: use equal split for BOTH directions (not just when increasing)
+        if (available !== currentTotal) {
+            const change = available - currentTotal;
+            const half = change / 2;
+            prizeSettings.ruin = Math.max(0, Math.round(prizeSettings.ruin + half));
+            prizeSettings.full = Math.max(0, Math.round(prizeSettings.full + half));
+            
+            // Ensure total is exactly 100 by adjusting denied if values were clamped
+            const actualTotal = prizeSettings.ruin + prizeSettings.full;
+            prizeSettings.denied = Math.max(0, 100 - actualTotal);
+        } else {
+            prizeSettings.denied = Math.max(0, newDenied);
+        }
     }
     
     updateSliderDisplays();
@@ -2204,16 +2205,16 @@ document.getElementById('noPrizeSlider').addEventListener('input', function() {
 
 function determinePrize() {
     const roll = Math.random() * 100;
-    return roll < prizeSettings.major ? 'major' : 
-           roll < prizeSettings.major + prizeSettings.minor ? 'minor' : 'none';
+    return roll < prizeSettings.full ? 'full' : 
+           roll < prizeSettings.full + prizeSettings.ruin ? 'ruin' : 'none';
 }
 
 function displayPrizeResult(prize) {
-    return prize === 'major' ? 
-        '<div class="prize-result prize-major">🏆 MAJOR PRIZE! 🏆<br>Congratulations!</div>' :
-        prize === 'minor' ? 
-        '<div class="prize-result prize-minor">🎉 Minor Prize! 🎉<br>Nice job!</div>' :
-        '<div class="prize-result prize-none">❌ No Prize<br>Better luck next time!</div>';
+    return prize === 'full' ? 
+        '<div class="prize-result prize-full">🏆 FULL PRIZE! 🏆<br>Congratulations!</div>' :
+        prize === 'ruin' ? 
+        '<div class="prize-result prize-ruin">🎉 Ruin! 🎉<br>You got ruined!</div>' :
+        '<div class="prize-result prize-denied">❌ Denial<br>Better luck next time!</div>';
 }
 
 // Body Part Functions
@@ -2462,11 +2463,11 @@ function rollForAddRemoveTasks() {
             
             if (!addTask || !removeTask) continue;
             
-            // If prison is locked, set add/remove chances to 0
+            // If cage is locked, set add/remove chances to 0
             let effectiveAddChance = toyModifiers[toyKey]?.addChance || 10;
             let effectiveRemoveChance = toyModifiers[toyKey]?.removeChance || 20;
             
-            if (toyId === 'prison' && prisonLocked) {
+            if (toyId === 'cage' && cageLocked) {
                 effectiveAddChance = 0;
                 effectiveRemoveChance = 0;
             }
@@ -2816,19 +2817,16 @@ function checkForAlwaysTasks(toys, conditions) {
                 
                 // Skip if this is a onlyOnce task that's already been completed
                 if (task.onlyOnce && completedOnlyOnceTasks[taskId]) {
-                    console.log(`Skipping onlyOnce task ${taskId} - already completed`);
                     continue;
                 }
                 
                 const result = task.alwaysSelect(conditions);
-                console.log(`Always task check for ${toyObj.setId}_${toyObj.toyId}:`, result);
                 if (result) {
                     alwaysTasks.push({task, toyObj, taskId});
                 }
             }
         }
     }
-    console.log('Total always tasks found:', alwaysTasks.length);
     return alwaysTasks;
 }
 
@@ -2874,10 +2872,8 @@ function displayRandomInstruction() {
     const alwaysTasks = checkForAlwaysTasks(toys, conditions);
     
     if (alwaysTasks.length > 0) {
-        console.log('[displayRandomInstruction] DISPLAYING ALWAYS TASK, count:', alwaysTasks.length);
         const selectedAlways = alwaysTasks[Math.floor(Math.random() * alwaysTasks.length)];
         const {task, toyObj, taskId} = selectedAlways;
-        console.log('[displayRandomInstruction] Selected:', toyObj.setId, toyObj.toyId);
         
         // Increment turn counts
         const selectedToyKey = `${toyObj.setId}_${toyObj.toyId}`;
@@ -2893,7 +2889,6 @@ function displayRandomInstruction() {
         // Mark onlyOnce task as completed
         if (task.onlyOnce && taskId) {
             completedOnlyOnceTasks[taskId] = true;
-            console.log(`Marked onlyOnce task ${taskId} as completed`);
         }
         
         window.lastTaskInfo = {
@@ -3046,13 +3041,13 @@ function displaySnakeLadderTask(type, fromPos, toPos) {
         debugInfo += '<br><strong>Condition Checks:</strong><br>';
         debugInfo += `- hasSet(tnd): ${conditions.hasSet('tnd')}<br>`;
         debugInfo += `- toyChecked(hand): ${conditions.toyChecked('hand')}<br>`;
-        debugInfo += `- toyChecked(vibranium): ${conditions.toyChecked('vibranium')}<br>`;
+        debugInfo += `- toyChecked(vibe): ${conditions.toyChecked('vibe')}<br>`;
         debugInfo += `- toySetEnabled(tnd_hand): ${conditions.toySetEnabled('tnd_hand')}<br>`;
-        debugInfo += `- toySetEnabled(tnd_vibranium): ${conditions.toySetEnabled('tnd_vibranium')}<br>`;
+        debugInfo += `- toySetEnabled(tnd_vibe): ${conditions.toySetEnabled('tnd_vibe')}<br>`;
         debugInfo += `- toyQuantity(tnd_hand): ${conditions.toyQuantity('tnd_hand')}<br>`;
-        debugInfo += `- toyQuantity(tnd_vibranium): ${conditions.toyQuantity('tnd_vibranium')}<br>`;
+        debugInfo += `- toyQuantity(tnd_vibe): ${conditions.toyQuantity('tnd_vibe')}<br>`;
         debugInfo += `- canBodyPartHold(Ha, hand): ${conditions.canBodyPartHold('Ha', 'hand')}<br>`;
-        debugInfo += `- isHolding(vibranium): ${conditions.isHolding('vibranium')}<br>`;
+        debugInfo += `- isHolding(vibe): ${conditions.isHolding('vibe')}<br>`;
     }
     
     // Filter available tasks
@@ -3138,7 +3133,6 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
         // Mark onlyOnce task as completed
         if (task.onlyOnce && taskId) {
             completedOnlyOnceTasks[taskId] = true;
-            console.log(`Marked onlyOnce task ${taskId} as completed`);
         }
         
         window.lastTaskInfo = {
@@ -3262,6 +3256,37 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
 }
 
 // Render Toy Library  
+// Update cage input states based on locked status
+function updateCageInputStates() {
+    // Update all cage add/remove inputs across all sets
+    // Instead of using toyData, iterate through all possible cage inputs by checking the DOM
+    const allInputs = document.querySelectorAll('input[id^="add_"], input[id^="remove_"]');
+    
+    allInputs.forEach(input => {
+        // Check if this is a cage input
+        if (input.id.includes('_cage')) {
+            const isAdd = input.id.startsWith('add_');
+            const toyKey = input.id.replace('add_', '').replace('remove_', '');
+            
+            if (cageLocked) {
+                input.value = 0;
+                input.disabled = true;
+                input.style.opacity = '0.5';
+                input.style.pointerEvents = 'none';
+            } else {
+                if (isAdd) {
+                    input.value = toyModifiers[toyKey]?.addChance || 10;
+                } else {
+                    input.value = toyModifiers[toyKey]?.removeChance || 20;
+                }
+                input.disabled = !toyChecked['cage'] || !toySetEnabled[toyKey];
+                input.style.opacity = '1';
+                input.style.pointerEvents = 'auto';
+            }
+        }
+    });
+}
+
 function renderToyLibrary() {
     selectedSets = Array.from(document.querySelectorAll('#instructionSetCheckboxes input:checked'))
         .map(cb => cb.value);
@@ -3274,10 +3299,10 @@ function renderToyLibrary() {
     const setEmojis = {dressup: '🎨', apple: '🍎', digging: '⛏️', tnd: '🎯'};
     const allToys = {};
     
-    // Always add prison toy first with empty sets array
-    allToys['prison'] = {
-        id: 'prison',
-        name: 'Prison 🔒',
+    // Always add cage toy first with empty sets array
+    allToys['cage'] = {
+        id: 'cage',
+        name: 'Cage 🔒',
         sets: [],
         alwaysVisible: true
     };
@@ -3285,9 +3310,9 @@ function renderToyLibrary() {
     selectedSets.forEach(setId => {
         if (instructionSets[setId]) {
             instructionSets[setId].toys.forEach(toy => {
-                if (toy.id === 'prison') {
-                    // Add this set to prison's sets array
-                    allToys['prison'].sets.push({
+                if (toy.id === 'cage') {
+                    // Add this set to cage's sets array
+                    allToys['cage'].sets.push({
                         setId,
                         setName: instructionSets[setId].name,
                         emoji: setEmojis[setId] || ''
@@ -3351,11 +3376,11 @@ function renderToyLibrary() {
         header.appendChild(nameSpan);
         toyItem.appendChild(header);
         
-        // Special handling for prison toy
-        if (toyId === 'prison') {
-            const prisonControls = document.createElement('div');
-            prisonControls.className = 'toy-controls';
-            prisonControls.style.cssText = 'margin-left: 28px; margin-top: 10px; display: flex; flex-direction: row; gap: 16px; align-items: center;';
+        // Special handling for cage toy
+        if (toyId === 'cage') {
+            const cageControls = document.createElement('div');
+            cageControls.className = 'toy-controls';
+            cageControls.style.cssText = 'margin-left: 28px; margin-top: 10px; display: flex; flex-direction: row; gap: 16px; align-items: center;';
             
             // Worn checkbox (now first)
             const wornLabel = document.createElement('label');
@@ -3363,7 +3388,7 @@ function renderToyLibrary() {
             
             const wornCheckbox = document.createElement('input');
             wornCheckbox.type = 'checkbox';
-            wornCheckbox.checked = prisonWorn;
+            wornCheckbox.checked = cageWorn;
             wornCheckbox.disabled = !toyChecked[toyId];
             wornCheckbox.style.cssText = 'width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;';
             
@@ -3373,7 +3398,7 @@ function renderToyLibrary() {
             
             wornLabel.appendChild(wornCheckbox);
             wornLabel.appendChild(wornText);
-            prisonControls.appendChild(wornLabel);
+            cageControls.appendChild(wornLabel);
             
             // Locked checkbox (now second)
             const lockedLabel = document.createElement('label');
@@ -3381,48 +3406,15 @@ function renderToyLibrary() {
             
             const lockedCheckbox = document.createElement('input');
             lockedCheckbox.type = 'checkbox';
-            lockedCheckbox.checked = prisonLocked;
+            lockedCheckbox.checked = cageLocked;
             lockedCheckbox.disabled = !toyChecked[toyId];
             lockedCheckbox.style.cssText = 'width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;';
             lockedCheckbox.onchange = () => {
-                prisonLocked = lockedCheckbox.checked;
+                cageLocked = lockedCheckbox.checked;
                 saveGameState();
-                // Update all prison add/remove inputs to show locked state
-                updatePrisonInputStates();
+                // Update all cage add/remove inputs to show locked state
+                updateCageInputStates();
             };
-            
-            function updatePrisonInputStates() {
-                // Update all prison add/remove inputs across all sets
-                toyData.sets.forEach(setInfo => {
-                    const toyKey = `${setInfo.setId}_prison`;
-                    const addInput = document.getElementById(`add_${toyKey}`);
-                    const removeInput = document.getElementById(`remove_${toyKey}`);
-                    
-                    if (addInput) {
-                        if (prisonLocked) {
-                            addInput.value = 0;
-                            addInput.style.opacity = '0.5';
-                            addInput.style.pointerEvents = 'none';
-                        } else {
-                            addInput.value = toyModifiers[toyKey]?.addChance || 10;
-                            addInput.style.opacity = '1';
-                            addInput.style.pointerEvents = 'auto';
-                        }
-                    }
-                    
-                    if (removeInput) {
-                        if (prisonLocked) {
-                            removeInput.value = 0;
-                            removeInput.style.opacity = '0.5';
-                            removeInput.style.pointerEvents = 'none';
-                        } else {
-                            removeInput.value = toyModifiers[toyKey]?.removeChance || 20;
-                            removeInput.style.opacity = '1';
-                            removeInput.style.pointerEvents = 'auto';
-                        }
-                    }
-                });
-            }
             
             const lockedText = document.createElement('span');
             lockedText.textContent = '🔒 Locked';
@@ -3430,15 +3422,15 @@ function renderToyLibrary() {
             
             lockedLabel.appendChild(lockedCheckbox);
             lockedLabel.appendChild(lockedText);
-            prisonControls.appendChild(lockedLabel);
+            cageControls.appendChild(lockedLabel);
             
             // Worn checkbox change handler
             wornCheckbox.onchange = () => {
-                prisonWorn = wornCheckbox.checked;
+                cageWorn = wornCheckbox.checked;
                 
                 // If unchecking worn, also uncheck and disable locked
-                if (!prisonWorn) {
-                    prisonLocked = false;
+                if (!cageWorn) {
+                    cageLocked = false;
                     lockedCheckbox.checked = false;
                     lockedCheckbox.disabled = true;
                     lockedCheckbox.style.opacity = '0.5';
@@ -3453,15 +3445,15 @@ function renderToyLibrary() {
             };
             
             // Set initial locked state based on worn
-            if (!prisonWorn) {
+            if (!cageWorn) {
                 lockedCheckbox.disabled = true;
                 lockedCheckbox.style.opacity = '0.5';
                 lockedText.style.color = '#999';
             }
             
-            toyItem.appendChild(prisonControls);
+            toyItem.appendChild(cageControls);
             
-            // If prison has sets (TnD or Analyse selected), show difficulty/modifiers
+            // If cage has sets (TnD or Analyse selected), show difficulty/modifiers
             if (toyData.sets.length > 0) {
                 const setDifficultyContainer = document.createElement('div');
                 setDifficultyContainer.className = 'set-difficulty';
@@ -3552,11 +3544,11 @@ function renderToyLibrary() {
                         addInput.type = 'number';
                         addInput.min = '0';
                         addInput.max = '100';
-                        // Show 0 if prison is locked, otherwise show stored value
-                        addInput.value = (toyId === 'prison' && prisonLocked) ? 0 : (toyModifiers[toyKey]?.addChance || 10);
+                        // Show 0 if cage is locked, otherwise show stored value
+                        addInput.value = (toyId === 'cage' && cageLocked) ? 0 : (toyModifiers[toyKey]?.addChance || 10);
                         addInput.id = `add_${toyKey}`;
                         // Disable if locked or if toy/set disabled
-                        addInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey] || (toyId === 'prison' && prisonLocked);
+                        addInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey] || (toyId === 'cage' && cageLocked);
                         addInput.oninput = (e) => {
                             const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
                             e.target.value = val;
@@ -3575,11 +3567,11 @@ function renderToyLibrary() {
                         removeInput.type = 'number';
                         removeInput.min = '0';
                         removeInput.max = '100';
-                        // Show 0 if prison is locked, otherwise show stored value
-                        removeInput.value = (toyId === 'prison' && prisonLocked) ? 0 : (toyModifiers[toyKey]?.removeChance || 20);
+                        // Show 0 if cage is locked, otherwise show stored value
+                        removeInput.value = (toyId === 'cage' && cageLocked) ? 0 : (toyModifiers[toyKey]?.removeChance || 20);
                         removeInput.id = `remove_${toyKey}`;
                         // Disable if locked or if toy/set disabled
-                        removeInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey] || (toyId === 'prison' && prisonLocked);
+                        removeInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey] || (toyId === 'cage' && cageLocked);
                         removeInput.oninput = (e) => {
                             const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
                             e.target.value = val;
@@ -3604,11 +3596,11 @@ function renderToyLibrary() {
             container.appendChild(toyItem);
             
             // Apply locked state to inputs after rendering
-            if (typeof updatePrisonInputStates === 'function') {
-                updatePrisonInputStates();
+            if (typeof updateCageInputStates === 'function') {
+                updateCageInputStates();
             }
             
-            continue; // Skip normal rendering for prison
+            continue; // Skip normal rendering for cage
         }
         
         const controls = document.createElement('div');
@@ -3772,6 +3764,9 @@ function renderToyLibrary() {
         container.appendChild(toyItem);
     }
     
+    // Update cage input states after rendering
+    updateCageInputStates();
+    
     saveGameState();
 }
 
@@ -3786,8 +3781,8 @@ function applyPreset(toyKey, difficulty) {
         const [setId, ...toyIdParts] = toyKey.split('_');
         const toyId = toyIdParts.join('_');
         
-        // If this is prison and it's locked, don't change add/remove values
-        if (toyId === 'prison' && prisonLocked) {
+        // If this is cage and it's locked, don't change add/remove values
+        if (toyId === 'cage' && cageLocked) {
             toyDifficulties[toyKey] = difficulty;
             // Don't update toyModifiers or inputs
             saveGameState();
@@ -3816,16 +3811,16 @@ document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => {
 
 // Final Challenge probability sliders
 const gesturesSlider = document.getElementById('gesturesSlider');
-const vibraniumSlider = document.getElementById('vibraniumSlider');
+const vibeSlider = document.getElementById('vibeSlider');
 const analyseSlider = document.getElementById('analyseSlider');
 
 function updateFinalChallengeDisplays() {
     document.getElementById('gesturesPercent').textContent = finalChallengeSettings.gestures + '%';
-    document.getElementById('vibraniumPercent').textContent = finalChallengeSettings.vibranium + '%';
+    document.getElementById('vibePercent').textContent = finalChallengeSettings.vibe + '%';
     document.getElementById('analysePercent').textContent = finalChallengeSettings.analyse + '%';
     
     gesturesSlider.value = finalChallengeSettings.gestures;
-    vibraniumSlider.value = finalChallengeSettings.vibranium;
+    vibeSlider.value = finalChallengeSettings.vibe;
     analyseSlider.value = finalChallengeSettings.analyse;
     
     saveGameState();
@@ -3835,43 +3830,51 @@ gesturesSlider.addEventListener('input', function() {
     const newGestures = Math.round(parseFloat(this.value));
     const maxAllowed = 100 - Math.round(finalChallengeSettings.analyse);
     finalChallengeSettings.gestures = newGestures > maxAllowed ? maxAllowed : newGestures;
-    finalChallengeSettings.vibranium = 100 - finalChallengeSettings.analyse - finalChallengeSettings.gestures;
+    finalChallengeSettings.vibe = 100 - finalChallengeSettings.analyse - finalChallengeSettings.gestures;
     updateFinalChallengeDisplays();
 });
 
-vibraniumSlider.addEventListener('input', function() {
-    const newVibranium = Math.round(parseFloat(this.value));
+vibeSlider.addEventListener('input', function() {
+    const newVibe = Math.round(parseFloat(this.value));
     const maxAllowed = 100 - Math.round(finalChallengeSettings.analyse);
-    finalChallengeSettings.vibranium = newVibranium > maxAllowed ? maxAllowed : newVibranium;
-    finalChallengeSettings.gestures = 100 - finalChallengeSettings.analyse - finalChallengeSettings.vibranium;
+    finalChallengeSettings.vibe = newVibe > maxAllowed ? maxAllowed : newVibe;
+    finalChallengeSettings.gestures = 100 - finalChallengeSettings.analyse - finalChallengeSettings.vibe;
     updateFinalChallengeDisplays();
 });
 
 analyseSlider.addEventListener('input', function() {
     const newAnalyse = Math.round(parseFloat(this.value));
-    const available = 100 - newAnalyse;
-    const currentTotal = Math.round(finalChallengeSettings.gestures) + Math.round(finalChallengeSettings.vibranium);
     
-    // Changed: use equal split for BOTH directions (not just when increasing)
-    if (available !== currentTotal) {
-        const change = available - currentTotal;
-        const half = change / 2;
-        finalChallengeSettings.gestures = Math.max(0, Math.round(finalChallengeSettings.gestures + half));
-        finalChallengeSettings.vibranium = Math.max(0, Math.round(finalChallengeSettings.vibranium + half));
-        
-        // Ensure total is exactly 100 by adjusting analyse if values were clamped
-        const actualTotal = finalChallengeSettings.gestures + finalChallengeSettings.vibranium;
-        finalChallengeSettings.analyse = Math.max(0, 100 - actualTotal);
+    // Special case: if analyse is 100%, force the others to 0
+    if (newAnalyse >= 100) {
+        finalChallengeSettings.gestures = 0;
+        finalChallengeSettings.vibe = 0;
+        finalChallengeSettings.analyse = 100;
     } else {
-        finalChallengeSettings.analyse = Math.max(0, newAnalyse);
+        const available = 100 - newAnalyse;
+        const currentTotal = Math.round(finalChallengeSettings.gestures) + Math.round(finalChallengeSettings.vibe);
+        
+        // Changed: use equal split for BOTH directions (not just when increasing)
+        if (available !== currentTotal) {
+            const change = available - currentTotal;
+            const half = change / 2;
+            finalChallengeSettings.gestures = Math.max(0, Math.round(finalChallengeSettings.gestures + half));
+            finalChallengeSettings.vibe = Math.max(0, Math.round(finalChallengeSettings.vibe + half));
+            
+            // Ensure total is exactly 100 by adjusting analyse if values were clamped
+            const actualTotal = finalChallengeSettings.gestures + finalChallengeSettings.vibe;
+            finalChallengeSettings.analyse = Math.max(0, 100 - actualTotal);
+        } else {
+            finalChallengeSettings.analyse = Math.max(0, newAnalyse);
+        }
     }
     
     updateFinalChallengeDisplays();
 });
 
 // Final challenge type checkboxes
-['gestures_ihot', 'gestures_icewater', 'gestures_spikeyband', 'gestures_squeezing', 'gestures_2finger',
- 'vibranium_ihot', 'vibranium_icewater', 'analyse_vibranium'].forEach(id => {
+['gestures_icyhot', 'gestures_icewater', 'gestures_ktb', 'gestures_ballsqueeze', 'gestures_2finger',
+ 'vibe_icyhot', 'vibe_icewater', 'analyse_vibe'].forEach(id => {
     document.getElementById(id).addEventListener('change', function() {
         finalChallengeTypes[id] = this.checked;
         saveGameState();
@@ -3879,7 +3882,7 @@ analyseSlider.addEventListener('input', function() {
 });
 
 // Final challenge difficulty dropdowns
-['gestures', 'vibranium', 'analyse'].forEach(type => {
+['gestures', 'vibe', 'analyse'].forEach(type => {
     document.getElementById(`${type}Difficulty`).addEventListener('change', function() {
         finalChallengeDifficulties[type] = this.value;
         saveGameState();
@@ -3887,8 +3890,8 @@ analyseSlider.addEventListener('input', function() {
 });
 
 // Final challenge modifier percentage inputs
-['gestures_ihot', 'gestures_icewater', 'gestures_spikeyband', 'gestures_squeezing', 'gestures_2finger',
- 'vibranium_ihot', 'vibranium_icewater', 'analyse_vibranium'].forEach(id => {
+['gestures_icyhot', 'gestures_icewater', 'gestures_ktb', 'gestures_ballsqueeze', 'gestures_2finger',
+ 'vibe_icyhot', 'vibe_icewater', 'analyse_vibe'].forEach(id => {
     document.getElementById(`${id}_chance`).addEventListener('input', function() {
         let value = parseInt(this.value) || 0;
         value = Math.max(0, Math.min(100, value)); // Clamp between 0-100
@@ -3924,9 +3927,9 @@ function startGame() {
         return;
     }
     
-    // Add prison to Pe if "Start Worn" is checked
-    if (prisonWorn && toyChecked['prison']) {
-        addToyToBodyPart('Pe', 'prison');
+    // Add cage to Pe if "Start Worn" is checked
+    if (cageWorn && toyChecked['cage']) {
+        addToyToBodyPart('Pe', 'cage');
     }
     
     gameStarted = true;
@@ -3987,8 +3990,8 @@ function displayFinalChallenge() {
     // Determine which task type based on weighted probability
     if (roll < finalChallengeSettings.gestures) {
         targetTaskId = 'gestures';
-    } else if (roll < finalChallengeSettings.gestures + finalChallengeSettings.vibranium) {
-        targetTaskId = 'vibranium';
+    } else if (roll < finalChallengeSettings.gestures + finalChallengeSettings.vibe) {
+        targetTaskId = 'vibe';
     } else {
         targetTaskId = 'analyse';
     }
@@ -4117,8 +4120,8 @@ confirmResetBtn.addEventListener('click', function() {
     playerName = '';
     player.remove();
     bodyPartState = JSON.parse(JSON.stringify(bodyParts));
-    prisonLocked = false;
-    prisonWorn = false;
+    cageLocked = false;
+    cageWorn = false;
     
     startButton.style.display = 'block';
     rollDiceButton.style.display = 'none';
@@ -4146,7 +4149,7 @@ confirmResetBtn.addEventListener('click', function() {
     toyDifficulties = {};
     toyQuantities = {};
     toyModifiers = {};
-    prizeSettings = {minor: 25, major: 10, noPrize: 65};
+    prizeSettings = {full: 33, ruin: 33, denied: 34};
     
     updateSliderDisplays();
     renderToyLibrary();
