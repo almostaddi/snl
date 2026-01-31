@@ -353,18 +353,18 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #ruinSlider { 
-    background: linear-gradient(to right, #51cf66, #37b24d); 
+    background: linear-gradient(to right, #ffd93d, #ffbc00); 
 }
 
 #fullSlider { 
-    background: linear-gradient(to right, #ffd93d, #ffbc00); 
+    background: linear-gradient(to right, #51cf66, #37b24d); 
 }
 
 #deniedSlider { 
     background: linear-gradient(to right, #adb5bd, #868e96); 
 }
 
-#gesturesSlider {
+#strokingSlider {
     background: linear-gradient(to right, #748ffc, #5c7cfa);
 }
 
@@ -372,7 +372,7 @@ input[type="range"]::-moz-range-thumb {
     background: linear-gradient(to right, #a78bfa, #8b5cf6);
 }
 
-#analyseSlider {
+#analSlider {
     background: linear-gradient(to right, #f59f0b, #d97706);
 }
 
@@ -569,7 +569,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .advanced-settings input { 
-    width: 45px; 
+    width: 50px; 
     padding: 2px 4px; 
     border: 1px solid #dee2e6; 
     border-radius: 3px; 
@@ -781,14 +781,10 @@ input[type="range"]::-moz-range-thumb {
         <div id="board"></div>
         <div id="controls">
             <button id="startButton">🎮 Start Game</button>
-            <button id="rollDice" style="display: none;">🎲 Roll Dice</button>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <label style="font-size: 14px; color: #333;">Test Jump:</label>
-                <input type="number" id="testJumpInput" min="1" max="100" placeholder="Square" 
-                       style="width: 80px; padding: 8px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;">
-                <button id="testJumpButton" style="padding: 8px 15px; background: #f39c12; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                    Jump
-                </button>
+                <button id="rollDice" style="display: none;">🎲 Roll Dice</button>
+                <input type="number" id="testJumpInput" min="1" max="100" placeholder="or jump to #" 
+                       style="display: none; width: 100px; padding: 8px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;">
             </div>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <div id="diceResult" style="display: none;">Dice: -</div>
@@ -803,13 +799,20 @@ input[type="range"]::-moz-range-thumb {
                 
                 <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px;">📦 Select Instruction Sets:</label>
                 <div id="instructionSetCheckboxes" class="instruction-set-selector">
-                    <label><input type="checkbox" value="apple"> Analyse Set 🍎</label>
-                    <label><input type="checkbox" value="digging"> Deepthread Set ⛏️</label>
-                    <label><input type="checkbox" value="dressup"> Pinplay Set 🎨</label>
-                    <label><input type="checkbox" value="tnd"> TnD 🎯</label>
+                    <label><input type="checkbox" value="apple"> Anal Set 🍎</label>
+                    <label><input type="checkbox" value="digging"> Deepthroat ⛏️</label>
+                    <label><input type="checkbox" value="dressup"> Painplay 🎨</label>
+                    <label><input type="checkbox" value="teaseanddenial"> Tease And Denial 🎯</label>
                 </div>
 
                 <label style="display: block; font-weight: bold; color: #333; margin-top: 15px; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px;">🎮 Select Toys:</label>
+                <div style="background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #dee2e6;">
+                    <div style="font-weight: 600; color: #333; margin-bottom: 8px;">📊 Continuous Task Probability:</div>
+                    <div style="display: flex; gap: 15px; font-size: 14px;">
+                        <span style="color: #51cf66; font-weight: 500;">➕ Add: <span id="totalAddProbability" style="font-weight: 700;">0%</span></span>
+                        <span style="color: #ff6b6b; font-weight: 500;">➖ Remove: <span id="totalRemoveProbability" style="font-weight: 700;">0%</span></span>
+                    </div>
+                </div>
                 <div id="toyLibraryContainer"></div>
             </div>
             
@@ -821,29 +824,29 @@ input[type="range"]::-moz-range-thumb {
                     <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Set probabilities for each final challenge type. These are separate from the main game toys.</p>
                     
                     <div class="slider-container">
-                        <div class="slider-label"><span>🤲 Gestures:</span><span class="percentage" id="gesturesPercent">33%</span></div>
-                        <input type="range" id="gesturesSlider" min="0" max="100" value="33">
+                        <div class="slider-label"><span>🤲 Stroking:</span><span class="percentage" id="strokingPercent">33%</span></div>
+                        <input type="range" id="strokingSlider" min="0" max="100" value="33">
                     </div>
                     <div class="slider-container">
                         <div class="slider-label"><span>💎 Vibe:</span><span class="percentage" id="vibePercent">33%</span></div>
                         <input type="range" id="vibeSlider" min="0" max="100" value="33">
                     </div>
                     <div class="slider-container">
-                        <div class="slider-label"><span>🔍 Analyse:</span><span class="percentage" id="analysePercent">34%</span></div>
-                        <input type="range" id="analyseSlider" min="0" max="100" value="34">
+                        <div class="slider-label"><span>🔍 Anal:</span><span class="percentage" id="analPercent">34%</span></div>
+                        <input type="range" id="analSlider" min="0" max="100" value="34">
                     </div>
                     
                     <!-- Challenge Types -->
                     <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #e9ecef;">
                         <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">Challenge Types & Difficulty:</h4>
                         
-                        <!-- Gestures -->
+                        <!-- Stroking -->
                         <div style="margin-bottom: 20px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <div style="font-weight: 600; color: #5c7cfa;">🤲 Gestures:</div>
+                                <div style="font-weight: 600; color: #5c7cfa;">🤲 Stroking:</div>
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span style="font-size: 12px; color: #666;">Difficulty:</span>
-                                    <select id="gesturesDifficulty" style="padding: 4px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; background: white;">
+                                    <select id="strokingDifficulty" style="padding: 4px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; background: white;">
                                         <option value="easy">Easy</option>
                                         <option value="medium" selected>Medium</option>
                                         <option value="hard">Hard</option>
@@ -852,33 +855,33 @@ input[type="range"]::-moz-range-thumb {
                             </div>
                             <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="gestures_icyhot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <input type="checkbox" id="stroking_icyhot" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">Icy Hot</span>
-                                    <input type="number" id="gestures_icyhot_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="number" id="stroking_icyhot_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="gestures_icewater" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <input type="checkbox" id="stroking_icewater" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">Ice Water</span>
-                                    <input type="number" id="gestures_icewater_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="number" id="stroking_icewater_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="gestures_ktb" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <input type="checkbox" id="stroking_ktb" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">KTB</span>
-                                    <input type="number" id="gestures_ktb_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="number" id="stroking_ktb_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="gestures_ballsqueeze" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <input type="checkbox" id="stroking_ballsqueeze" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">Ball Squeeze</span>
-                                    <input type="number" id="gestures_ballsqueeze_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="number" id="stroking_ballsqueeze_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="gestures_2finger" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
+                                    <input type="checkbox" id="stroking_2finger" style="width: 16px; height: 16px; cursor: pointer; accent-color: #5c7cfa;">
                                     <span style="color: #495057; font-size: 14px;">2 Finger</span>
-                                    <input type="number" id="gestures_2finger_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="number" id="stroking_2finger_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                             </div>
@@ -913,13 +916,13 @@ input[type="range"]::-moz-range-thumb {
                             </div>
                         </div>
                         
-                        <!-- Analyse -->
+                        <!-- Anal -->
                         <div style="margin-bottom: 20px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <div style="font-weight: 600; color: #d97706;">🔍 Analyse:</div>
+                                <div style="font-weight: 600; color: #d97706;">🔍 Anal:</div>
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span style="font-size: 12px; color: #666;">Difficulty:</span>
-                                    <select id="analyseDifficulty" style="padding: 4px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; background: white;">
+                                    <select id="analDifficulty" style="padding: 4px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; background: white;">
                                         <option value="easy">Easy</option>
                                         <option value="medium" selected>Medium</option>
                                         <option value="hard">Hard</option>
@@ -928,9 +931,9 @@ input[type="range"]::-moz-range-thumb {
                             </div>
                             <div style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="analyse_vibe" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;">
+                                    <input type="checkbox" id="anal_vibe" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;">
                                     <span style="color: #495057; font-size: 14px;">Vibe</span>
-                                    <input type="number" id="analyse_vibe_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
+                                    <input type="number" id="anal_vibe_chance" min="0" max="100" value="10" style="width: 50px; padding: 2px 4px; border: 1px solid #dee2e6; border-radius: 4px; text-align: center; font-size: 12px;" placeholder="%">
                                     <span style="font-size: 12px; color: #666;">%</span>
                                 </label>
                             </div>
@@ -1022,58 +1025,59 @@ let toyDifficulties = {};
 let gameStarted = false;
 let playerPosition = 0;
 let turnCount = 0;
-let turnCountBySet = {}; // Track turns per set (e.g., {dressup: 5, tnd: 3})
-let turnCountByToy = {}; // Track turns per set-toy combo (e.g., {dressup_stickers: 3, tnd_cage: 2})
-let lastSelectedSet = {}; // Track which set each toy was last selected from (e.g., {stickers: 'dressup', cage: 'tnd'})
-let completedOnlyOnceTasks = {}; // Track which onlyOnce tasks have been completed (e.g., {tnd_cage_always: true})
+let turnCountBySet = {}; // Track turns per set (e.g., {dressup: 5, teaseanddenial: 3})
+let turnCountByToy = {}; // Track turns per set-toy combo (e.g., {dressup_pegs: 3, teaseanddenial_cage: 2})
+let lastSelectedSet = {}; // Track which set each toy was last selected from (e.g., {pegs: 'dressup', cage: 'teaseanddenial'})
+let completedOnlyOnceTasks = {}; // Track which onlyOnce tasks have been completed (e.g., {teaseanddenial_cage_always: true})
 let selectedSets = [];
 let prizeSettings = {full: 33, ruin: 33, denied: 34};
 let toyQuantities = {};
 let toyModifiers = {};
+let expandedAdvancedSettings = {}; // Track which toys have advanced settings expanded
 let playerName = '';
 let toySetEnabled = {};
 let toyChecked = {};
 
-// Cage-specific state (always available, not tied to TnD selection)
+// Cage-specific state (always available, not tied to Tease And Denial selection)
 let cageLocked = false;
 let cageWorn = false;
 
 // Final challenge state
 let finalChallengeSettings = {
-    gestures: 33,
+    stroking: 33,
     vibe: 33,
-    analyse: 34
+    anal: 34
 };
 
 // Final challenge types enabled
 let finalChallengeTypes = {
-    gestures_icyhot: false,
-    gestures_icewater: false,
-    gestures_ktb: false,
-    gestures_ballsqueeze: false,
-    gestures_2finger: false,
+    stroking_icyhot: false,
+    stroking_icewater: false,
+    stroking_ktb: false,
+    stroking_ballsqueeze: false,
+    stroking_2finger: false,
     vibe_icyhot: false,
     vibe_icewater: false,
-    analyse_vibe: false
+    anal_vibe: false
 };
 
 // Final challenge modifier percentages (chance to be applied)
 let finalChallengeModifierChances = {
-    gestures_icyhot: 10,
-    gestures_icewater: 10,
-    gestures_ktb: 10,
-    gestures_ballsqueeze: 10,
-    gestures_2finger: 10,
+    stroking_icyhot: 10,
+    stroking_icewater: 10,
+    stroking_ktb: 10,
+    stroking_ballsqueeze: 10,
+    stroking_2finger: 10,
     vibe_icyhot: 10,
     vibe_icewater: 10,
-    analyse_vibe: 10
+    anal_vibe: 10
 };
 
 // Final challenge difficulties
 let finalChallengeDifficulties = {
-    gestures: 'medium',
+    stroking: 'medium',
     vibe: 'medium',
-    analyse: 'medium'
+    anal: 'medium'
 };
 
 // Final challenge modifiers
@@ -1094,8 +1098,8 @@ const bodyParts = {
     Pe: { name: "Pe", items: [] }
 };
 
-// Clothestickers max count per body part
-const clothestickersMaxCount = {
+// Clothes Pegs max count per body part
+const clothespegsMaxCount = {
     'Ba': 20,
     'Ni': 2,
     'Mo': 3,
@@ -1107,7 +1111,7 @@ const clothestickersMaxCount = {
 };
 
 // List of toys that can be worn/held on body parts
-const wearableToys = new Set(['stickers', 'silly_shirt', 'stick_a', 'stick_m', 'metal_stick', 'tail', 'cage', 'hand', 'vibe']);
+const wearableToys = new Set(['pegs', 'silly_shirt', 'stick_a', 'stick_m', 'metal_stick', 'tail', 'cage', 'hand', 'vibe']);
 
 function isToyWearable(toyId) {
     return wearableToys.has(toyId);
@@ -1117,20 +1121,20 @@ function isBodyPartEmpty(bodyPart) {
     return bodyPartState[bodyPart].items.length === 0;
 }
 
-function hasClothestickers(bodyPart) {
-    return bodyPartState[bodyPart].items.some(item => item === 'stickers');
+function hasClothesPegs(bodyPart) {
+    return bodyPartState[bodyPart].items.some(item => item === 'pegs');
 }
 
 function hasRegularToys(bodyPart) {
-    return bodyPartState[bodyPart].items.some(item => item !== 'stickers');
+    return bodyPartState[bodyPart].items.some(item => item !== 'pegs');
 }
 
-function getClothestickerCount(bodyPart) {
-    return bodyPartState[bodyPart].items.filter(item => item === 'stickers').length;
+function hasClothesPegCount(bodyPart) {
+    return bodyPartState[bodyPart].items.filter(item => item === 'pegs').length;
 }
 
-function getClothestickerMax(bodyPart) {
-    return clothestickersMaxCount[bodyPart] || 1;
+function getClothesPegMax(bodyPart) {
+    return clothespegsMaxCount[bodyPart] || 1;
 }
 
 let bodyPartState = JSON.parse(JSON.stringify(bodyParts));
@@ -1208,8 +1212,8 @@ function getTaskConditions() {
             return hasRegularToys(bodyPartKey);
         },
         
-        bodyPartHasClothestickers: (bodyPartKey) => {
-            return hasClothestickers(bodyPartKey);
+        bodyPartHasClothesPegs: (bodyPartKey) => {
+            return hasClothesPegs(bodyPartKey);
         },
         
         isBodyPartOccupied: (bodyPartKey) => {
@@ -1269,32 +1273,32 @@ function getDifficultyValue(difficulty, easyVal, mediumVal, hardVal) {
 // Instruction Sets
 const instructionSets = {
     dressup: {
-        name: "Pinplay Set",
+        name: "Painplay",
         toys: [
-            {id: "stickers", name: "Clothestickers 🎨"},
+            {id: "pegs", name: "Clothes Pegs 🎨"},
             {id: "silly_shirt", name: "Clamps 👕"},
             {id: "wristband", name: "KTB ⌚"},
             {id: "hand", name: "Hand ✋"},
             {id: "vibe", name: "Vibe 💎"}
         ],
         tasks: {
-            stickers: [
+            pegs: [
                 {
-                    // STANDARD TASK: Apply clothestickers
-                    // Difficulty: Easy=3, Medium=5, Hard=8 clothestickers
+                    // STANDARD TASK: Apply clothespegs
+                    // Difficulty: Easy=3, Medium=5, Hard=8 clothespegs
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Clothesticker Challenge</strong><p>Apply ${d=='easy'?3:d=='medium'?5:8} clothestickers to yourself.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard clothesticker task. Difficulty: Easy=3, Medium=5, Hard=8 stickers.</em></p><img src="https://picsum.photos/seed/sticker1/800/600"/>`
+                    getDifficulty: d => `<strong>Clothes Peg Challenge</strong><p>Apply ${d=='easy'?3:d=='medium'?5:8} clothespegs to yourself.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard clothespeg task. Difficulty: Easy=3, Medium=5, Hard=8 pegs.</em></p><img src="https://picsum.photos/seed/peg1/800/600"/>`
                 },
                 {
-                    // ADD TASK: Add clothestickers to Ba
-                    // Difficulty: Easy=3, Medium=5, Hard=8 clothestickers
+                    // ADD TASK: Add clothespegs to Ba
+                    // Difficulty: Easy=3, Medium=5, Hard=8 clothespegs
                     type: 'add', 
                     bodyPart: 'Ba', 
                     quantity: d => d=='easy'?3:d=='medium'?5:8
                 },
                 {
-                    // REMOVE TASK: Remove clothestickers from Ba
-                    // Difficulty: Easy=3, Medium=5, Hard=8 clothestickers
+                    // REMOVE TASK: Remove clothespegs from Ba
+                    // Difficulty: Easy=3, Medium=5, Hard=8 clothespegs
                     type: 'remove', 
                     bodyPart: 'Ba', 
                     quantity: d => d=='easy'?3:d=='medium'?5:8
@@ -1304,21 +1308,21 @@ const instructionSets = {
                 {
                     // DYNAMIC TASK: Multi-toy task with conditions
                     // CONDITIONS:
-                    //   - Only available if: Analyse set is selected OR Ba has clothestickers
+                    //   - Only available if: Anal set is selected OR Ba has clothespegs
                     // DYNAMIC BEHAVIOR:
                     //   - If wearing clamps: asks to spin (uses clamps difficulty: Easy=5s, Medium=10s, Hard=15s)
                     //   - If not wearing: asks to put it on
-                    //   - Adds special comment if Analyse set is active
-                    //   - If Ba can hold more stickers: adds requirement to add clothestickers (uses sticker difficulty: Easy=3, Medium=5, Hard=8)
-                    //   - Comments on existing clothesticker count in Ba (0, <5, <15, 15+)
+                    //   - Adds special comment if Anal set is active
+                    //   - If Ba can hold more pegs: adds requirement to add clothespegs (uses peg difficulty: Easy=3, Medium=5, Hard=8)
+                    //   - Comments on existing clothespeg count in Ba (0, <5, <15, 15+)
                     canSelect: (c) => {
-                        return c.hasSet('apple') || c.countToyInBodyPart('stickers', 'Ba') > 0;
+                        return c.hasSet('apple') || c.countToyInBodyPart('pegs', 'Ba') > 0;
                     },
                     getDifficulty: (primaryDifficulty, c, diffMap) => {
                         let html = '<strong>Clamps Task</strong><p>';
                         
                         const shirtDiff = diffMap['silly_shirt'] || 'medium';
-                        const stickerDiff = diffMap['stickers'] || 'medium';
+                        const pegDiff = diffMap['pegs'] || 'medium';
                         
                         if (c.bodyPartHas('Ni', 'silly_shirt')) {
                             const spinTime = getDifficultyValue(shirtDiff, 5, 10, 15);
@@ -1326,36 +1330,36 @@ const instructionSets = {
                         } else {
                             html += 'Put on the clamps';
                             if (c.hasSet('apple')) {
-                                html += ' (the Analyse set appreciates fashion)';
+                                html += ' (the Anal set appreciates fashion)';
                             }
                             html += '.';
                         }
                         
-                        const baStickers = c.countToyInBodyPart('stickers', 'Ba');
-                        const stickerCount = getDifficultyValue(stickerDiff, 3, 5, 8);
+                        const baPegs = c.countToyInBodyPart('pegs', 'Ba');
+                        const pegCount = getDifficultyValue(pegDiff, 3, 5, 8);
                         
-                        if (c.canBodyPartHold('Ba', 'stickers')) {
-                            html += `<br><br>Also add ${stickerCount} clothestickers to Ba.`;
+                        if (c.canBodyPartHold('Ba', 'pegs')) {
+                            html += `<br><br>Also add ${pegCount} clothespegs to Ba.`;
                         }
                         
-                        if (baStickers > 0) {
+                        if (baPegs > 0) {
                             html += '<br><br><em>';
-                            if (baStickers < 5) {
-                                html += "Just a few clothestickers... not bad.";
-                            } else if (baStickers < 15) {
-                                html += "That's quite a few clothestickers!";
+                            if (baPegs < 5) {
+                                html += "Just a few clothespegs... not bad.";
+                            } else if (baPegs < 15) {
+                                html += "That's quite a few clothespegs!";
                             } else {
-                                html += "Wow! So many clothestickers!";
+                                html += "Wow! So many clothespegs!";
                             }
                             html += '</em>';
                         }
                         
                         html += '</p>';
                         html += '<p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Dynamic multi-toy task. ';
-                        html += 'Condition: Only appears if Analyse set selected OR Ba has clothestickers. ';
+                        html += 'Condition: Only appears if Anal set selected OR Ba has clothespegs. ';
                         html += 'Clamps difficulty (Easy=5s, Med=10s, Hard=15s). ';
-                        html += 'Clothesticker difficulty (Easy=3, Med=5, Hard=8). ';
-                        html += 'Changes based on: wearing shirt, Analyse set active, Ba sticker count, if Ba can hold more.</em></p>';
+                        html += 'Clothes Peg difficulty (Easy=3, Med=5, Hard=8). ';
+                        html += 'Changes based on: wearing shirt, Anal set active, Ba peg count, if Ba can hold more.</em></p>';
                         html += '<img src="https://picsum.photos/seed/shirt1/800/600"/>';
                         return html;
                     }
@@ -1416,30 +1420,30 @@ const instructionSets = {
         }
     },
     apple: {
-        name: "Analyse Set",
+        name: "Anal Set",
         toys: [
-            {id: "stick_a", name: "Dillstick A 🪵"},
-            {id: "metal_stick", name: "Metal Dillstick 🔩"},
-            {id: "tail", name: "Plugtail 🦊"},
+            {id: "stick_a", name: "Dildo A 🪵"},
+            {id: "metal_stick", name: "Metal Wand 🔩"},
+            {id: "tail", name: "Plug 🦊"},
             {id: "vibe", name: "Vibe 💎"},
             {id: "cage", name: "Cage 🔒"}
         ],
         tasks: {
             stick_a: [
                 {
-                    // STANDARD TASK: Balance dillstick A
+                    // STANDARD TASK: Balance dildo A
                     // Difficulty: Easy=3, Medium=5, Hard=8 seconds
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Dillstick A Balance</strong><p>Balance the dillstick A on your hand for ${d=='easy'?3:d=='medium'?5:8} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard dillstick A task. Difficulty: Easy=3s, Medium=5s, Hard=8s.</em></p><img src="https://picsum.photos/seed/stick1/800/600"/>`
+                    getDifficulty: d => `<strong>Dildo A Balance</strong><p>Balance the dildo A on your hand for ${d=='easy'?3:d=='medium'?5:8} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard dildo A task. Difficulty: Easy=3s, Medium=5s, Hard=8s.</em></p><img src="https://picsum.photos/seed/stick1/800/600"/>`
                 },
                 {
-                    // ADD TASK: Add dillstick A to Bu
+                    // ADD TASK: Add dildo A to Bu
                     // No difficulty variation - always 1 item
                     type: 'add', 
                     bodyPart: 'Bu'
                 },
                 {
-                    // REMOVE TASK: Remove dillstick A from Bu
+                    // REMOVE TASK: Remove dildo A from Bu
                     // No difficulty variation - always 1 item
                     type: 'remove', 
                     bodyPart: 'Bu'
@@ -1447,19 +1451,19 @@ const instructionSets = {
             ],
             metal_stick: [
                 {
-                    // STANDARD TASK: Tap metal dillstick
+                    // STANDARD TASK: Tap metal wand
                     // Difficulty: Easy=10, Medium=15, Hard=20 taps
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Metal Dillstick Tap</strong><p>Tap the metal dillstick on the ground ${d=='easy'?10:d=='medium'?15:20} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard metal dillstick task. Difficulty: Easy=10, Medium=15, Hard=20 taps.</em></p><img src="https://picsum.photos/seed/metal1/800/600"/>`
+                    getDifficulty: d => `<strong>Metal Wand Tap</strong><p>Tap the metal wand on the ground ${d=='easy'?10:d=='medium'?15:20} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard metal wand task. Difficulty: Easy=10, Medium=15, Hard=20 taps.</em></p><img src="https://picsum.photos/seed/metal1/800/600"/>`
                 },
                 {
-                    // ADD TASK: Add metal dillstick to Bu
+                    // ADD TASK: Add metal wand to Bu
                     // No difficulty variation - always 1 item
                     type: 'add', 
                     bodyPart: 'Bu'
                 },
                 {
-                    // REMOVE TASK: Remove metal dillstick from Bu
+                    // REMOVE TASK: Remove metal wand from Bu
                     // No difficulty variation - always 1 item
                     type: 'remove', 
                     bodyPart: 'Bu'
@@ -1467,19 +1471,19 @@ const instructionSets = {
             ],
             tail: [
                 {
-                    // STANDARD TASK: Wag plugtail
+                    // STANDARD TASK: Wag plug
                     // Difficulty: Easy=5, Medium=10, Hard=15 wags
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Plugtail Wag</strong><p>Wag your plugtail ${d=='easy'?5:d=='medium'?10:15} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard plugtail task. Difficulty: Easy=5, Medium=10, Hard=15 wags.</em></p><img src="https://picsum.photos/seed/tail1/800/600"/>`
+                    getDifficulty: d => `<strong>Plug Wag</strong><p>Wag your plug ${d=='easy'?5:d=='medium'?10:15} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard plug task. Difficulty: Easy=5, Medium=10, Hard=15 wags.</em></p><img src="https://picsum.photos/seed/tail1/800/600"/>`
                 },
                 {
-                    // ADD TASK: Add plugtail to Bu
+                    // ADD TASK: Add plug to Bu
                     // No difficulty variation - always 1 item
                     type: 'add', 
                     bodyPart: 'Bu'
                 },
                 {
-                    // REMOVE TASK: Remove plugtail from Bu
+                    // REMOVE TASK: Remove plug from Bu
                     // No difficulty variation - always 1 item
                     type: 'remove', 
                     bodyPart: 'Bu'
@@ -1507,7 +1511,7 @@ const instructionSets = {
                     // TASK: Inspect the cage
                     // DIFFICULTY: Easy=5sec, Medium=10sec, Hard=15sec
                     // CONDITIONS: None (always available)
-                    getDifficulty: d => `<strong>Cage Inspection</strong><p>Carefully inspect the cage for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Analyse cage task. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/cage2/800/600"/>`
+                    getDifficulty: d => `<strong>Cage Inspection</strong><p>Carefully inspect the cage for ${d=='easy'?5:d=='medium'?10:15} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Anal cage task. Difficulty: Easy=5s, Medium=10s, Hard=15s.</em></p><img src="https://picsum.photos/seed/cage2/800/600"/>`
                 },
                 {
                     // ADD TASK: Add cage to Pe
@@ -1525,27 +1529,27 @@ const instructionSets = {
         }
     },
     digging: {
-        name: "Deepthread Set",
+        name: "Deepthroat",
         toys: [
-            {id: "stick_m", name: "Dillstick M 🪵"},
+            {id: "stick_m", name: "Dildo M 🪵"},
             {id: "hand", name: "Hand ✋"}
         ],
         tasks: {
             stick_m: [
                 {
-                    // STANDARD TASK: Dig with dillstick M
+                    // STANDARD TASK: Dig with dildo M
                     // Difficulty: Easy=3, Medium=5, Hard=8 digging motions
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Dig with Dillstick M</strong><p>Use the dillstick M to make ${d=='easy'?3:d=='medium'?5:8} digging motions.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard dillstick M task. Difficulty: Easy=3, Medium=5, Hard=8 motions.</em></p><img src="https://picsum.photos/seed/dig1/800/600"/>`
+                    getDifficulty: d => `<strong>Dig with Dildo M</strong><p>Use the dildo M to make ${d=='easy'?3:d=='medium'?5:8} digging motions.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard dildo M task. Difficulty: Easy=3, Medium=5, Hard=8 motions.</em></p><img src="https://picsum.photos/seed/dig1/800/600"/>`
                 },
                 {
-                    // ADD TASK: Add dillstick M to Mo
+                    // ADD TASK: Add dildo M to Mo
                     // No difficulty variation - always 1 item
                     type: 'add', 
                     bodyPart: 'Mo'
                 },
                 {
-                    // REMOVE TASK: Remove dillstick M from Mo
+                    // REMOVE TASK: Remove dildo M from Mo
                     // No difficulty variation - always 1 item
                     type: 'remove', 
                     bodyPart: 'Mo'
@@ -1561,8 +1565,8 @@ const instructionSets = {
             ]
         }
     },
-    tnd: {
-        name: "TnD",
+    teaseanddenial: {
+        name: "Tease And Denial",
         toys: [
             {id: "vibe", name: "Vibe 💎"},
             {id: "hand", name: "Hand ✋"},
@@ -1588,25 +1592,25 @@ const instructionSets = {
             ],
             hand: [
                 {
-                    // STANDARD TASK: Hand gestures
-                    // Difficulty: Easy=8, Medium=12, Hard=16 gestures
+                    // STANDARD TASK: Hand stroking
+                    // Difficulty: Easy=8, Medium=12, Hard=16 stroking
                     // No conditions - always available
-                    getDifficulty: d => `<strong>Hand Gesture</strong><p>Make hand gestures ${d=='easy'?8:d=='medium'?12:16} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard hand gesture task. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/handtnd1/800/600"/>`
+                    getDifficulty: d => `<strong>Hand Gesture</strong><p>Make hand stroking ${d=='easy'?8:d=='medium'?12:16} times.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Standard hand stroke task. Difficulty: Easy=8, Medium=12, Hard=16 stroking.</em></p><img src="https://picsum.photos/seed/handteaseanddenial1/800/600"/>`
                 }
             ],
             cage: [
                 {
-                    // SPECIAL ALWAYS TASK: Put on cage after 2 TnD hand tasks
-                    // CONDITIONS: TnD selected, Cage can be worn on Pe, Rolled 2+ TnD hand tasks
+                    // SPECIAL ALWAYS TASK: Put on cage after 2 Tease And Denial hand tasks
+                    // CONDITIONS: Tease And Denial selected, Cage can be worn on Pe, Rolled 2+ Tease And Denial hand tasks
                     // This task is "always" selected when conditions are met (overrides normal task selection)
                     alwaysSelect: (c) => {
-                        // Check if we've rolled at least 2 TnD hand tasks
-                        const handCount = c.getTurnCountForToy('tnd_hand');
+                        // Check if we've rolled at least 2 Tease And Denial hand tasks
+                        const handCount = c.getTurnCountForToy('teaseanddenial_hand');
                         if (handCount < 2) {
                             return false;
                         }
-                        // Check TnD is selected
-                        if (!c.hasSet('tnd')) {
+                        // Check Tease And Denial is selected
+                        if (!c.hasSet('teaseanddenial')) {
                             return false;
                         }
                         // Check if cage toy is checked
@@ -1623,8 +1627,8 @@ const instructionSets = {
                     excludeFromNormalPool: true,  // Only appears via alwaysSelect, not random selection
                     onlyOnce: true,  // Only triggers once per game (tracked separately)
                     getDifficulty: (d, c, diffMap) => {
-                        const handCount = c.getTurnCountForToy('tnd_hand');
-                        return `<strong>🔒 Special Cage Task!</strong><p>You've completed ${handCount} hand tasks from TnD. Time to put on the cage!</p><p>Place the cage on your Pe.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: ALWAYS task - only triggers after rolling 2+ TnD hand tasks if TnD selected, cage checked, and Pe can hold cage. This overrides normal task selection.</em></p><img src="https://picsum.photos/seed/cagehand/800/600"/>`;
+                        const handCount = c.getTurnCountForToy('teaseanddenial_hand');
+                        return `<strong>🔒 Special Cage Task!</strong><p>You've completed ${handCount} hand tasks from Tease And Denial. Time to put on the cage!</p><p>Place the cage on your Pe.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: ALWAYS task - only triggers after rolling 2+ Tease And Denial hand tasks if Tease And Denial selected, cage checked, and Pe can hold cage. This overrides normal task selection.</em></p><img src="https://picsum.photos/seed/cagehand/800/600"/>`;
                     },
                     execute: function() {
                         // Add cage to Pe
@@ -1632,12 +1636,12 @@ const instructionSets = {
                     }
                 },
                 {
-                    // TASK: Hand gestures (when cage is NOT on Pe AND hand is available)
-                    // DIFFICULTY: Easy=8, Medium=12, Hard=16 gestures
-                    // CONDITIONS: Cage is NOT on Pe AND hand toy is checked for TnD
+                    // TASK: Hand stroking (when cage is NOT on Pe AND hand is available)
+                    // DIFFICULTY: Easy=8, Medium=12, Hard=16 stroking
+                    // CONDITIONS: Cage is NOT on Pe AND hand toy is checked for Tease And Denial
                     canSelect: (c) => {
                         const isCageOnPe = c.isHolding('cage') && c.getBodyPartsHolding('cage').some(part => part.key === 'Pe');
-                        const isHandAvailable = c.toyChecked('hand') && c.toySetEnabled('tnd_hand');
+                        const isHandAvailable = c.toyChecked('hand') && c.toySetEnabled('teaseanddenial_hand');
                         return !isCageOnPe && isHandAvailable; // Cage OFF and hand available
                     },
                     getDifficulty: (d, c, diffMap) => {
@@ -1646,24 +1650,24 @@ const instructionSets = {
                         const isCageWorn = c.isHolding('cage');
                         
                         if (isCageWorn) {
-                            return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures while wearing the cage.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD hand task with cage worn. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/cagehandworn/800/600"/>`;
+                            return `<strong>Hand Stroking</strong><p>Complete ${count} hand stroking while wearing the cage.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Tease And Denial hand task with cage worn. Difficulty: Easy=8, Medium=12, Hard=16 stroking.</em></p><img src="https://picsum.photos/seed/cagehandworn/800/600"/>`;
                         } else {
-                            return `<strong>Hand Gestures</strong><p>Complete ${count} hand gestures.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD hand task without cage. Difficulty: Easy=8, Medium=12, Hard=16 gestures.</em></p><img src="https://picsum.photos/seed/cagehand/800/600"/>`;
+                            return `<strong>Hand Stroking</strong><p>Complete ${count} hand stroking.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Tease And Denial hand task without cage. Difficulty: Easy=8, Medium=12, Hard=16 stroking.</em></p><img src="https://picsum.photos/seed/cagehand/800/600"/>`;
                         }
                     }
                 },
                 {
                     // TASK: Put on cage then do settings (when cage is NOT on Pe AND hand is NOT available)
                     // DIFFICULTY: Easy=10sec, Medium=15sec, Hard=20sec
-                    // CONDITIONS: Cage is NOT on Pe AND hand toy is NOT available for TnD
+                    // CONDITIONS: Cage is NOT on Pe AND hand toy is NOT available for Tease And Denial
                     canSelect: (c) => {
                         const isCageOnPe = c.isHolding('cage') && c.getBodyPartsHolding('cage').some(part => part.key === 'Pe');
-                        const isHandAvailable = c.toyChecked('hand') && c.toySetEnabled('tnd_hand');
+                        const isHandAvailable = c.toyChecked('hand') && c.toySetEnabled('teaseanddenial_hand');
                         return !isCageOnPe && !isHandAvailable; // Cage OFF and hand NOT available
                     },
                     getDifficulty: (d, c, diffMap) => {
                         const seconds = d === 'easy' ? 10 : d === 'hard' ? 20 : 15;
-                        return `<strong>Cage Task</strong><p>Put the cage on your Pe.</p><p>Then adjust the cage settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD cage off + hand NOT available - put on cage task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/cageputon/800/600"/>`;
+                        return `<strong>Cage Task</strong><p>Put the cage on your Pe.</p><p>Then adjust the cage settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Tease And Denial cage off + hand NOT available - put on cage task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/cageputon/800/600"/>`;
                     }
                 },
                 {
@@ -1676,7 +1680,7 @@ const instructionSets = {
                     },
                     getDifficulty: (d, c, diffMap) => {
                         const seconds = d === 'easy' ? 10 : d === 'hard' ? 20 : 15;
-                        return `<strong>Cage Control</strong><p>Adjust the cage settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: TnD cage on - settings task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/cagesettings/800/600"/>`;
+                        return `<strong>Cage Control</strong><p>Adjust the cage settings for ${seconds} seconds.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Tease And Denial cage on - settings task. Difficulty: Easy=10s, Medium=15s, Hard=20s.</em></p><img src="https://picsum.photos/seed/cagesettings/800/600"/>`;
                     }
                 },
                 {
@@ -1701,16 +1705,16 @@ const snakeLadderTasks = {
     snakeTasks: [
         {
             // SNAKE TASK: Conditional vibe task
-            // CONDITIONS: TnD selected AND vibe available AND vibe not currently held
+            // CONDITIONS: Tease And Denial selected AND vibe available AND vibe not currently held
             // DIFFICULTY: Easy=5sec, Medium=10sec, Hard=15sec
             canSelect: (c) => {
-                // Check TnD is selected
-                if (!c.hasSet('tnd')) return false;
+                // Check Tease And Denial is selected
+                if (!c.hasSet('teaseanddenial')) return false;
                 // Check if vibe toy is checked/enabled
                 if (!c.toyChecked('vibe')) return false;
-                // Check if any vibe toy key is enabled (could be from TnD or other sets)
-                const tndVibKey = 'tnd_vibe';
-                const hasVibe = c.toySetEnabled(tndVibKey) && (c.toyQuantity(tndVibKey) > 0);
+                // Check if any vibe toy key is enabled (could be from Tease And Denial or other sets)
+                const teaseanddenialVibKey = 'teaseanddenial_vibe';
+                const hasVibe = c.toySetEnabled(teaseanddenialVibKey) && (c.toyQuantity(teaseanddenialVibKey) > 0);
                 if (!hasVibe) return false;
                 // Check if vibe is free (not currently held on any body part)
                 return !c.isHolding('vibe');
@@ -1718,7 +1722,7 @@ const snakeLadderTasks = {
             getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
                 const vibDiff = diffMap['vibe'] || 'medium';
                 const seconds = getDifficultyValue(vibDiff, 5, 10, 15);
-                return `<strong>Snake Slide! 🐍</strong><p>You fell ${Math.abs(snakeLadderInfo.distance)} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Hold the vibe steady for ${seconds} seconds to steady yourself.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Conditional snake task with vibe. Only appears if TnD selected, vibe checked, tnd_vibe enabled with quantity > 0, and vibe is NOT currently being held. Difficulty: Easy=5s, Medium=10s, Hard=15s. Fall distance: ${Math.abs(snakeLadderInfo.distance)} spaces.</em></p><img src="https://picsum.photos/seed/snakevib/800/600"/>`;
+                return `<strong>Snake Slide! 🐍</strong><p>You fell ${Math.abs(snakeLadderInfo.distance)} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Hold the vibe steady for ${seconds} seconds to steady yourself.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: Conditional snake task with vibe. Only appears if Tease And Denial selected, vibe checked, teaseanddenial_vibe enabled with quantity > 0, and vibe is NOT currently being held. Difficulty: Easy=5s, Medium=10s, Hard=15s. Fall distance: ${Math.abs(snakeLadderInfo.distance)} spaces.</em></p><img src="https://picsum.photos/seed/snakevib/800/600"/>`;
             }
         },
         {
@@ -1732,24 +1736,24 @@ const snakeLadderTasks = {
     ladderTasks: [
         {
             // LADDER TASK: Conditional hand task
-            // CONDITIONS: TnD selected AND hand available AND Ha available
-            // DIFFICULTY: Easy=8, Medium=12, Hard=16 gestures
+            // CONDITIONS: Tease And Denial selected AND hand available AND Ha available
+            // DIFFICULTY: Easy=8, Medium=12, Hard=16 stroking
             canSelect: (c) => {
-                // Check TnD is selected
-                if (!c.hasSet('tnd')) return false;
+                // Check Tease And Denial is selected
+                if (!c.hasSet('teaseanddenial')) return false;
                 // Check if hand toy is checked/enabled
                 if (!c.toyChecked('hand')) return false;
-                // Check if TnD hand is enabled with quantity > 0
-                const tndHandKey = 'tnd_hand';
-                const hasHand = c.toySetEnabled(tndHandKey) && (c.toyQuantity(tndHandKey) > 0);
+                // Check if Tease And Denial hand is enabled with quantity > 0
+                const teaseanddenialHandKey = 'teaseanddenial_hand';
+                const hasHand = c.toySetEnabled(teaseanddenialHandKey) && (c.toyQuantity(teaseanddenialHandKey) > 0);
                 if (!hasHand) return false;
                 // Check if Ha can hold hand
                 return c.canBodyPartHold('Ha', 'hand');
             },
             getDifficulty: (d, c, diffMap, snakeLadderInfo) => {
                 const handDiff = diffMap['hand'] || 'medium';
-                const gestures = getDifficultyValue(handDiff, 8, 12, 16);
-                return `<strong>Ladder Climb! 🪜</strong><p>You climbed ${snakeLadderInfo.distance} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Make ${gestures} celebratory hand gestures for your climb.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: CONDITIONAL ladder task with hand. Only appears if TnD selected, hand checked, tnd_hand enabled with quantity > 0, and Ha can hold it. Difficulty: Easy=8, Medium=12, Hard=16 gestures. Climb distance: ${snakeLadderInfo.distance} spaces.</em></p><img src="https://picsum.photos/seed/ladderhand/800/600"/>`;
+                const stroking = getDifficultyValue(handDiff, 8, 12, 16);
+                return `<strong>Ladder Climb! 🪜</strong><p>You climbed ${snakeLadderInfo.distance} spaces from ${snakeLadderInfo.from} to ${snakeLadderInfo.to}!</p><p>Make ${stroking} celebratory hand stroking for your climb.</p><p style="font-size: 0.85em; color: #666; margin-top: 10px;"><em>Testing: CONDITIONAL ladder task with hand. Only appears if Tease And Denial selected, hand checked, teaseanddenial_hand enabled with quantity > 0, and Ha can hold it. Difficulty: Easy=8, Medium=12, Hard=16 stroking. Climb distance: ${snakeLadderInfo.distance} spaces.</em></p><img src="https://picsum.photos/seed/ladderhand/800/600"/>`;
             }
         },
         {
@@ -1765,27 +1769,27 @@ const snakeLadderTasks = {
 // Final Challenge Tasks
 const finalChallengeTasks = [
     {
-        id: 'gestures',
-        // GESTURES TASK: Only if gestures probability > 0%
+        id: 'stroking',
+        // GESTURES TASK: Only if stroking probability > 0%
         canSelect: (c) => {
-            return finalChallengeSettings.gestures > 0;
+            return finalChallengeSettings.stroking > 0;
         },
         getDifficulty: (d, c, diffMap, prizeType) => {
             // Roll for each modifier based on percentage chance
             const appliedModifiers = [];
-            if (finalChallengeTypes.gestures_icyhot && Math.random() * 100 < finalChallengeModifierChances.gestures_icyhot) {
+            if (finalChallengeTypes.stroking_icyhot && Math.random() * 100 < finalChallengeModifierChances.stroking_icyhot) {
                 appliedModifiers.push('Icy Hot');
             }
-            if (finalChallengeTypes.gestures_icewater && Math.random() * 100 < finalChallengeModifierChances.gestures_icewater) {
+            if (finalChallengeTypes.stroking_icewater && Math.random() * 100 < finalChallengeModifierChances.stroking_icewater) {
                 appliedModifiers.push('Ice Water');
             }
-            if (finalChallengeTypes.gestures_ktb && Math.random() * 100 < finalChallengeModifierChances.gestures_ktb) {
+            if (finalChallengeTypes.stroking_ktb && Math.random() * 100 < finalChallengeModifierChances.stroking_ktb) {
                 appliedModifiers.push('KTB');
             }
-            if (finalChallengeTypes.gestures_ballsqueeze && Math.random() * 100 < finalChallengeModifierChances.gestures_ballsqueeze) {
+            if (finalChallengeTypes.stroking_ballsqueeze && Math.random() * 100 < finalChallengeModifierChances.stroking_ballsqueeze) {
                 appliedModifiers.push('Ball Squeeze');
             }
-            if (finalChallengeTypes.gestures_2finger && Math.random() * 100 < finalChallengeModifierChances.gestures_2finger) {
+            if (finalChallengeTypes.stroking_2finger && Math.random() * 100 < finalChallengeModifierChances.stroking_2finger) {
                 appliedModifiers.push('2 Finger');
             }
             
@@ -1795,20 +1799,20 @@ const finalChallengeTasks = [
                 modifierText = ' with ' + appliedModifiers.join(', ');
             }
             
-            const difficulty = finalChallengeDifficulties.gestures;
+            const difficulty = finalChallengeDifficulties.stroking;
             const count = difficulty === 'easy' ? 8 : difficulty === 'hard' ? 16 : 12;
             
             return `
                 <strong>🏆 Final Challenge! 🏆</strong>
-                <p>Complete ${count} hand gestures${modifierText} at ${difficulty} difficulty.</p>
-                <button onclick="revealFinalPrize('gestures', '${prizeType}')" 
+                <p>Complete ${count} hand stroking${modifierText} at ${difficulty} difficulty.</p>
+                <button onclick="revealFinalPrize('stroking', '${prizeType}')" 
                         style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                     I Completed the Challenge
                 </button>
-                <div id="prizeReveal_gestures" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                <div id="prizeReveal_stroking" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
                     <!-- Prize will be revealed here -->
                 </div>
-                <img src="https://picsum.photos/seed/finalgestures/800/600"/>
+                <img src="https://picsum.photos/seed/finalstroking/800/600"/>
             `;
         }
     },
@@ -1852,32 +1856,32 @@ const finalChallengeTasks = [
         }
     },
     {
-        id: 'analyse',
-        // ANALYSE TASK: Only if analyse probability > 0%
+        id: 'anal',
+        // ANALYSE TASK: Only if anal probability > 0%
         canSelect: (c) => {
-            return finalChallengeSettings.analyse > 0;
+            return finalChallengeSettings.anal > 0;
         },
         getDifficulty: (d, c, diffMap, prizeType) => {
             // Roll for modifier based on percentage chance
             let modifierText = '';
-            if (finalChallengeTypes.analyse_vibe && Math.random() * 100 < finalChallengeModifierChances.analyse_vibe) {
+            if (finalChallengeTypes.anal_vibe && Math.random() * 100 < finalChallengeModifierChances.anal_vibe) {
                 modifierText = ' with Vibe';
             }
             
-            const difficulty = finalChallengeDifficulties.analyse;
+            const difficulty = finalChallengeDifficulties.anal;
             const count = difficulty === 'easy' ? 3 : difficulty === 'hard' ? 7 : 5;
             
             return `
                 <strong>🏆 Final Challenge! 🏆</strong>
-                <p>Analyse ${count} dillsticks${modifierText} at ${difficulty} difficulty.</p>
-                <button onclick="revealFinalPrize('analyse', '${prizeType}')" 
+                <p>Anal ${count} dildos${modifierText} at ${difficulty} difficulty.</p>
+                <button onclick="revealFinalPrize('anal', '${prizeType}')" 
                         style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                     I Completed the Challenge
                 </button>
-                <div id="prizeReveal_analyse" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                <div id="prizeReveal_anal" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
                     <!-- Prize will be revealed here -->
                 </div>
-                <img src="https://picsum.photos/seed/finalanalyse/800/600"/>
+                <img src="https://picsum.photos/seed/finalanal/800/600"/>
             `;
         }
     },
@@ -2030,18 +2034,18 @@ function loadGameState() {
         toyChecked = gs.toyChecked || {};
         cageLocked = gs.cageLocked || false;
         cageWorn = gs.cageWorn || false;
-        finalChallengeSettings = gs.finalChallengeSettings || {gestures: 33, vibe: 33, analyse: 34};
+        finalChallengeSettings = gs.finalChallengeSettings || {stroking: 33, vibe: 33, anal: 34};
         finalChallengeTypes = gs.finalChallengeTypes || {
-            gestures_icyhot: false, gestures_icewater: false, gestures_ktb: false,
-            gestures_ballsqueeze: false, gestures_2finger: false, vibe_icyhot: false,
-            vibe_icewater: false, analyse_vibe: false
+            stroking_icyhot: false, stroking_icewater: false, stroking_ktb: false,
+            stroking_ballsqueeze: false, stroking_2finger: false, vibe_icyhot: false,
+            vibe_icewater: false, anal_vibe: false
         };
         finalChallengeModifierChances = gs.finalChallengeModifierChances || {
-            gestures_icyhot: 10, gestures_icewater: 10, gestures_ktb: 10,
-            gestures_ballsqueeze: 10, gestures_2finger: 10, vibe_icyhot: 10,
-            vibe_icewater: 10, analyse_vibe: 10
+            stroking_icyhot: 10, stroking_icewater: 10, stroking_ktb: 10,
+            stroking_ballsqueeze: 10, stroking_2finger: 10, vibe_icyhot: 10,
+            vibe_icewater: 10, anal_vibe: 10
         };
-        finalChallengeDifficulties = gs.finalChallengeDifficulties || {gestures: 'medium', vibe: 'medium', analyse: 'medium'};
+        finalChallengeDifficulties = gs.finalChallengeDifficulties || {stroking: 'medium', vibe: 'medium', anal: 'medium'};
         finalChallengeModifiers = gs.finalChallengeModifiers || {ce: false, pf: false};
         
         if (gs.bodyPartState) {
@@ -2058,12 +2062,12 @@ function loadGameState() {
         });
         
         // Restore final challenge sliders
-        document.getElementById('gesturesSlider').value = finalChallengeSettings.gestures;
+        document.getElementById('strokingSlider').value = finalChallengeSettings.stroking;
         document.getElementById('vibeSlider').value = finalChallengeSettings.vibe;
-        document.getElementById('analyseSlider').value = finalChallengeSettings.analyse;
-        document.getElementById('gesturesPercent').textContent = finalChallengeSettings.gestures + '%';
+        document.getElementById('analSlider').value = finalChallengeSettings.anal;
+        document.getElementById('strokingPercent').textContent = finalChallengeSettings.stroking + '%';
         document.getElementById('vibePercent').textContent = finalChallengeSettings.vibe + '%';
-        document.getElementById('analysePercent').textContent = finalChallengeSettings.analyse + '%';
+        document.getElementById('analPercent').textContent = finalChallengeSettings.anal + '%';
         
         // Restore final challenge type checkboxes
         Object.keys(finalChallengeTypes).forEach(key => {
@@ -2219,19 +2223,19 @@ function displayPrizeResult(prize) {
 
 // Body Part Functions
 function canAddToyToBodyPart(bodyPart, toyId) {
-    if (toyId === 'stickers') {
-        // Clothestickers case
+    if (toyId === 'pegs') {
+        // Clothes Pegs case
         // Can't add if body part has regular toys
         if (hasRegularToys(bodyPart)) {
             return false;
         }
         // Check if under max count
-        const currentCount = getClothestickerCount(bodyPart);
-        const maxCount = getClothestickerMax(bodyPart);
+        const currentCount = hasClothesPegCount(bodyPart);
+        const maxCount = getClothesPegMax(bodyPart);
         return currentCount < maxCount;
     } else {
         // Regular toy case
-        // Body part must be completely empty (no regular toys AND no clothestickers)
+        // Body part must be completely empty (no regular toys AND no clothespegs)
         return isBodyPartEmpty(bodyPart);
     }
 }
@@ -2263,8 +2267,8 @@ function getAvailableBodyPartsForToy(toyId) {
             available.push({
                 key: partKey,
                 name: part.name,
-                available: toyId === 'stickers' ? 
-                    (getClothestickerMax(partKey) - getClothestickerCount(partKey)) : 
+                available: toyId === 'pegs' ? 
+                    (getClothesPegMax(partKey) - hasClothesPegCount(partKey)) : 
                     1
             });
         }
@@ -2293,10 +2297,10 @@ function createAddToyTaskWithBodyPart(toyKey, toyName, bodyPart, quantity = 1) {
     const [setId, ...toyIdParts] = toyKey.split('_');
     const toyId = toyIdParts.join('_');
     
-    // For clothestickers, check if we can add the requested quantity
-    if (toyId === 'stickers') {
-        const currentCount = getClothestickerCount(bodyPart);
-        const maxCount = getClothestickerMax(bodyPart);
+    // For clothespegs, check if we can add the requested quantity
+    if (toyId === 'pegs') {
+        const currentCount = hasClothesPegCount(bodyPart);
+        const maxCount = getClothesPegMax(bodyPart);
         const spaceAvailable = maxCount - currentCount;
         
         // If we can't add any or if body part has regular toys, return null
@@ -2316,7 +2320,7 @@ function createAddToyTaskWithBodyPart(toyKey, toyName, bodyPart, quantity = 1) {
             bodyPartName: bodyPartState[bodyPart].name,
             quantity: actualQuantity,
             execute: function() {
-                // Add multiple clothestickers
+                // Add multiple clothespegs
                 for (let i = 0; i < this.quantity; i++) {
                     if (!addToyToBodyPart(this.bodyPart, this.toyId)) {
                         return false;
@@ -2367,9 +2371,9 @@ function createRemoveToyTaskWithBodyPart(toyKey, toyName, bodyPart, quantity = 1
     const [setId, ...toyIdParts] = toyKey.split('_');
     const toyId = toyIdParts.join('_');
     
-    // For clothestickers, check if we have enough to remove
-    if (toyId === 'stickers') {
-        const currentCount = getClothestickerCount(bodyPart);
+    // For clothespegs, check if we have enough to remove
+    if (toyId === 'pegs') {
+        const currentCount = hasClothesPegCount(bodyPart);
         
         if (currentCount <= 0) {
             return null;
@@ -2387,7 +2391,7 @@ function createRemoveToyTaskWithBodyPart(toyKey, toyName, bodyPart, quantity = 1
             bodyPartName: bodyPartState[bodyPart].name,
             quantity: actualQuantity,
             execute: function() {
-                // Remove multiple clothestickers
+                // Remove multiple clothespegs
                 for (let i = 0; i < this.quantity; i++) {
                     if (!removeToyFromBodyPart(this.bodyPart, this.toyId)) {
                         return false;
@@ -2464,8 +2468,8 @@ function rollForAddRemoveTasks() {
             if (!addTask || !removeTask) continue;
             
             // If cage is locked, set add/remove chances to 0
-            let effectiveAddChance = toyModifiers[toyKey]?.addChance || 10;
-            let effectiveRemoveChance = toyModifiers[toyKey]?.removeChance || 20;
+            let effectiveAddChance = toyModifiers[toyKey]?.addChance ?? 10;
+            let effectiveRemoveChance = toyModifiers[toyKey]?.removeChance ?? 20;
             
             if (toyId === 'cage' && cageLocked) {
                 effectiveAddChance = 0;
@@ -3039,13 +3043,13 @@ function displaySnakeLadderTask(type, fromPos, toPos) {
     // Check conditions for first task if it has canSelect
     if (taskList[0].canSelect) {
         debugInfo += '<br><strong>Condition Checks:</strong><br>';
-        debugInfo += `- hasSet(tnd): ${conditions.hasSet('tnd')}<br>`;
+        debugInfo += `- hasSet(teaseanddenial): ${conditions.hasSet('teaseanddenial')}<br>`;
         debugInfo += `- toyChecked(hand): ${conditions.toyChecked('hand')}<br>`;
         debugInfo += `- toyChecked(vibe): ${conditions.toyChecked('vibe')}<br>`;
-        debugInfo += `- toySetEnabled(tnd_hand): ${conditions.toySetEnabled('tnd_hand')}<br>`;
-        debugInfo += `- toySetEnabled(tnd_vibe): ${conditions.toySetEnabled('tnd_vibe')}<br>`;
-        debugInfo += `- toyQuantity(tnd_hand): ${conditions.toyQuantity('tnd_hand')}<br>`;
-        debugInfo += `- toyQuantity(tnd_vibe): ${conditions.toyQuantity('tnd_vibe')}<br>`;
+        debugInfo += `- toySetEnabled(teaseanddenial_hand): ${conditions.toySetEnabled('teaseanddenial_hand')}<br>`;
+        debugInfo += `- toySetEnabled(teaseanddenial_vibe): ${conditions.toySetEnabled('teaseanddenial_vibe')}<br>`;
+        debugInfo += `- toyQuantity(teaseanddenial_hand): ${conditions.toyQuantity('teaseanddenial_hand')}<br>`;
+        debugInfo += `- toyQuantity(teaseanddenial_vibe): ${conditions.toyQuantity('teaseanddenial_vibe')}<br>`;
         debugInfo += `- canBodyPartHold(Ha, hand): ${conditions.canBodyPartHold('Ha', 'hand')}<br>`;
         debugInfo += `- isHolding(vibe): ${conditions.isHolding('vibe')}<br>`;
     }
@@ -3256,6 +3260,72 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
 }
 
 // Render Toy Library  
+// Calculate and update the total add/remove probabilities
+function updateContinuousTaskProbabilities() {
+    // Get all selected toys
+    const selectedToys = getSelectedToys();
+    
+    // Calculate probability that at least one add task triggers
+    // P(at least one) = 1 - P(none trigger) = 1 - (1-p1)(1-p2)(1-p3)...
+    let probNoAddTriggers = 1.0;
+    let probNoRemoveTriggers = 1.0;
+    
+    let hasAnyAddTasks = false;
+    let hasAnyRemoveTasks = false;
+    
+    selectedToys.forEach(toyObj => {
+        const toyKey = `${toyObj.setId}_${toyObj.toyId}`;
+        const toyId = toyObj.toyId;
+        const tasks = instructionSets[toyObj.setId].tasks[toyObj.toyId];
+        
+        if (!tasks) return;
+        
+        // Check if this toy has add/remove tasks
+        const hasAddTask = tasks.some(task => task.type === 'add');
+        const hasRemoveTask = tasks.some(task => task.type === 'remove');
+        
+        if (hasAddTask) {
+            // Get the add probability for this toy (default 10%)
+            // If cage is locked, treat as 0
+            let addChance = toyModifiers[toyKey]?.addChance ?? 10;
+            if (toyId === 'cage' && cageLocked) {
+                addChance = 0;
+            }
+            // Only include in calculation if chance > 0
+            if (addChance > 0) {
+                const addProbability = addChance / 100;
+                // Multiply by probability this one doesn't trigger
+                probNoAddTriggers *= (1 - addProbability);
+                hasAnyAddTasks = true;
+            }
+        }
+        
+        if (hasRemoveTask) {
+            // Get the remove probability for this toy (default 20%)
+            // If cage is locked, treat as 0
+            let removeChance = toyModifiers[toyKey]?.removeChance ?? 20;
+            if (toyId === 'cage' && cageLocked) {
+                removeChance = 0;
+            }
+            // Only include in calculation if chance > 0
+            if (removeChance > 0) {
+                const removeProbability = removeChance / 100;
+                // Multiply by probability this one doesn't trigger
+                probNoRemoveTriggers *= (1 - removeProbability);
+                hasAnyRemoveTasks = true;
+            }
+        }
+    });
+    
+    // Calculate probability at least one triggers (only if there are any tasks)
+    const totalAddProb = hasAnyAddTasks ? (1 - probNoAddTriggers) * 100 : 0;
+    const totalRemoveProb = hasAnyRemoveTasks ? (1 - probNoRemoveTriggers) * 100 : 0;
+    
+    // Update the display
+    document.getElementById('totalAddProbability').textContent = totalAddProb.toFixed(1) + '%';
+    document.getElementById('totalRemoveProbability').textContent = totalRemoveProb.toFixed(1) + '%';
+}
+
 // Update cage input states based on locked status
 function updateCageInputStates() {
     // Update all cage add/remove inputs across all sets
@@ -3275,9 +3345,9 @@ function updateCageInputStates() {
                 input.style.pointerEvents = 'none';
             } else {
                 if (isAdd) {
-                    input.value = toyModifiers[toyKey]?.addChance || 10;
+                    input.value = toyModifiers[toyKey]?.addChance ?? 10;
                 } else {
-                    input.value = toyModifiers[toyKey]?.removeChance || 20;
+                    input.value = toyModifiers[toyKey]?.removeChance ?? 20;
                 }
                 input.disabled = !toyChecked['cage'] || !toySetEnabled[toyKey];
                 input.style.opacity = '1';
@@ -3296,7 +3366,7 @@ function renderToyLibrary() {
     
     container.innerHTML = '';
     
-    const setEmojis = {dressup: '🎨', apple: '🍎', digging: '⛏️', tnd: '🎯'};
+    const setEmojis = {dressup: '🎨', apple: '🍎', digging: '⛏️', teaseanddenial: '🎯'};
     const allToys = {};
     
     // Always add cage toy first with empty sets array
@@ -3363,7 +3433,35 @@ function renderToyLibrary() {
         checkbox.style.cursor = 'pointer';
         checkbox.onchange = () => {
             toyChecked[toyId] = checkbox.checked;
-            renderToyLibrary();
+            
+            // Update disabled states for this toy's sets and inputs
+            toyData.sets.forEach(setInfo => {
+                const toyKey = `${setInfo.setId}_${toyId}`;
+                
+                // Update set checkbox
+                const setCheckbox = document.querySelector(`input[type="checkbox"][data-toy-key="${toyKey}"]`);
+                if (setCheckbox) {
+                    setCheckbox.disabled = !checkbox.checked;
+                }
+                
+                // Update difficulty dropdown
+                const diffSelect = document.getElementById(`difficulty_${toyKey}`);
+                if (diffSelect) {
+                    diffSelect.disabled = !checkbox.checked || !toySetEnabled[toyKey];
+                }
+                
+                // Update add/remove inputs
+                const addInput = document.getElementById(`add_${toyKey}`);
+                const removeInput = document.getElementById(`remove_${toyKey}`);
+                if (addInput) {
+                    addInput.disabled = !checkbox.checked || !toySetEnabled[toyKey] || (toyId === 'cage' && cageLocked);
+                }
+                if (removeInput) {
+                    removeInput.disabled = !checkbox.checked || !toySetEnabled[toyKey] || (toyId === 'cage' && cageLocked);
+                }
+            });
+            
+            updateContinuousTaskProbabilities();
             saveGameState();
         };
         checkboxWrapper.appendChild(checkbox);
@@ -3453,7 +3551,7 @@ function renderToyLibrary() {
             
             toyItem.appendChild(cageControls);
             
-            // If cage has sets (TnD or Analyse selected), show difficulty/modifiers
+            // If cage has sets (Tease And Denial or Anal selected), show difficulty/modifiers
             if (toyData.sets.length > 0) {
                 const setDifficultyContainer = document.createElement('div');
                 setDifficultyContainer.className = 'set-difficulty';
@@ -3472,11 +3570,29 @@ function renderToyLibrary() {
                     const setCheckbox = document.createElement('input');
                     setCheckbox.type = 'checkbox';
                     setCheckbox.checked = toySetEnabled[toyKey];
+                    setCheckbox.setAttribute('data-toy-key', toyKey);
                     setCheckbox.style.cssText = 'width:16px;height:16px;cursor:pointer;accent-color:#667eea;';
                     setCheckbox.disabled = !toyChecked[toyId];
                     setCheckbox.onchange = () => {
                         toySetEnabled[toyKey] = setCheckbox.checked;
-                        renderToyLibrary();
+                        
+                        // Update difficulty dropdown
+                        const diffSelect = document.getElementById(`difficulty_${toyKey}`);
+                        if (diffSelect) {
+                            diffSelect.disabled = !toyChecked[toyId] || !setCheckbox.checked;
+                        }
+                        
+                        // Update add/remove inputs
+                        const addInput = document.getElementById(`add_${toyKey}`);
+                        const removeInput = document.getElementById(`remove_${toyKey}`);
+                        if (addInput) {
+                            addInput.disabled = !toyChecked[toyId] || !setCheckbox.checked || (toyId === 'cage' && cageLocked);
+                        }
+                        if (removeInput) {
+                            removeInput.disabled = !toyChecked[toyId] || !setCheckbox.checked || (toyId === 'cage' && cageLocked);
+                        }
+                        
+                        updateContinuousTaskProbabilities();
                         saveGameState();
                     };
                     setCheckboxWrapper.appendChild(setCheckbox);
@@ -3517,6 +3633,11 @@ function renderToyLibrary() {
                     gearBtn.disabled = !isWearable || !hasAddRemove || !toyChecked[toyId] || !toySetEnabled[toyKey];
                     gearBtn.id = `gear_${toyKey}`;
                     
+                    // Restore active state if it was previously expanded
+                    if (expandedAdvancedSettings[toyKey]) {
+                        gearBtn.classList.add('active');
+                    }
+                    
                     if (isWearable && hasAddRemove) {
                         gearBtn.onclick = (e) => {
                             e.preventDefault();
@@ -3524,9 +3645,11 @@ function renderToyLibrary() {
                             if (advSettings.classList.contains('visible')) {
                                 advSettings.classList.remove('visible');
                                 gearBtn.classList.remove('active');
+                                expandedAdvancedSettings[toyKey] = false;
                             } else {
                                 advSettings.classList.add('visible');
                                 gearBtn.classList.add('active');
+                                expandedAdvancedSettings[toyKey] = true;
                             }
                         };
                     }
@@ -3538,6 +3661,11 @@ function renderToyLibrary() {
                         const advSettings = document.createElement('div');
                         advSettings.className = 'advanced-settings';
                         
+                        // Restore expanded state if it was previously expanded
+                        if (expandedAdvancedSettings[toyKey]) {
+                            advSettings.classList.add('visible');
+                        }
+                        
                         const addLabel = document.createElement('label');
                         addLabel.textContent = 'Add: ';
                         const addInput = document.createElement('input');
@@ -3545,7 +3673,7 @@ function renderToyLibrary() {
                         addInput.min = '0';
                         addInput.max = '100';
                         // Show 0 if cage is locked, otherwise show stored value
-                        addInput.value = (toyId === 'cage' && cageLocked) ? 0 : (toyModifiers[toyKey]?.addChance || 10);
+                        addInput.value = (toyId === 'cage' && cageLocked) ? 0 : (toyModifiers[toyKey]?.addChance ?? 10);
                         addInput.id = `add_${toyKey}`;
                         // Disable if locked or if toy/set disabled
                         addInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey] || (toyId === 'cage' && cageLocked);
@@ -3554,6 +3682,7 @@ function renderToyLibrary() {
                             e.target.value = val;
                             if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 10, removeChance: 20};
                             toyModifiers[toyKey].addChance = val;
+                            updateContinuousTaskProbabilities();
                             saveGameState();
                         };
                         addLabel.appendChild(addInput);
@@ -3568,7 +3697,7 @@ function renderToyLibrary() {
                         removeInput.min = '0';
                         removeInput.max = '100';
                         // Show 0 if cage is locked, otherwise show stored value
-                        removeInput.value = (toyId === 'cage' && cageLocked) ? 0 : (toyModifiers[toyKey]?.removeChance || 20);
+                        removeInput.value = (toyId === 'cage' && cageLocked) ? 0 : (toyModifiers[toyKey]?.removeChance ?? 20);
                         removeInput.id = `remove_${toyKey}`;
                         // Disable if locked or if toy/set disabled
                         removeInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey] || (toyId === 'cage' && cageLocked);
@@ -3577,6 +3706,7 @@ function renderToyLibrary() {
                             e.target.value = val;
                             if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 10, removeChance: 20};
                             toyModifiers[toyKey].removeChance = val;
+                            updateContinuousTaskProbabilities();
                             saveGameState();
                         };
                         removeLabel.appendChild(removeInput);
@@ -3644,13 +3774,31 @@ function renderToyLibrary() {
             const setCheckbox = document.createElement('input');
             setCheckbox.type = 'checkbox';
             setCheckbox.checked = toySetEnabled[toyKey];
+            setCheckbox.setAttribute('data-toy-key', toyKey);
             setCheckbox.style.cssText = 'width:16px;height:16px;cursor:pointer;accent-color:#667eea;';
             
             setCheckbox.disabled = !toyChecked[toyId];
             
             setCheckbox.onchange = () => {
                 toySetEnabled[toyKey] = setCheckbox.checked;
-                renderToyLibrary();
+                
+                // Update difficulty dropdown
+                const diffSelect = document.getElementById(`difficulty_${toyKey}`);
+                if (diffSelect) {
+                    diffSelect.disabled = !toyChecked[toyId] || !setCheckbox.checked;
+                }
+                
+                // Update add/remove inputs
+                const addInput = document.getElementById(`add_${toyKey}`);
+                const removeInput = document.getElementById(`remove_${toyKey}`);
+                if (addInput) {
+                    addInput.disabled = !toyChecked[toyId] || !setCheckbox.checked || (toyId === 'cage' && cageLocked);
+                }
+                if (removeInput) {
+                    removeInput.disabled = !toyChecked[toyId] || !setCheckbox.checked || (toyId === 'cage' && cageLocked);
+                }
+                
+                updateContinuousTaskProbabilities();
                 saveGameState();
             };
             setCheckboxWrapper.appendChild(setCheckbox);
@@ -3691,6 +3839,11 @@ function renderToyLibrary() {
             gearBtn.disabled = !isWearable || !hasAddRemove || !toyChecked[toyId] || !toySetEnabled[toyKey];
             gearBtn.id = `gear_${toyKey}`;
             
+            // Restore active state if it was previously expanded
+            if (expandedAdvancedSettings[toyKey]) {
+                gearBtn.classList.add('active');
+            }
+            
             if (isWearable && hasAddRemove) {
                 gearBtn.onclick = (e) => {
                     e.preventDefault();
@@ -3698,9 +3851,11 @@ function renderToyLibrary() {
                     if (advSettings.classList.contains('visible')) {
                         advSettings.classList.remove('visible');
                         gearBtn.classList.remove('active');
+                        expandedAdvancedSettings[toyKey] = false;
                     } else {
                         advSettings.classList.add('visible');
                         gearBtn.classList.add('active');
+                        expandedAdvancedSettings[toyKey] = true;
                     }
                 };
             }
@@ -3712,13 +3867,18 @@ function renderToyLibrary() {
                 const advSettings = document.createElement('div');
                 advSettings.className = 'advanced-settings';
                 
+                // Restore expanded state if it was previously expanded
+                if (expandedAdvancedSettings[toyKey]) {
+                    advSettings.classList.add('visible');
+                }
+                
                 const addLabel = document.createElement('label');
                 addLabel.textContent = 'Add: ';
                 const addInput = document.createElement('input');
                 addInput.type = 'number';
                 addInput.min = '0';
                 addInput.max = '100';
-                addInput.value = toyModifiers[toyKey]?.addChance || 25;
+                addInput.value = toyModifiers[toyKey]?.addChance ?? 10;
                 addInput.id = `add_${toyKey}`;
                 addInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey];
                 addInput.oninput = (e) => {
@@ -3726,6 +3886,7 @@ function renderToyLibrary() {
                     e.target.value = val;
                     if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 10, removeChance: 20};
                     toyModifiers[toyKey].addChance = val;
+                    updateContinuousTaskProbabilities();
                     saveGameState();
                 };
                 addLabel.appendChild(addInput);
@@ -3739,7 +3900,7 @@ function renderToyLibrary() {
                 removeInput.type = 'number';
                 removeInput.min = '0';
                 removeInput.max = '100';
-                removeInput.value = toyModifiers[toyKey]?.removeChance || 15;
+                removeInput.value = toyModifiers[toyKey]?.removeChance ?? 20;
                 removeInput.id = `remove_${toyKey}`;
                 removeInput.disabled = !toyChecked[toyId] || !toySetEnabled[toyKey];
                 removeInput.oninput = (e) => {
@@ -3747,6 +3908,7 @@ function renderToyLibrary() {
                     e.target.value = val;
                     if (!toyModifiers[toyKey]) toyModifiers[toyKey] = {addChance: 10, removeChance: 20};
                     toyModifiers[toyKey].removeChance = val;
+                    updateContinuousTaskProbabilities();
                     saveGameState();
                 };
                 removeLabel.appendChild(removeInput);
@@ -3766,6 +3928,9 @@ function renderToyLibrary() {
     
     // Update cage input states after rendering
     updateCageInputStates();
+    
+    // Update continuous task probabilities
+    updateContinuousTaskProbabilities();
     
     saveGameState();
 }
@@ -3797,6 +3962,7 @@ function applyPreset(toyKey, difficulty) {
         if (addInput) addInput.value = toyModifiers[toyKey].addChance;
         if (removeInput) removeInput.value = toyModifiers[toyKey].removeChance;
         
+        updateContinuousTaskProbabilities();
         saveGameState();
     }
 }
@@ -3810,62 +3976,62 @@ document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => {
 });
 
 // Final Challenge probability sliders
-const gesturesSlider = document.getElementById('gesturesSlider');
+const strokingSlider = document.getElementById('strokingSlider');
 const vibeSlider = document.getElementById('vibeSlider');
-const analyseSlider = document.getElementById('analyseSlider');
+const analSlider = document.getElementById('analSlider');
 
 function updateFinalChallengeDisplays() {
-    document.getElementById('gesturesPercent').textContent = finalChallengeSettings.gestures + '%';
+    document.getElementById('strokingPercent').textContent = finalChallengeSettings.stroking + '%';
     document.getElementById('vibePercent').textContent = finalChallengeSettings.vibe + '%';
-    document.getElementById('analysePercent').textContent = finalChallengeSettings.analyse + '%';
+    document.getElementById('analPercent').textContent = finalChallengeSettings.anal + '%';
     
-    gesturesSlider.value = finalChallengeSettings.gestures;
+    strokingSlider.value = finalChallengeSettings.stroking;
     vibeSlider.value = finalChallengeSettings.vibe;
-    analyseSlider.value = finalChallengeSettings.analyse;
+    analSlider.value = finalChallengeSettings.anal;
     
     saveGameState();
 }
 
-gesturesSlider.addEventListener('input', function() {
-    const newGestures = Math.round(parseFloat(this.value));
-    const maxAllowed = 100 - Math.round(finalChallengeSettings.analyse);
-    finalChallengeSettings.gestures = newGestures > maxAllowed ? maxAllowed : newGestures;
-    finalChallengeSettings.vibe = 100 - finalChallengeSettings.analyse - finalChallengeSettings.gestures;
+strokingSlider.addEventListener('input', function() {
+    const newStroking = Math.round(parseFloat(this.value));
+    const maxAllowed = 100 - Math.round(finalChallengeSettings.anal);
+    finalChallengeSettings.stroking = newStroking > maxAllowed ? maxAllowed : newStroking;
+    finalChallengeSettings.vibe = 100 - finalChallengeSettings.anal - finalChallengeSettings.stroking;
     updateFinalChallengeDisplays();
 });
 
 vibeSlider.addEventListener('input', function() {
     const newVibe = Math.round(parseFloat(this.value));
-    const maxAllowed = 100 - Math.round(finalChallengeSettings.analyse);
+    const maxAllowed = 100 - Math.round(finalChallengeSettings.anal);
     finalChallengeSettings.vibe = newVibe > maxAllowed ? maxAllowed : newVibe;
-    finalChallengeSettings.gestures = 100 - finalChallengeSettings.analyse - finalChallengeSettings.vibe;
+    finalChallengeSettings.stroking = 100 - finalChallengeSettings.anal - finalChallengeSettings.vibe;
     updateFinalChallengeDisplays();
 });
 
-analyseSlider.addEventListener('input', function() {
-    const newAnalyse = Math.round(parseFloat(this.value));
+analSlider.addEventListener('input', function() {
+    const newAnal = Math.round(parseFloat(this.value));
     
-    // Special case: if analyse is 100%, force the others to 0
-    if (newAnalyse >= 100) {
-        finalChallengeSettings.gestures = 0;
+    // Special case: if anal is 100%, force the others to 0
+    if (newAnal >= 100) {
+        finalChallengeSettings.stroking = 0;
         finalChallengeSettings.vibe = 0;
-        finalChallengeSettings.analyse = 100;
+        finalChallengeSettings.anal = 100;
     } else {
-        const available = 100 - newAnalyse;
-        const currentTotal = Math.round(finalChallengeSettings.gestures) + Math.round(finalChallengeSettings.vibe);
+        const available = 100 - newAnal;
+        const currentTotal = Math.round(finalChallengeSettings.stroking) + Math.round(finalChallengeSettings.vibe);
         
         // Changed: use equal split for BOTH directions (not just when increasing)
         if (available !== currentTotal) {
             const change = available - currentTotal;
             const half = change / 2;
-            finalChallengeSettings.gestures = Math.max(0, Math.round(finalChallengeSettings.gestures + half));
+            finalChallengeSettings.stroking = Math.max(0, Math.round(finalChallengeSettings.stroking + half));
             finalChallengeSettings.vibe = Math.max(0, Math.round(finalChallengeSettings.vibe + half));
             
-            // Ensure total is exactly 100 by adjusting analyse if values were clamped
-            const actualTotal = finalChallengeSettings.gestures + finalChallengeSettings.vibe;
-            finalChallengeSettings.analyse = Math.max(0, 100 - actualTotal);
+            // Ensure total is exactly 100 by adjusting anal if values were clamped
+            const actualTotal = finalChallengeSettings.stroking + finalChallengeSettings.vibe;
+            finalChallengeSettings.anal = Math.max(0, 100 - actualTotal);
         } else {
-            finalChallengeSettings.analyse = Math.max(0, newAnalyse);
+            finalChallengeSettings.anal = Math.max(0, newAnal);
         }
     }
     
@@ -3873,8 +4039,8 @@ analyseSlider.addEventListener('input', function() {
 });
 
 // Final challenge type checkboxes
-['gestures_icyhot', 'gestures_icewater', 'gestures_ktb', 'gestures_ballsqueeze', 'gestures_2finger',
- 'vibe_icyhot', 'vibe_icewater', 'analyse_vibe'].forEach(id => {
+['stroking_icyhot', 'stroking_icewater', 'stroking_ktb', 'stroking_ballsqueeze', 'stroking_2finger',
+ 'vibe_icyhot', 'vibe_icewater', 'anal_vibe'].forEach(id => {
     document.getElementById(id).addEventListener('change', function() {
         finalChallengeTypes[id] = this.checked;
         saveGameState();
@@ -3882,7 +4048,7 @@ analyseSlider.addEventListener('input', function() {
 });
 
 // Final challenge difficulty dropdowns
-['gestures', 'vibe', 'analyse'].forEach(type => {
+['stroking', 'vibe', 'anal'].forEach(type => {
     document.getElementById(`${type}Difficulty`).addEventListener('change', function() {
         finalChallengeDifficulties[type] = this.value;
         saveGameState();
@@ -3890,8 +4056,8 @@ analyseSlider.addEventListener('input', function() {
 });
 
 // Final challenge modifier percentage inputs
-['gestures_icyhot', 'gestures_icewater', 'gestures_ktb', 'gestures_ballsqueeze', 'gestures_2finger',
- 'vibe_icyhot', 'vibe_icewater', 'analyse_vibe'].forEach(id => {
+['stroking_icyhot', 'stroking_icewater', 'stroking_ktb', 'stroking_ballsqueeze', 'stroking_2finger',
+ 'vibe_icyhot', 'vibe_icewater', 'anal_vibe'].forEach(id => {
     document.getElementById(`${id}_chance`).addEventListener('input', function() {
         let value = parseInt(this.value) || 0;
         value = Math.max(0, Math.min(100, value)); // Clamp between 0-100
@@ -3955,6 +4121,7 @@ function startGame() {
     diceResult.style.display = 'block';
     turnCounter.style.display = 'block';
     turnCounter.textContent = 'Turn: 0';
+    document.getElementById('testJumpInput').style.display = 'block';
 }
 
 // Display final challenge task
@@ -3988,12 +4155,12 @@ function displayFinalChallenge() {
     let targetTaskId = null;
     
     // Determine which task type based on weighted probability
-    if (roll < finalChallengeSettings.gestures) {
-        targetTaskId = 'gestures';
-    } else if (roll < finalChallengeSettings.gestures + finalChallengeSettings.vibe) {
+    if (roll < finalChallengeSettings.stroking) {
+        targetTaskId = 'stroking';
+    } else if (roll < finalChallengeSettings.stroking + finalChallengeSettings.vibe) {
         targetTaskId = 'vibe';
     } else {
-        targetTaskId = 'analyse';
+        targetTaskId = 'anal';
     }
     
     // Find the task with matching ID
@@ -4013,14 +4180,30 @@ function displayFinalChallenge() {
 
 function rollDice() {
     rollDiceButton.disabled = true;
-    turnCount++; // Increment turn counter
-    const diceRoll = Math.floor(Math.random() * 6) + 1;
-    diceResult.textContent = `Dice: ${diceRoll} 🎲`;
-    turnCounter.textContent = `Turn: ${turnCount}`;
-
     
-    let nextPosition = playerPosition + diceRoll;
-    if (nextPosition > totalSquares) nextPosition = totalSquares;
+    // Check if there's a jump value
+    const jumpInput = document.getElementById('testJumpInput');
+    const jumpValue = parseInt(jumpInput.value);
+    
+    let diceRoll, nextPosition;
+    
+    if (jumpValue >= 1 && jumpValue <= 100) {
+        // Jump mode
+        turnCount++; // Increment turn counter
+        diceRoll = jumpValue - playerPosition; // Calculate "virtual" dice roll for display
+        diceResult.textContent = `Jump to: ${jumpValue} 🎯`;
+        turnCounter.textContent = `Turn: ${turnCount}`;
+        nextPosition = jumpValue;
+        jumpInput.value = ''; // Clear the input after jumping
+    } else {
+        // Normal dice roll
+        turnCount++; // Increment turn counter
+        diceRoll = Math.floor(Math.random() * 6) + 1;
+        diceResult.textContent = `Dice: ${diceRoll} 🎲`;
+        turnCounter.textContent = `Turn: ${turnCount}`;
+        nextPosition = playerPosition + diceRoll;
+        if (nextPosition > totalSquares) nextPosition = totalSquares;
+    }
     
     let finalPosition = nextPosition;
     let showContinueButton = false;
@@ -4133,6 +4316,8 @@ confirmResetBtn.addEventListener('click', function() {
     diceResult.style.display = 'none';
     turnCounter.textContent = 'Turn: 0';
     turnCounter.style.display = 'none';
+    document.getElementById('testJumpInput').style.display = 'none';
+    document.getElementById('testJumpInput').value = '';
     
     document.getElementById('playerNameInput').value = '';
     
@@ -4153,40 +4338,6 @@ confirmResetBtn.addEventListener('click', function() {
     
     updateSliderDisplays();
     renderToyLibrary();
-});
-
-// Test jump button for debugging
-document.getElementById('testJumpButton').addEventListener('click', function() {
-    if (!gameStarted) return;
-    
-    const targetSquare = parseInt(document.getElementById('testJumpInput').value);
-    if (isNaN(targetSquare) || targetSquare < 1 || targetSquare > 100) {
-        alert('Please enter a number between 1 and 100');
-        return;
-    }
-    
-    // Increment turn counter (simulating a dice roll)
-    turnCount++;
-    turnCounter.textContent = `Turn: ${turnCount}`;
-    
-    // Instant jump (no animation)
-    playerPosition = targetSquare;
-    const square = document.getElementById(`square-${targetSquare}`);
-    if (square) square.appendChild(player);
-    
-    if (playerPosition === totalSquares) {
-        rollDiceButton.disabled = true;
-        displayFinalChallenge();
-    } else {
-        displayRandomInstruction();
-        instructions.appendChild(continueButton);
-        continueButton.style.display = "block";
-        continueButton.onclick = () => {
-            continueButton.style.display = "none";
-            rollDiceButton.disabled = false;
-        };
-    }
-    saveGameState();
 });
 
 // Initialize
