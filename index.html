@@ -76,6 +76,38 @@ h1 {
     z-index: 5; 
 }
 
+.square.snake-destination {
+    animation: pulseRed 1.5s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.8);
+}
+
+.square.ladder-destination {
+    animation: pulseGreen 1.5s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(81, 207, 102, 0.8);
+}
+
+@keyframes pulseRed {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 107, 107, 0.8);
+        border: 3px solid #ff6b6b;
+    }
+    50% { 
+        box-shadow: 0 0 35px rgba(255, 107, 107, 1);
+        border: 3px solid #ff3838;
+    }
+}
+
+@keyframes pulseGreen {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(81, 207, 102, 0.8);
+        border: 3px solid #51cf66;
+    }
+    50% { 
+        box-shadow: 0 0 35px rgba(81, 207, 102, 1);
+        border: 3px solid #2fb344;
+    }
+}
+
 .snake { 
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); 
     color: white; 
@@ -777,21 +809,11 @@ input[type="range"]::-moz-range-thumb {
 </head>
 <body>
     <h1>🎲 Snakes and Ladders 🎲</h1>
-    <div id="gameContainer">
-        <div id="board"></div>
-        <div id="controls">
-            <button id="startButton">🎮 Start Game</button>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <button id="rollDice" style="display: none;">🎲 Roll Dice</button>
-                <input type="number" id="testJumpInput" min="1" max="100" placeholder="or jump to #" 
-                       style="display: none; width: 100px; padding: 8px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;">
-            </div>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <div id="diceResult" style="display: none;">Dice: -</div>
-                <div id="turnCounter" style="display: none; font-size: 20px; font-weight: bold; padding: 12px 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; box-shadow: 0 4px 15px rgba(102,126,234,0.3);">Turn: 0</div>
-            </div>
+    <!-- HOME PAGE - Settings and Start Game -->
+    <div id="homePage" style="display: block;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button id="startButton" style="padding: 20px 50px; font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; cursor: pointer; box-shadow: 0 8px 20px rgba(102,126,234,0.4);">🎮 Start Game</button>
         </div>
-        <div id="instructions"></div>
         <div id="buttoncontainer">
             <div class="settings-column-left">
                 <label style="display: block; font-weight: bold; color: #333; margin-bottom: 10px; background: white; padding: 10px; border-radius: 8px;">👤 Player Name:</label>
@@ -975,6 +997,30 @@ input[type="range"]::-moz-range-thumb {
             </div>
         </div>
     </div>
+    
+    <!-- BOARD PAGE - Game Board and Controls -->
+    <div id="boardPage" style="display: none;">
+        <div id="gameContainer">
+            <div id="board"></div>
+            <div id="controls" style="text-align: center; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    <button id="rollDice">🎲 Roll Dice</button>
+                    <input type="number" id="testJumpInput" min="1" max="100" placeholder="or jump to #" 
+                           style="width: 100px; padding: 8px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;">
+                </div>
+                <div style="display: flex; gap: 15px; align-items: center; justify-content: center;">
+                    <div id="diceResult">Dice: -</div>
+                    <div id="turnCounter" style="font-size: 20px; font-weight: bold; padding: 12px 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; box-shadow: 0 4px 15px rgba(102,126,234,0.3);">Turn: 0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- TASK PAGE - Task Display -->
+    <div id="taskPage" style="display: none;">
+        <div id="instructions"></div>
+    </div>
+    
     <button id="resetBtn">🔄 Reset</button>
     <button id="patchNotesBtn">📋 Notes</button>
     
@@ -2137,6 +2183,13 @@ function loadGameState() {
             renderToyLibrary();
         }
         
+        // Show appropriate page based on game state
+        if (gs.gameStarted) {
+            showPage('board');
+        } else {
+            showPage('home');
+        }
+        
         return true;
     } catch (e) {
         console.error('Load error:', e);
@@ -3096,6 +3149,11 @@ function displaySnakeLadderTask(type, fromPos, toPos) {
     const content = selectedTask.getDifficulty(primaryDifficulty, conditions, difficultyMap, snakeLadderInfo);
     instructions.innerHTML = content + debugInfo;
     
+    // Add continue button
+    instructions.appendChild(continueButton);
+    continueButton.style.display = "block";
+    continueButton.onclick = onTaskComplete;
+    
     saveGameState();
 }
 
@@ -3257,6 +3315,11 @@ function displayRandomInstructionWithAddRemove(addRemoveTask) {
         const content = randomTask.getDifficulty(randomToyObj.difficulty, conditions, difficultyMap);
         instructions.innerHTML = addRemoveHTML + content;
     }
+    
+    // Add continue button
+    instructions.appendChild(continueButton);
+    continueButton.style.display = "block";
+    continueButton.onclick = onTaskComplete;
 }
 
 // Render Toy Library  
@@ -4080,6 +4143,21 @@ document.getElementById('playerNameInput').addEventListener('input', function() 
     saveGameState();
 });
 
+// Page navigation functions
+function showPage(pageName) {
+    document.getElementById('homePage').style.display = 'none';
+    document.getElementById('boardPage').style.display = 'none';
+    document.getElementById('taskPage').style.display = 'none';
+    
+    if (pageName === 'home') {
+        document.getElementById('homePage').style.display = 'block';
+    } else if (pageName === 'board') {
+        document.getElementById('boardPage').style.display = 'block';
+    } else if (pageName === 'task') {
+        document.getElementById('taskPage').style.display = 'block';
+    }
+}
+
 function startGame() {
     const toys = getSelectedToys();
     if (toys.length === 0) {
@@ -4101,27 +4179,8 @@ function startGame() {
     gameStarted = true;
     saveGameState();
     
-    startButton.style.display = 'none';
-    const leftCol = document.querySelector('.settings-column-left');
-    const rightCol = document.querySelector('.settings-column-right');
-    if (leftCol) leftCol.style.display = 'none';
-    if (rightCol) rightCol.style.display = 'none';
-    
-    instructions.classList.add('active');
-    instructions.innerHTML = `
-        <div style="font-size: 2em; font-weight: bold; color: #667eea; margin-bottom: 20px;">
-            🍀 Good Luck${playerName ? ' ' + playerName : ''}! 🍀
-        </div>
-        <div style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
-            Roll the dice to begin!
-        </div>
-    `;
-    
-    rollDiceButton.style.display = 'block';
-    diceResult.style.display = 'block';
-    turnCounter.style.display = 'block';
-    turnCounter.textContent = 'Turn: 0';
-    document.getElementById('testJumpInput').style.display = 'block';
+    // Show board page
+    showPage('board');
 }
 
 // Display final challenge task
@@ -4178,8 +4237,20 @@ function displayFinalChallenge() {
     instructions.classList.add('active');
 }
 
+// State variables for multi-step navigation
+let pendingSnakeLadder = null; // {type, from, to}
+let currentSquare = 0;
+let isRolling = false; // Prevent multiple simultaneous rolls
+
 function rollDice() {
+    if (isRolling) {
+        console.log('Already rolling, ignoring click');
+        return;
+    }
+    
+    isRolling = true;
     rollDiceButton.disabled = true;
+    rollDiceButton.textContent = '🎲 Roll Dice';
     
     // Check if there's a jump value
     const jumpInput = document.getElementById('testJumpInput');
@@ -4189,15 +4260,15 @@ function rollDice() {
     
     if (jumpValue >= 1 && jumpValue <= 100) {
         // Jump mode
-        turnCount++; // Increment turn counter
-        diceRoll = jumpValue - playerPosition; // Calculate "virtual" dice roll for display
+        turnCount++;
+        diceRoll = jumpValue - playerPosition;
         diceResult.textContent = `Jump to: ${jumpValue} 🎯`;
         turnCounter.textContent = `Turn: ${turnCount}`;
         nextPosition = jumpValue;
-        jumpInput.value = ''; // Clear the input after jumping
+        jumpInput.value = '';
     } else {
         // Normal dice roll
-        turnCount++; // Increment turn counter
+        turnCount++;
         diceRoll = Math.floor(Math.random() * 6) + 1;
         diceResult.textContent = `Dice: ${diceRoll} 🎲`;
         turnCounter.textContent = `Turn: ${turnCount}`;
@@ -4205,69 +4276,121 @@ function rollDice() {
         if (nextPosition > totalSquares) nextPosition = totalSquares;
     }
     
-    let finalPosition = nextPosition;
-    let showContinueButton = false;
-    
+    // Check for snake or ladder
     const isSnake = snakes[nextPosition];
     const isLadder = ladders[nextPosition];
     
-    if (isSnake || isLadder) {
-        finalPosition = isSnake ? snakes[nextPosition] : ladders[nextPosition];
-        showContinueButton = true;
-    }
-    
+    // Roll for add/remove tasks
     const addRemoveTask = rollForAddRemoveTasks();
     
+    // Animate to the square
     animatePlayer(playerPosition, nextPosition, () => {
         playerPosition = nextPosition;
+        currentSquare = nextPosition;
         
+        // Execute add/remove task if any
         if (addRemoveTask) {
             addRemoveTask.execute();
         }
         
-        // If landed on snake or ladder, show that task immediately
-        if (isSnake || isLadder) {
-            displaySnakeLadderTask(isSnake ? 'snake' : 'ladder', nextPosition, finalPosition);
-        } else {
-            displayRandomInstructionWithAddRemove(addRemoveTask);
-        }
         saveGameState();
         
+        // Check if final square
         if (playerPosition === totalSquares) {
-            rollDiceButton.disabled = true;
+            showPage('task');
             displayFinalChallenge();
+            isRolling = false;
             return;
         }
         
-        instructions.appendChild(continueButton);
-        continueButton.style.display = "block";
+        // Stay on board page and show Continue button
+        rollDiceButton.textContent = '➡️ Continue';
+        rollDiceButton.disabled = false;
+        isRolling = false;
         
-        if (showContinueButton) {
-            continueButton.onclick = () => {
-                if (currentMetronomeTask && !currentMetronomeTask.isComplete()) return;
-                continueButton.style.display = "none";
-                animatePlayer(nextPosition, finalPosition, () => {
-                    playerPosition = finalPosition;
-                    if (playerPosition === totalSquares) {
-                        rollDiceButton.disabled = true;
-                        displayFinalChallenge();
-                        saveGameState();
-                    } else {
-                        rollDiceButton.disabled = false;
-                        // After sliding down/climbing up, show normal task
-                        displayRandomInstruction();
-                        saveGameState();
-                    }
-                }, true);
+        // Set up what happens when user clicks Continue
+        if (isSnake || isLadder) {
+            // Snake/Ladder: Highlight the destination square
+            const finalPosition = isSnake ? snakes[nextPosition] : ladders[nextPosition];
+            const destSquare = document.getElementById(`square-${finalPosition}`);
+            if (destSquare) {
+                destSquare.classList.add(isSnake ? 'snake-destination' : 'ladder-destination');
+            }
+            
+            pendingSnakeLadder = {
+                type: isSnake ? 'snake' : 'ladder',
+                from: nextPosition,
+                to: finalPosition,
+                addRemoveTask: addRemoveTask
+            };
+            
+            rollDiceButton.onclick = () => {
+                // Remove highlight when continuing
+                if (destSquare) {
+                    destSquare.classList.remove('snake-destination', 'ladder-destination');
+                }
+                showPage('task');
+                displaySnakeLadderTask(pendingSnakeLadder.type, pendingSnakeLadder.from, pendingSnakeLadder.to);
             };
         } else {
-            continueButton.onclick = () => {
-                if (currentMetronomeTask && !currentMetronomeTask.isComplete()) return;
-                continueButton.style.display = "none";
-                rollDiceButton.disabled = false;
+            // Normal square: Continue goes to normal task
+            pendingSnakeLadder = null;
+            
+            rollDiceButton.onclick = () => {
+                showPage('task');
+                displayRandomInstructionWithAddRemove(addRemoveTask);
             };
         }
     });
+}
+
+// Called when task page complete button is clicked
+function onTaskComplete() {
+    if (currentMetronomeTask && !currentMetronomeTask.isComplete()) return;
+    
+    // If there's a pending snake/ladder, go back to board to move piece
+    if (pendingSnakeLadder) {
+        const savedPending = pendingSnakeLadder;
+        showPage('board');
+        rollDiceButton.textContent = '➡️ Continue';
+        rollDiceButton.disabled = false;
+        
+        // First continue: animate the piece movement
+        rollDiceButton.onclick = () => {
+            rollDiceButton.disabled = true;
+            animatePlayer(savedPending.from, savedPending.to, () => {
+                playerPosition = savedPending.to;
+                currentSquare = savedPending.to;
+                
+                saveGameState();
+                
+                // Check if final square after snake/ladder
+                if (playerPosition === totalSquares) {
+                    pendingSnakeLadder = null;
+                    showPage('task');
+                    displayFinalChallenge();
+                    return;
+                }
+                
+                // Stay on board, show Continue button for the destination square task
+                rollDiceButton.textContent = '➡️ Continue';
+                rollDiceButton.disabled = false;
+                pendingSnakeLadder = null; // Clear pending since we've moved
+                
+                // Second continue: show the normal task at destination square
+                rollDiceButton.onclick = () => {
+                    showPage('task');
+                    displayRandomInstructionWithAddRemove(savedPending.addRemoveTask);
+                };
+            }, true);
+        };
+    } else {
+        // No snake/ladder, go back to board for next roll
+        showPage('board');
+        rollDiceButton.textContent = '🎲 Roll Dice';
+        rollDiceButton.disabled = false;
+        rollDiceButton.onclick = rollDice;
+    }
 }
 
 // Modal Functions
@@ -4305,26 +4428,20 @@ confirmResetBtn.addEventListener('click', function() {
     bodyPartState = JSON.parse(JSON.stringify(bodyParts));
     cageLocked = false;
     cageWorn = false;
+    pendingSnakeLadder = null;
+    currentSquare = 0;
     
-    startButton.style.display = 'block';
-    rollDiceButton.style.display = 'none';
-    rollDiceButton.disabled = false;
     continueButton.style.display = 'none';
     instructions.classList.remove('active');
     instructions.innerHTML = '';
     diceResult.textContent = 'Dice: -';
-    diceResult.style.display = 'none';
     turnCounter.textContent = 'Turn: 0';
-    turnCounter.style.display = 'none';
-    document.getElementById('testJumpInput').style.display = 'none';
     document.getElementById('testJumpInput').value = '';
+    rollDiceButton.disabled = false;
+    rollDiceButton.textContent = '🎲 Roll Dice';
+    rollDiceButton.onclick = rollDice;
     
     document.getElementById('playerNameInput').value = '';
-    
-    const leftCol = document.querySelector('.settings-column-left');
-    const rightCol = document.querySelector('.settings-column-right');
-    if (leftCol) leftCol.style.display = 'block';
-    if (rightCol) rightCol.style.display = 'block';
     
     document.querySelectorAll('#instructionSetCheckboxes input').forEach(cb => cb.checked = false);
     
@@ -4338,11 +4455,15 @@ confirmResetBtn.addEventListener('click', function() {
     
     updateSliderDisplays();
     renderToyLibrary();
+    
+    // Return to home page
+    showPage('home');
 });
 
 // Initialize
 startButton.addEventListener('click', startGame);
-rollDiceButton.addEventListener('click', rollDice);
+rollDiceButton.onclick = rollDice; // Use onclick instead of addEventListener
+
 createBoard();
 renderToyLibrary();
 
