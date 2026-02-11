@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Square Board</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            transition: background 0.5s;
+        }
+        
+        body.cyberpunk {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a0a0a 100%);
+        }
+        
+        body.barbie {
+            background: linear-gradient(135deg, #ffb3e6 0%, #ff80d5 50%, #ffb3e6 100%);
+        }
+        
+        body.retro70s {
+            background: linear-gradient(135deg, #5fb3b3 0%, #6fc2bd 50%, #5fb3b3 100%);
+        }
+        
+        .controls {
+            margin-top: 20px;
+            margin-bottom: 200px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            position: relative;
+        }
+        
+        body.cyberpunk .controls {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #54c1e6;
+            box-shadow: 0 0 20px rgba(84, 193, 230, 0.5);
+        }
+        
+        body.barbie .controls {
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #ff1493;
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
+        }
+        
+        body.retro70s .controls {
+            background: rgba(255, 127, 80, 0.9);
+            border: 3px solid #c85a3a;
+            box-shadow: 0 8px 16px rgba(200, 90, 58, 0.4);
+        }
+        
+        .controls label {
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        body.cyberpunk .controls label {
+            color: #54c1e6;
+            text-shadow: 0 0 10px #54c1e6;
+        }
+        
+        body.barbie .controls label {
+            color: #ff1493;
+            text-shadow: 0 0 5px rgba(255, 20, 147, 0.5);
+        }
+        
+        body.retro70s .controls label {
+            color: #4a3228;
+            text-shadow: 1px 1px 2px rgba(74, 50, 40, 0.3);
+        }
+        
+        .controls select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 2px solid #333;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            min-width: 80px;
+        }
+        
+        .controls input[type="number"] {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 2px solid #333;
+            font-size: 16px;
+            background: white;
+            width: 100px;
+            font-weight: bold;
+        }
+        
+        body.cyberpunk .controls input[type="number"] {
+            background: #0a0a0a;
+            color: #54c1e6;
+            border: 2px solid #54c1e6;
+            box-shadow: 0 0 10px rgba(84, 193, 230, 0.3);
+        }
+        
+        body.barbie .controls input[type="number"] {
+            background: white;
+            color: #ff1493;
+            border: 2px solid #ff1493;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.3);
+        }
+        
+        body.retro70s .controls input[type="number"] {
+            background: #f5e6d3;
+            color: #4a3228;
+            border: 2px solid #8b6f47;
+            box-shadow: 0 2px 4px rgba(139, 111, 71, 0.3);
+        }
+        
+        body.cyberpunk .controls select {
+            background: #0a0a0a;
+            color: #54c1e6;
+            border: 2px solid #54c1e6;
+            box-shadow: 0 0 10px rgba(84, 193, 230, 0.3);
+        }
+        
+        body.barbie .controls select {
+            background: white;
+            color: #ff1493;
+            border: 2px solid #ff1493;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.3);
+        }
+        
+        body.retro70s .controls select {
+            background: #f5e6d3;
+            color: #4a3228;
+            border: 2px solid #8b6f47;
+            box-shadow: 0 2px 4px rgba(139, 111, 71, 0.3);
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px 15px;
+                margin-bottom: 100px;
+                align-items: stretch;
+            }
+            
+            .controls label {
+                font-size: 14px;
+            }
+            
+            .controls select {
+                width: 100%;
+                font-size: 14px;
+            }
+            
+            .box {
+                width: 60px;
+                height: 60px;
+                font-size: 18px;
+            }
+            
+            .box-connector-up,
+            .box-connector-up-right,
+            .box-connector-down,
+            .box-connector-down-left,
+            .box-connector-down-left-tl {
+                height: 69px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .box {
+                width: 50px;
+                height: 50px;
+                font-size: 14px;
+                border: 2px solid #333;
+            }
+            
+            body.cyberpunk .box {
+                border: 1px solid #00ffff;
+            }
+            
+            .box-connector-up,
+            .box-connector-up-right,
+            .box-connector-down,
+            .box-connector-down-left,
+            .box-connector-down-left-tl {
+                height: 59px;
+            }
+            
+            .controls {
+                margin-bottom: 80px;
+                padding: 8px 12px;
+            }
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: flex-start;
+            transform-origin: top center;
+            max-width: 100%;
+        }
+        
+        .row {
+            display: flex;
+            gap: 2px;
+            align-items: flex-end;
+        }
+        
+        .box {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border: 3px solid #333;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+            position: relative;
+        }
+        
+        body.cyberpunk .box {
+            background: #0a0a0a;
+            border: 2px solid #54c1e6;
+            color: #54c1e6;
+            text-shadow: 0 0 5px #54c1e6;
+        }
+        
+        body.barbie .box {
+            background: linear-gradient(135deg, #ffe4f5 0%, #ffc0e0 100%);
+            border: 2px solid #ff69b4;
+            color: #ff1493;
+            font-weight: 900;
+            box-shadow: 0 4px 8px rgba(255, 105, 180, 0.3);
+        }
+        
+        body.retro70s .box {
+            background: linear-gradient(135deg, #7dd3c0 0%, #5fb3b3 100%);
+            border: 3px solid #4a9b8e;
+            color: #2d5a54;
+            font-weight: 900;
+            box-shadow: 0 4px 8px rgba(74, 155, 142, 0.4);
+        }
+        
+        .box:hover {
+            background: #f0f0f0;
+            z-index: 10;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+            border-color: #555;
+        }
+        
+        body.cyberpunk .box:hover {
+            background: #1a1a1a;
+            border-color: #ff00ff;
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.8), inset 0 0 15px rgba(255, 0, 255, 0.3);
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+        
+        body.barbie .box:hover {
+            background: linear-gradient(135deg, #ffb3e6 0%, #ff80d5 100%);
+            border-color: #ff1493;
+            box-shadow: 0 8px 16px rgba(255, 20, 147, 0.5);
+            transform: scale(1.05);
+        }
+        
+        body.retro70s .box:hover {
+            background: linear-gradient(135deg, #5fb3b3 0%, #4a9b8e 100%);
+            border-color: #2d5a54;
+            box-shadow: 0 8px 16px rgba(45, 90, 84, 0.5);
+        }
+        
+        .box-finish {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-color: #d4af37;
+            font-weight: 900;
+        }
+        
+        body.cyberpunk .box-finish {
+            background: #0a0a0a;
+            border: 2px solid #fee801;
+            color: #fee801;
+            text-shadow: 0 0 10px #fee801;
+            box-shadow: 0 0 20px rgba(254, 232, 1, 0.6), inset 0 0 20px rgba(254, 232, 1, 0.3);
+            position: relative;
+        }
+        
+        body.cyberpunk .box-finish::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(254, 232, 1, 0.4), inset 0 0 15px rgba(254, 232, 1, 0.2);
+            opacity: 0;
+            animation: breathe 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { 
+                opacity: 0;
+            }
+            50% { 
+                opacity: 1;
+            }
+        }
+        
+        .box-finish:hover {
+            background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+        }
+        
+        body.cyberpunk .box-finish:hover {
+            border-color: #ff00ff;
+            box-shadow: 0 0 40px rgba(255, 0, 255, 1), inset 0 0 25px rgba(255, 0, 255, 0.4);
+        }
+        
+        body.barbie .box-finish {
+            background: linear-gradient(135deg, #ffd700 0%, #ffeb3b 50%, #ffd700 100%);
+            border: 3px solid #ff1493;
+            color: #ff1493;
+            font-weight: 900;
+            box-shadow: 0 4px 8px rgba(255, 20, 147, 0.3);
+        }
+        
+        body.retro70s .box-finish {
+            background: linear-gradient(135deg, #f4d03f 0%, #e8b923 50%, #f4d03f 100%);
+            border: 3px solid #c89f1c;
+            color: #8b6914;
+            font-weight: 900;
+            box-shadow: 0 4px 8px rgba(200, 159, 28, 0.4);
+        }
+        
+        .box-snake {
+        }
+        
+        body.cyberpunk .box-snake {
+            background: #0a0a0a;
+            border: 2px solid #bd00ff;
+            color: #bd00ff;
+            text-shadow: 0 0 10px #bd00ff;
+            box-shadow: 0 0 20px rgba(189, 0, 255, 0.6), inset 0 0 20px rgba(189, 0, 255, 0.3);
+            position: relative;
+        }
+        
+        body.cyberpunk .box-snake::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(189, 0, 255, 0.4), inset 0 0 15px rgba(189, 0, 255, 0.2);
+            opacity: 0;
+            animation: breatheRed 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        body.barbie .box-snake {
+            background: linear-gradient(135deg, #ff99dd 0%, #ff66cc 100%);
+            border: 3px solid #ff0080;
+            color: #c71585;
+            font-weight: 900;
+            box-shadow: 0 4px 8px rgba(255, 0, 128, 0.3);
+        }
+        
+        body.retro70s .box-snake {
+            background: linear-gradient(135deg, #ff8c69 0%, #ff6b4a 100%);
+            border: 3px solid #d9534f;
+            color: #8b3a3a;
+            font-weight: 900;
+            box-shadow: 0 4px 8px rgba(217, 83, 79, 0.3);
+        }
+        
+        .box-ladder {
+        }
+        
+        body.cyberpunk .box-ladder {
+            background: #0a0a0a;
+            border: 2px solid #00ff9f;
+            color: #00ff9f;
+            text-shadow: 0 0 10px #00ff9f;
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.6), inset 0 0 20px rgba(0, 255, 159, 0.3);
+            position: relative;
+        }
+        
+        body.cyberpunk .box-ladder::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0, 255, 159, 0.4), inset 0 0 15px rgba(0, 255, 159, 0.2);
+            opacity: 0;
+            animation: breatheGreen 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        body.barbie .box-ladder {
+            background: linear-gradient(135deg, #99f0ff 0%, #66e0ff 100%);
+            border: 3px solid #00bfff;
+            color: #0099cc;
+            font-weight: 900;
+            box-shadow: 0 4px 8px rgba(0, 191, 255, 0.3);
+        }
+        
+        body.retro70s .box-ladder {
+            background: linear-gradient(135deg, #8b6f47 0%, #6b5639 100%);
+            border: 3px solid #4a3228;
+            color: #2d1f16;
+            font-weight: 900;
+            box-shadow: 0 4px 8px rgba(74, 50, 40, 0.3);
+        }
+        
+        @keyframes breatheRed {
+            0%, 100% { 
+                opacity: 0;
+            }
+            50% { 
+                opacity: 1;
+            }
+        }
+        
+        @keyframes breatheGreen {
+            0%, 100% { 
+                opacity: 0;
+            }
+            50% { 
+                opacity: 1;
+            }
+        }
+        
+        .box-connector-up {
+            height: 79px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            border-bottom-left-radius: 20px;
+            align-self: flex-end;
+        }
+        
+        body.cyberpunk .box-connector-up {
+            overflow: hidden;
+        }
+        
+        .box-connector-up-right {
+            height: 79px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            border-bottom-right-radius: 20px;
+            align-self: flex-end;
+        }
+        
+        body.cyberpunk .box-connector-up-right {
+            overflow: hidden;
+        }
+        
+        .box-connector-up-inner {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: inherit;
+        }
+        
+        body.barbie .box-connector-up-inner {
+            font-weight: 900;
+        }
+        
+        body.retro70s .box-connector-up-inner {
+            font-weight: 900;
+        }
+        
+        .box-connector-up-right-inner {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: inherit;
+        }
+        
+        body.barbie .box-connector-up-right-inner {
+            font-weight: 900;
+        }
+        
+        body.retro70s .box-connector-up-right-inner {
+            font-weight: 900;
+        }
+        
+        .box-connector-down-left-inner {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: inherit;
+        }
+        
+        body.barbie .box-connector-down-left-inner {
+            font-weight: 900;
+        }
+        
+        body.retro70s .box-connector-down-left-inner {
+            font-weight: 900;
+        }
+        
+        .box-connector-down-left-tl-inner {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: inherit;
+        }
+        
+        body.barbie .box-connector-down-left-tl-inner {
+            font-weight: 900;
+        }
+        
+        .box-connector-down {
+            height: 79px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            border-top-right-radius: 20px;
+        }
+        
+        .box-connector-down-left {
+            height: 79px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            border-top-right-radius: 20px;
+        }
+        
+        body.cyberpunk .box-connector-down-left {
+            overflow: hidden;
+        }
+        
+        .box-connector-down-left-tl {
+            height: 79px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            border-top-left-radius: 20px;
+        }
+        
+        body.cyberpunk .box-connector-down-left-tl {
+            overflow: hidden;
+        }
+        
+        .box-connector-down-left-inner {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .box-connector-down-left-tl-inner {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .box-connector-up-left {
+            height: 79px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            border-bottom-left-radius: 20px;
+            align-self: flex-end;
+            transform: translateY(-9px);
+        }
+        
+        .box-connector-up-left-inner {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .box-connector-down-inner {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label for="boardSize">Board Size:</label>
+        <input type="number" id="boardSize" value="100" min="10" max="500" step="10" onchange="generateBoard()" oninput="validateBoardSize(this)">
+        
+        <label for="theme">Theme:</label>
+        <select id="theme" onchange="changeTheme()">
+            <option value="default">Default</option>
+            <option value="cyberpunk">Cyberpunk</option>
+            <option value="barbie">Barbie</option>
+            <option value="retro70s">70s Retro</option>
+        </select>
+        
+        <label for="snakesLadders">Snakes & Ladders:</label>
+        <select id="snakesLadders" onchange="generateBoard()">
+            <option value="none">None</option>
+            <option value="classic">Classic</option>
+        </select>
+    </div>
+    <div class="container" id="board"></div>
+
+    <script>
+        // Classic snakes and ladders configuration
+        const snakesLaddersConfig = {
+            snakes: {
+                16: 6,
+                47: 26,
+                49: 11,
+                56: 53,
+                62: 19,
+                64: 60,
+                87: 24,
+                93: 73,
+                95: 75,
+                98: 78
+            },
+            ladders: {
+                1: 38,
+                4: 14,
+                9: 31,
+                21: 42,
+                28: 84,
+                36: 44,
+                51: 67,
+                71: 91,
+                80: 100
+            }
+        };
+        
+        function changeTheme() {
+            const theme = document.getElementById('theme').value;
+            document.body.classList.remove('cyberpunk', 'barbie', 'retro70s');
+            if (theme === 'cyberpunk') {
+                document.body.classList.add('cyberpunk');
+            } else if (theme === 'barbie') {
+                document.body.classList.add('barbie');
+            } else if (theme === 'retro70s') {
+                document.body.classList.add('retro70s');
+            }
+        }
+        
+        function validateBoardSize(input) {
+            let value = parseInt(input.value);
+            
+            // Enforce min/max
+            if (value < 10) value = 10;
+            if (value > 500) value = 500;
+            
+            // Round to nearest multiple of 10
+            value = Math.round(value / 10) * 10;
+            
+            input.value = value;
+        }
+        
+        function generateBoard() {
+            const totalSquares = parseInt(document.getElementById('boardSize').value);
+            const squaresPerRow = 10;
+            const totalRows = totalSquares / squaresPerRow;
+            
+            const container = document.getElementById('board');
+            container.innerHTML = ''; // Clear existing board
+            
+            // Generate rows from top to bottom (100 to 1)
+        
+        // Generate rows from top to bottom (100 to 1)
+        for (let row = totalRows - 1; row >= 0; row--) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
+            
+            // Determine if this is an odd or even row (for direction)
+            const isLeftToRight = row % 2 === 0;
+            
+            // Calculate starting number for this row
+            const rowStartNum = row * squaresPerRow + 1;
+            
+            for (let col = 0; col < squaresPerRow; col++) {
+                let squareNum;
+                
+                if (isLeftToRight) {
+                    // Left to right
+                    squareNum = rowStartNum + col;
+                } else {
+                    // Right to left
+                    squareNum = rowStartNum + (squaresPerRow - 1 - col);
+                }
+                
+                const boxDiv = document.createElement('div');
+                
+                // Check if this is the finish square
+                const isFinish = squareNum === totalSquares;
+                
+                // Check for snakes and ladders
+                const snakesLaddersMode = document.getElementById('snakesLadders').value;
+                let isSnake = false;
+                let isLadder = false;
+                
+                if (snakesLaddersMode === 'classic') {
+                    isSnake = snakesLaddersConfig.snakes.hasOwnProperty(squareNum);
+                    isLadder = snakesLaddersConfig.ladders.hasOwnProperty(squareNum);
+                }
+                
+                // Calculate shift amount dynamically
+                let shiftAmount = 0;
+                const startShiftAt = 12;
+                if (squareNum >= startShiftAt) {
+                    const shiftLevel = Math.floor((squareNum - startShiftAt) / 10) + 1;
+                    shiftAmount = shiftLevel * 9; // 9px per level
+                }
+                
+                // Set base class
+                let baseClass = 'box';
+                if (isFinish) baseClass += ' box-finish';
+                if (isSnake) baseClass += ' box-snake';
+                if (isLadder) baseClass += ' box-ladder';
+                
+                boxDiv.className = baseClass;
+                
+                // Apply transform inline if needed
+                if (shiftAmount > 0) {
+                    boxDiv.style.transform = `translateY(-${shiftAmount}px)`;
+                    
+                    // Add hover handler to maintain shift
+                    boxDiv.addEventListener('mouseenter', function() {
+                        this.style.transform = `translateY(-${shiftAmount}px) scale(1.1)`;
+                    });
+                    boxDiv.addEventListener('mouseleave', function() {
+                        this.style.transform = `translateY(-${shiftAmount}px)`;
+                    });
+                }
+                
+                // Add connector classes based on number endings and row position
+                // Numbers ending in 0 (except the finish square) reach up
+                if (squareNum % 10 === 0 && !isFinish) {
+                    // Determine if this is in an even or odd decade (10,30,50 vs 20,40,60)
+                    const decade = Math.floor(squareNum / 10);
+                    if (decade % 2 === 1) {
+                        // 10, 30, 50, 70, 90 - bottom right
+                        boxDiv.className = baseClass + ' box-connector-up-right';
+                        const inner = document.createElement('div');
+                        inner.className = 'box-connector-up-right-inner';
+                        inner.textContent = squareNum;
+                        boxDiv.appendChild(inner);
+                    } else {
+                        // 20, 40, 60, 80 - bottom left
+                        boxDiv.className = baseClass + ' box-connector-up';
+                        const inner = document.createElement('div');
+                        inner.className = 'box-connector-up-inner';
+                        inner.textContent = squareNum;
+                        boxDiv.appendChild(inner);
+                    }
+                }
+                // Numbers ending in 1 reach down
+                else if (squareNum % 10 === 1 && squareNum !== 1) {
+                    // Determine if this is in an even or odd decade (11,31,51 vs 21,41,61)
+                    const decade = Math.floor(squareNum / 10);
+                    if (decade % 2 === 1) {
+                        // 11, 31, 51, 71, 91 - top right
+                        boxDiv.className = baseClass + ' box-connector-down-left';
+                        const inner = document.createElement('div');
+                        inner.className = 'box-connector-down-left-inner';
+                        inner.textContent = squareNum;
+                        boxDiv.appendChild(inner);
+                    } else {
+                        // 21, 41, 61, 81 - top left
+                        boxDiv.className = baseClass + ' box-connector-down-left-tl';
+                        const inner = document.createElement('div');
+                        inner.className = 'box-connector-down-left-tl-inner';
+                        inner.textContent = squareNum;
+                        boxDiv.appendChild(inner);
+                    }
+                }
+                else {
+                    boxDiv.textContent = squareNum;
+                }
+                
+                rowDiv.appendChild(boxDiv);
+            }
+            
+            container.appendChild(rowDiv);
+        }
+        
+        // Scale board to fit window
+        scaleBoard();
+    }
+    
+    function scaleBoard() {
+        const container = document.getElementById('board');
+        const controls = document.querySelector('.controls');
+        
+        // Get natural dimensions
+        container.style.transform = 'scale(1)';
+        const boardWidth = container.offsetWidth;
+        const boardHeight = container.offsetHeight;
+        
+        // Get available space
+        const windowWidth = window.innerWidth - 40; // 20px padding on each side
+        const windowHeight = window.innerHeight - controls.offsetHeight - 280; // Controls + margins
+        
+        // Calculate scale factor - prioritize width, allow vertical scrolling
+        const scaleX = windowWidth / boardWidth;
+        const scaleY = windowHeight / boardHeight;
+        
+        // Use a minimum scale to prevent boards from getting too small
+        // For width: fit to screen, For height: allow up to 2x screen height before scaling down
+        const minScale = 0.5; // Never go below 50% scale
+        const scale = Math.max(Math.min(scaleX, Math.max(scaleY, windowHeight / boardHeight * 2), 1), minScale);
+        
+        // Apply scale
+        container.style.transform = `scale(${scale})`;
+    }
+    
+    // Re-scale on window resize
+    window.addEventListener('resize', scaleBoard);
+    
+    // Generate initial board
+    generateBoard();
+    </script>
+</body>
+</html>
